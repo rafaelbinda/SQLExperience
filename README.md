@@ -10,15 +10,19 @@ Este repositório reúne scripts SQL referentes aos meus estudos diários e prá
 
 ## 🎯 Objetivos | Objectives
 
-* **Organização:** Centralizar scripts de estudo de forma estruturada.
-* **Referência:** Servir de base para consultas rápidas no desenvolvimento de atividades.
-* **Compartilhamento:** Disseminar conhecimento sobre o ecossistema Microsoft SQL.
+* **Organização:** Centralizar scripts de estudo de forma estruturada.  
+  *(**Organization:** To centralize study scripts in a structured way.)*
+* **Referência:** Servir de base para consultas rápidas no desenvolvimento de atividades.  
+  *(**Reference:** To serve as a basis for quick consultation during task development.)*
+* **Compartilhamento:** Disseminar conhecimento sobre o ecossistema Microsoft SQL.  
+  *(**Knowledge Sharing:** To share knowledge about the Microsoft SQL ecosystem.)*
 
 ---
 
 ## 🛠️ Escopo Técnico | Technical Scope
 
-O conteúdo é focado exclusivamente em:
+O conteúdo é focado exclusivamente em:  
+*(The content is focused exclusively on:)*
 * **Microsoft SQL Server On-Premises**
 * **Azure SQL Database / Managed Instance**
 
@@ -26,25 +30,26 @@ O conteúdo é focado exclusivamente em:
 
 ## 📂 Estrutura do Repositório | Repository Structure
 
-O repositório está organizado em **05 módulos principais**, com divisões por tarefas (`#task`) em ordem cronológica.
+O repositório está organizado em **05 módulos principais**, com divisões por tarefas (`#task`) em ordem cronológica.  
+*(The repository is organized into **05 main modules**, divided by tasks (`#task`) in chronological order.)*
 
 ```text
 Module01_sql_on_premises/
-├── 01_network/                 # Configurações e troubleshooting de rede
-├── 02_sql_introduction/        # Fundamentos e instalação
-├── 03_administration/          # Administração de instâncias e serviços
-├── 04_backup_and_restore/      # Planos de manutenção e recuperação
-├── 05_recovery_databases/      # Modelos de recuperação (Full, Simple, Bulk-Logged)
-├── 06_tables_and_indexes/      # Design de tabelas e estratégias de indexação
-├── 07_security/                # Logins, Users, Roles e Auditoria
-├── 08_in_memory_oltp/          # Otimização de tabelas em memória
-├── 09_automating_tasks/        # SQL Server Agent e Jobs
-├── 10_monitoring_sql_server/   # Performance Counters e DMVs
-├── 11_concurrency_control/     # Locks, Blocking e Isolation Levels
-├── 12_highavailability/        # AlwaysOn, Mirroring e Failover Cluster
-└── 13_Replication/             # Replicação Snapshot, Transactional e Merge
+├── 01_network/                 # Configurações de rede | Network settings
+├── 02_sql_introduction/        # Fundamentos | Fundamentals
+├── 03_administration/          # Administração | Administration
+├── 04_backup_and_restore/      # Backup e Restauração | Backup and Restore
+├── 05_recovery_databases/      # Recuperação de dados | Data recovery
+├── 06_tables_and_indexes/      # Tabelas e Índices | Tables and Indexes
+├── 07_security/                # Segurança | Security
+├── 08_in_memory_oltp/          # OLTP em memória | In-memory OLTP
+├── 09_automating_tasks/        # Automação de tarefas | Automating tasks
+├── 10_monitoring_sql_server/   # Monitoramento | Monitoring
+├── 11_concurrency_control/     # Controle de concorrência | Concurrency control
+├── 12_highavailability/        # Alta disponibilidade | High Availability
+└── 13_Replication/             # Replicação | Replication
 
-Module02_azure_infrastructure/  # Infraestrutura em nuvem
-Module03_azure_sqlserver/       # Azure SQL Database e Managed Instance
-Module04_sql_language/          # T-SQL Avançado (DML/DDL)
-Module05_query_tuning/          # Otimização de consultas e execução de planos
+Module02_azure_infrastructure/  # Infraestrutura Azure | Azure Infrastructure
+Module03_azure_sqlserver/       # Azure SQL Server
+Module04_sql_language/          # Linguagem SQL (T-SQL) | SQL Language
+Module05_query_tuning/          # Otimização de consultas | Query Tuning
