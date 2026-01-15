@@ -11,11 +11,11 @@ Este repositório reúne scripts SQL referentes aos meus estudos diários e prá
 ## 🎯 Objetivos | Objectives
 
 * **Organização:** Centralizar scripts de estudo de forma estruturada.  
-  *(**Organization:** To centralize study scripts in a structured way.)*
+  *(**Organization:** Centralize study scripts in a structured way.)*
 * **Referência:** Servir de base para consultas rápidas no desenvolvimento de atividades.  
-  *(**Reference:** To serve as a basis for quick consultation during task development.)*
+  *(**Reference:** Serve as a base for quick consultation in task development.)*
 * **Compartilhamento:** Disseminar conhecimento sobre o ecossistema Microsoft SQL.  
-  *(**Knowledge Sharing:** To share knowledge about the Microsoft SQL ecosystem.)*
+  *(**Sharing:** Disseminate knowledge about the Microsoft SQL ecosystem.)*
 
 ---
 
@@ -29,9 +29,6 @@ O conteúdo é focado exclusivamente em:
 ---
 
 ## 📂 Estrutura do Repositório | Repository Structure
-
-O repositório está organizado em **05 módulos principais**, com divisões por tarefas (`#task`) em ordem cronológica.  
-*(The repository is organized into **05 main modules**, divided by tasks (`#task`) in chronological order.)*
 
 ```text
 Module01_sql_on_premises/
@@ -53,3 +50,49 @@ Module02_azure_infrastructure/  # Infraestrutura Azure | Azure Infrastructure
 Module03_azure_sqlserver/       # Azure SQL Server
 Module04_sql_language/          # Linguagem SQL (T-SQL) | SQL Language
 Module05_query_tuning/          # Otimização de consultas | Query Tuning
+```
+
+* O repositório está dividido em **05 módulos** principais para facilitar a navegação.  
+  *(The repository is divided into **05 main modules** for easier navigation.)*
+* Cada **#task** representa uma atividade de estudo em ordem cronológica.  
+  *(Each **#task** represents a study activity in chronological order.)*
+* Os scripts foram organizados de forma clara para facilitar consultas rápidas.  
+  *(Scripts are clearly organized for quick consultation.)*
+
+---
+
+## 📝 Padrão de Documentação | Documentation Standard
+
+Todos os scripts seguem um padrão de documentação para garantir a consistência e rastreabilidade:  
+*(All scripts follow a documentation standard to ensure consistency and traceability:)*
+
+```sql
+/*
+@author     My Nome
+@date       yyyy-mm-dd
+@version    1.0
+@task       Numero da atividade de estudo / Study task number
+@redmine    Endereço da atividade / Activity URL
+@object     Procedure | View | Function | Script
+
+Histórico / History:
+1.0 - Criacao do script / Script creation
+
+Descrição / Description:
+Descreva aqui o que o script faz / Describe here what the script does
+*/
+```
+
+---
+
+## 🚀 Como utilizar | How to use
+
+1. Navegue pelo módulo desejado através das pastas.  
+   *(Navigate to the desired module through the folders.)*
+2. Os scripts estão numerados por `#task` para facilitar o acompanhamento do progresso.  
+   *(Scripts are numbered by `#task` to facilitate progress tracking.)*
+3. Sinta-se à vontade para utilizar os códigos como base para seus próprios projetos ou laboratórios.  
+   *(Feel free to use the codes as a basis for your own projects or labs.)*
+
+---
+**Desenvolvido com foco em excelência e performance em SQL Server.** ***Developed with a focus on excellence and performance in SQL Server.***
