@@ -1,62 +1,50 @@
-# Xcode
-#
-# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
+# ===============================================================
+# .gitignore para projetos SQL Server | .gitignore for SQL Server projects
+# Author: Rafael Binda
+# ===============================================================
 
-## User settings
-xcuserdata/
+# --- Arquivos de sistema e IDE (SSMS / VS) | System and IDE files (SSMS / VS) ---
+.vs/
+**/.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.slnx
+VSWorkspaceState.json
+.DS_Store
 
-## Obj-C/Swift specific
-*.hmap
+# --- Arquivos de Cache e Banco de Dados Local | Cache and Local Database files ---
+*.sqlite
+*.db
+*.cache
 
-## App packaging
-*.ipa
-*.dSYM.zip
-*.dSYM
+# --- Arquivos Temporários | Temporary Files ---
+*.tmp
+*.temp
+*.old
+*.orig
+*.log
 
-## Playgrounds
-timeline.xctimeline
-playground.xcworkspace
+# --- Arquivos de Banco de Dados (Dados Reais) | Database Files (Actual Data) ---
+# Ignora arquivos de dados para evitar subir DBs pesados ao GitHub
+*.mdf
+*.ldf
+*.ndf
 
-# Swift Package Manager
-#
-# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
-# Packages/
-# Package.pins
-# Package.resolved
-# *.xcodeproj
-#
-# Xcode automatically generates this directory with a .xcworkspacedata file and xcuserdata
-# hence it is not needed unless you have added a package configuration file to your project
-# .swiftpm
+# --- Backups e Logs de Transação | Backups and Transaction Logs ---
+*.bak
+*.trn
 
-.build/
+# --- Arquivos Temporários de Office | Office Temporary Files ---
+~$*
+*.tmp.docx
+*.tmp.xlsx
+*.tmp.pptx
+*.tmp.pdf
 
-# CocoaPods
-#
-# We recommend against adding the Pods directory to your .gitignore. However
-# you should judge for yourself, the pros and cons are mentioned at:
-# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
-#
-# Pods/
-#
-# Add this line if you want to avoid checking in source code from the Xcode workspace
-# *.xcworkspace
-
-# Carthage
-#
-# Add this line if you want to avoid checking in source code from Carthage dependencies.
-# Carthage/Checkouts
-
-Carthage/Build/
-
-# fastlane
-#
-# It is recommended to not store the screenshots in the git repo.
-# Instead, use fastlane to re-generate the screenshots whenever they are needed.
-# For more information about the recommended setup visit:
-# https://docs.fastlane.tools/best-practices/source-control/#source-control
-
-fastlane/report.xml
-fastlane/Preview.html
-fastlane/screenshots/**/*.png
-fastlane/test_output
+# --- Exceções (Arquivos que DEVEM ser mantidos) | Exceptions (Files to KEEP) ---
+!.sql
+!.md
+!LICENSE
+!README.md
