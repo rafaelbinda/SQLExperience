@@ -32,19 +32,18 @@ O conteúdo é focado exclusivamente em:
 
 ```text
 Module01_sql_on_premises/
-├── 01_network/                 # Configurações de rede | Network settings
-├── 02_sql_introduction/        # Fundamentos | Fundamentals
-├── 03_administration/          # Administração | Administration
-├── 04_backup_and_restore/      # Backup e Restauração | Backup and Restore
-├── 05_recovery_databases/      # Recuperação de dados | Data recovery
-├── 06_tables_and_indexes/      # Tabelas e Índices | Tables and Indexes
-├── 07_security/                # Segurança | Security
-├── 08_in_memory_oltp/          # OLTP em memória | In-memory OLTP
-├── 09_automating_tasks/        # Automação de tarefas | Automating tasks
-├── 10_monitoring_sql_server/   # Monitoramento | Monitoring
-├── 11_concurrency_control/     # Controle de concorrência | Concurrency control
-├── 12_highavailability/        # Alta disponibilidade | High Availability
-└── 13_Replication/             # Replicação | Replication
+├── 01_sql_introduction/        # Fundamentos | Fundamentals
+├── 02_administration/          # Administração | Administration
+├── 03_backup_and_restore/      # Backup e Restauração | Backup and Restore
+├── 04_recovery_databases/      # Recuperação de dados | Data recovery
+├── 05_tables_and_indexes/      # Tabelas e Índices | Tables and Indexes
+├── 06_security/                # Segurança | Security
+├── 07_in_memory_oltp/          # OLTP em memória | In-memory OLTP
+├── 08_automating_tasks/        # Automação de tarefas | Automating tasks
+├── 09_monitoring_sql_server/   # Monitoramento | Monitoring
+├── 10_concurrency_control/     # Controle de concorrência | Concurrency control
+├── 11_highavailability/        # Alta disponibilidade | High Availability
+└── 12_Replication/             # Replicação | Replication
 
 Module02_azure_infrastructure/  # Infraestrutura Azure | Azure Infrastructure
 Module03_azure_sqlserver/       # Azure SQL Server
@@ -72,7 +71,6 @@ Todos os scripts seguem um padrão de documentação para garantir a consistênc
 @date       yyyy-mm-dd
 @version    1.0
 @task       Numero da atividade de estudo / Study task number
-@redmine    Endereço da atividade / Activity URL
 @object     Procedure | View | Function | Script
 
 Histórico / History:
@@ -95,4 +93,5 @@ Descreva aqui o que o script faz / Describe here what the script does
    *(Feel free to use the codes as a basis for your own projects or labs.)*
 
 ---
-**Desenvolvido com foco em excelência e performance em SQL Server.** ***Developed with a focus on excellence and performance in SQL Server.***
+**Desenvolvido com foco em excelência e performance em SQL Server.**
+**Developed with a focus on excellence and performance in SQL Server.**
