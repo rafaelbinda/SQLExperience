@@ -25,7 +25,7 @@ Este será o servidor de banco de dados
 
 1º - 	Habilitar o uso do Hyper-V no Windows Home 
 
-	--->>> Instalar o pack A0001B_EnableHyperV_Windows_Home.bat 
+	--->>> Instalar o pack A0001_X_EnableHyperV_Windows_Home.bat 
 
 ==============================================================================================================================================================
 
