@@ -1,20 +1,23 @@
 ﻿
 /*
-@author     Rafael Binda
-@date       2026-02-08
-@version    1.0
-@task       M1S1
-@object     Script
+===============================================================================
+@author        Rafael Binda
+@date          2026-02-08
+@version       1.0
+@task          M01A01
+@object        Annotation
+@environment   -
+@database      -
+@server        SRVSQLSERVER
+===============================================================================
 
 Histórico / History:
 1.0 - Criacao do script / Script creation
 
 Descrição / Description:
 
-Executar via CMD / Run via CMD
-
 1 - Via CMD saber o ip do google /  
-	Find Google's IP address via CMD.
+	Find Google’s IP address using the Windows Command Prompt.
 
 2 - Saber/Descobrir o nome de uma máquina na rede /  
 	To know/discover the name of a machine on the network
@@ -31,7 +34,11 @@ Executar via CMD / Run via CMD
 1 - Via CMD saber o ip do google /  
 	Find Google's IP address via CMD.
 
+	Opção 1 / Option 1 
 	--->>> ping google.com.br
+
+	Opção 2 / Option 2
+	--->>> nslookup google.com
 
 2 - Saber/Descobrir o nome de uma máquina na rede /  
 	To know/discover the name of a machine on the network
