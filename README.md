@@ -33,8 +33,9 @@ O conteúdo é focado exclusivamente em:
 ```text
 
 annotations                     # Anotações | Annotations
+├── Para leitura | For reading
 
-Module01_sql_on_premises/
+module_01_sql_on_premises/
 ├── 01_sql_introduction/        # Fundamentos de SQL Server | SQL Server fundamentals
 ├── 02_administration/          # Administração | Administration
 ├── 03_backup_and_restore/      # Backup e Restauração | Backup and Restore
@@ -48,13 +49,16 @@ Module01_sql_on_premises/
 ├── 11_highavailability/        # Alta disponibilidade | High Availability
 └── 12_Replication/             # Replicação | Replication
 
-Module02_azure_infrastructure/  # Infraestrutura Azure | Azure Infrastructure
-├── 
-Module03_azure_sqlserver/       # Azure SQL Server
-├── 
-Module04_sql_language/          # Linguagem SQL (T-SQL) | SQL Language
-├── 
-Module05_query_tuning/          # Otimização de consultas | Query Tuning
+module_02_azure_infrastructure/  # Infraestrutura Azure | Azure Infrastructure
+├──
+
+module_03_azure_sqlserver/       # Azure SQL Server
+├──
+
+module_04_sql_language/          # Linguagem SQL (T-SQL) | SQL Language
+├──
+
+module_05_query_tuning/          # Otimização de consultas | Query Tuning
 ├──
 
 ```
