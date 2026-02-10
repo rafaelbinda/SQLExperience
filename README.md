@@ -31,26 +31,32 @@ O conteúdo é focado exclusivamente em:
 ## 📂 Estrutura do Repositório | Repository Structure
 
 ```text
+
+annotations                     # Anotações | Annotations
+
 Module01_sql_on_premises/
-├── 01_network_introduction/    # Redes | Network fundamentals
-├── 02_hyperv_annotations/       # Hyper-V Anotações | Hyper-V Annotations
-├── 03_sql_introduction/        # Fundamentos de SQL Server | SQL Server fundamentals
-├── 04_administration/          # Administração | Administration
-├── 05_backup_and_restore/      # Backup e Restauração | Backup and Restore
-├── 06_recovery_databases/      # Recuperação de dados | Data recovery
-├── 07_tables_and_indexes/      # Tabelas e Índices | Tables and Indexes
-├── 08_security/                # Segurança | Security
-├── 09_in_memory_oltp/          # OLTP em memória | In-memory OLTP
-├── 10_automating_tasks/        # Automação de tarefas | Automating tasks
-├── 11_monitoring_sql_server/   # Monitoramento | Monitoring
-├── 12_concurrency_control/     # Controle de concorrência | Concurrency control
-├── 13_highavailability/        # Alta disponibilidade | High Availability
-└── 14_Replication/             # Replicação | Replication
+├── 01_sql_introduction/        # Fundamentos de SQL Server | SQL Server fundamentals
+├── 02_administration/          # Administração | Administration
+├── 03_backup_and_restore/      # Backup e Restauração | Backup and Restore
+├── 04_recovery_databases/      # Recuperação de dados | Data recovery
+├── 05_tables_and_indexes/      # Tabelas e Índices | Tables and Indexes
+├── 06_security/                # Segurança | Security
+├── 07_in_memory_oltp/          # OLTP em memória | In-memory OLTP
+├── 08_automating_tasks/        # Automação de tarefas | Automating tasks
+├── 09_monitoring_sql_server/   # Monitoramento | Monitoring
+├── 10_concurrency_control/     # Controle de concorrência | Concurrency control
+├── 11_highavailability/        # Alta disponibilidade | High Availability
+└── 12_Replication/             # Replicação | Replication
 
 Module02_azure_infrastructure/  # Infraestrutura Azure | Azure Infrastructure
+├── 
 Module03_azure_sqlserver/       # Azure SQL Server
+├── 
 Module04_sql_language/          # Linguagem SQL (T-SQL) | SQL Language
+├── 
 Module05_query_tuning/          # Otimização de consultas | Query Tuning
+├──
+
 ```
 
 * O repositório está dividido em **05 módulos** principais para facilitar a navegação.  
@@ -75,7 +81,7 @@ Todos os scripts seguem um padrão de documentação para garantir a consistênc
 @object        Script | Procedure | Function | View | Annotation
 @environment   DEV
 @database      DatabaseName
-@server        SRVSQLSERVER
+@server        ServerName
 ===============================================================================
 
 Histórico / History:
