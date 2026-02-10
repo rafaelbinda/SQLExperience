@@ -55,8 +55,6 @@ Module05_query_tuning/          # Otimização de consultas | Query Tuning
 
 * O repositório está dividido em **05 módulos** principais para facilitar a navegação.  
   *(The repository is divided into **05 main modules** for easier navigation.)*
-* Cada **#task** representa uma atividade de estudo em ordem cronológica.  
-  *(Each **#task** represents a study activity in chronological order.)*
 * Os scripts foram organizados de forma clara para facilitar consultas rápidas.  
   *(Scripts are clearly organized for quick consultation.)*
 
@@ -69,17 +67,26 @@ Todos os scripts seguem um padrão de documentação para garantir a consistênc
 
 ```sql
 /*
-@author     My Nome
-@date       yyyy-mm-dd
-@version    1.0
-@task       Numero da atividade de estudo / Study task number
-@object     Procedure | View | Function | Script | Annotations
+===============================================================================
+@author        My Name
+@date          yyyy-mm-dd
+@version       1.0
+@task          Task
+@object        Script | Procedure | Function | View | Annotation
+@environment   DEV
+@database      DatabaseName
+@server        SRVSQLSERVER
+===============================================================================
 
 Histórico / History:
 1.0 - Criacao do script / Script creation
 
 Descrição / Description:
 Descreva aqui o que o script faz / Describe here what the script does
+
+Observações / Notes:
+Notes
+===============================================================================
 */
 ```
 
