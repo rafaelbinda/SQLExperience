@@ -32,19 +32,20 @@ O conteúdo é focado exclusivamente em:
 
 ```text
 Module01_sql_on_premises/
-├── 01_network_introduction/    # Redes | Network
-├── 02_sql_introduction/        # Fundamentos | Fundamentals
-├── 03_administration/          # Administração | Administration
-├── 04_backup_and_restore/      # Backup e Restauração | Backup and Restore
-├── 05_recovery_databases/      # Recuperação de dados | Data recovery
-├── 06_tables_and_indexes/      # Tabelas e Índices | Tables and Indexes
-├── 07_security/                # Segurança | Security
-├── 08_in_memory_oltp/          # OLTP em memória | In-memory OLTP
-├── 09_automating_tasks/        # Automação de tarefas | Automating tasks
-├── 10_monitoring_sql_server/   # Monitoramento | Monitoring
-├── 11_concurrency_control/     # Controle de concorrência | Concurrency control
-├── 12_highavailability/        # Alta disponibilidade | High Availability
-└── 13_Replication/             # Replicação | Replication
+├── 01_network_introduction/    # Redes | Network fundamentals
+├── 02_hyperv_annotations/       # Hyper-V Anotações | Hyper-V Annotations
+├── 03_sql_introduction/        # Fundamentos de SQL Server | SQL Server fundamentals
+├── 04_administration/          # Administração | Administration
+├── 05_backup_and_restore/      # Backup e Restauração | Backup and Restore
+├── 06_recovery_databases/      # Recuperação de dados | Data recovery
+├── 07_tables_and_indexes/      # Tabelas e Índices | Tables and Indexes
+├── 08_security/                # Segurança | Security
+├── 09_in_memory_oltp/          # OLTP em memória | In-memory OLTP
+├── 10_automating_tasks/        # Automação de tarefas | Automating tasks
+├── 11_monitoring_sql_server/   # Monitoramento | Monitoring
+├── 12_concurrency_control/     # Controle de concorrência | Concurrency control
+├── 13_highavailability/        # Alta disponibilidade | High Availability
+└── 14_Replication/             # Replicação | Replication
 
 Module02_azure_infrastructure/  # Infraestrutura Azure | Azure Infrastructure
 Module03_azure_sqlserver/       # Azure SQL Server
@@ -72,7 +73,7 @@ Todos os scripts seguem um padrão de documentação para garantir a consistênc
 @date       yyyy-mm-dd
 @version    1.0
 @task       Numero da atividade de estudo / Study task number
-@object     Procedure | View | Function | Script
+@object     Procedure | View | Function | Script | Annotations
 
 Histórico / History:
 1.0 - Criacao do script / Script creation
