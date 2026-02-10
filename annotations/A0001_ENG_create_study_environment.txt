@@ -25,7 +25,7 @@ This will be the database server
 		
 1º - 	Enable the use of Hyper-V on Windows Home
 
-	--->>> Install the package M02E01_EnableHyperV_Windows_Home.bat
+	--->>> Install the package A0001B_EnableHyperV_Windows_Home.bat
 
 ==============================================================================================================================================================
 
