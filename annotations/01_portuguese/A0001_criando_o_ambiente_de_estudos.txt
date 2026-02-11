@@ -18,6 +18,7 @@ Habilitar o uso do Hyper-V no Windows Home
 Criação de uma Maquina Virtual usando Hyper-V + Windows Server 2025
 
 Observações:
+Utiliza o arquivo .bat que está disponível em annotations\03_files\A0001_X_EnableHyperV_Windows_Home.bat
 Criação do ambiente de desenvolvimento usando Hyper-V com Windows Server 2025
 Este será o servidor de banco de dados
 

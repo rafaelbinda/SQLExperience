@@ -1,0 +1,163 @@
+===============================================================================
+@author        Rafael Binda
+@date          2026-02-10
+@version       1.0
+@task          A0003_ENG_SQLSERVER_connectivity_troubleshooting
+@object        Annotation
+@environment   -
+@database      -
+@server        -
+===============================================================================
+
+History:
+1.0 - Create annotation
+
+Description:
+Use the executable available at annotations\03_files\A0003_X_PortQry.zip
+SQL Server connectivity troubleshooting
+
+Notes:
+This document describes the step-by-step process for diagnosing SQL Server connectivity issues.
+
+==============================================================================================================================================================
+
+1 - 	Test SQL SERVER BROWSER (UDP 1434) - The SQL Server Browser must be running
+
+	Objective:
+	- Verify that the SQL Server Browser service is active.
+	- Confirm that UDP port 1434 is accessible.
+
+	--->>> C:\TESTES\A0003_PortQry>PortQry.exe -n SRVSQLSERVER -p UDP -e 1434
+
+	------------------------------------------------------------------------------------------------------------------
+	Expected result:
+	------------------------------------------------------------------------------------------------------------------
+	Querying target system called:
+	SRVSQLSERVER
+	Attempting to resolve name to IP address...
+	Name resolved to 192.168.0.113
+	querying...
+	UDP port 1434 (ms-sql-m service): LISTENING or FILTERED
+	Sending SQL Server query to UDP port 1434...
+	Server's response:
+	ServerName SRVSQLSERVER
+	InstanceName MSSQLSERVER
+	IsClustered No
+	Version 16.0.1000.6
+	tcp 1433
+	==== End of SQL Server query response ====
+
+	------------------------------------------------------------------------------------------------------------------
+	Possible results:
+	------------------------------------------------------------------------------------------------------------------
+
+	LISTENING
+	→ Service active and responding.
+
+	NOT LISTENING
+	→ Service stopped or not installed.
+
+	FILTERED
+	→ Firewall blocking UDP port 1434.
+
+	Note:
+	The SQL Server Browser is responsible for informing the TCP port used
+	by the instance when it is configured with dynamic ports.
+
+==============================================================================================================================================================
+2 - 	Identify the real TCP port of SQL SERVER 
+		
+	To discover the real port:
+
+	Option 1 – SQL Server Configuration Manager
+	- SQL Server Network Configuration
+	- Protocols for MSSQLSERVER
+	- TCP/IP → Properties → IPAll
+	- Check:
+		TCP Dynamic Ports
+		TCP Port
+	
+	
+	If TCP 1433 is not working, the instance may be using a dynamic port.
+
+	Option 2 – Executing inside SQL Server:
+
+	Important note:
+	You must be connected remotely. Do not run this while connected locally
+	on the database server using SSMS.
+
+	SELECT local_net_address, local_tcp_port
+	FROM sys.dm_exec_connections
+	WHERE session_id = @@SPID;
+
+	------------------------------------------------------------------------------------------------------------------
+	Expected result:
+	------------------------------------------------------------------------------------------------------------------
+	local_tcp_port
+	49732
+
+==============================================================================================================================================================
+3 - 	Test the real port using PortQry 
+
+	Example (assuming port 1433):
+
+	--->>> 	C:\TESTES\A0003_PortQry>PortQry.exe -n SRVSQLSERVER -p TCP -e 1433
+
+	------------------------------------------------------------------------------------------------------------------
+	Expected result:
+	------------------------------------------------------------------------------------------------------------------
+	Querying target system called:
+	SRVSQLSERVER
+	Attempting to resolve name to IP address...
+	Name resolved to 192.168.0.113
+	querying...
+	TCP port 1433 (ms-sql-s service): LISTENING
+
+	------------------------------------------------------------------------------------------------------------------
+	Possible results:
+	------------------------------------------------------------------------------------------------------------------
+
+	LISTENING
+	→ SQL Server accessible.
+
+	NOT LISTENING
+	→ SQL Server is not listening on this port.
+
+	FILTERED
+	→ Firewall blocking the port.
+
+==============================================================================================================================================================
+4 - 	Test a range of ports (IF NECESSARY)
+
+	Objective:
+	- Test multiple ports simultaneously.
+	- Useful when the exact port is unknown.
+
+	--->>> 	C:\TESTES\A0003_PortQry>PortQry.exe -n SRVSQLSERVER -p TCP -r 1400:1500
+
+	------------------------------------------------------------------------------------------------------------------
+	Expected result:
+	------------------------------------------------------------------------------------------------------------------
+	
+	Querying target system called:
+	SRVSQLSERVER
+	Attempting to resolve name to IP address...
+	Name resolved to 192.168.0.113
+	querying...
+	TCP port 1430 (unknown service): NOT LISTENING
+	TCP port 1431 (unknown service): NOT LISTENING
+	TCP port 1432 (unknown service): NOT LISTENING
+	TCP port 1433 (ms-sql-s service): LISTENING
+	TCP port 1434 (ms-sql-m service): NOT LISTENING
+	TCP port 1435 (unknown service): NOT LISTENING
+
+
+==============================================================================================================================================================
+IMPORTANT NOTE
+
+BE CAREFUL WITH CTRL+C / CTRL+V
+
+When copying commands, the hyphen (-) may be automatically replaced with a similar character (–), causing the command to fail.
+Always verify that the hyphen used is the standard keyboard character.
+
+==============================================================================================================================================================

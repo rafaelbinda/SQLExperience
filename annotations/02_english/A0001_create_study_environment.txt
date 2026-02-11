@@ -18,6 +18,7 @@ Enable the use of Hyper-V on Windows Home
 Creation of a Virtual Machine using Hyper-V + Windows Server 2025
 
 Notes:
+Use the .bat available at annotations\03_files\A0001_X_EnableHyperV_Windows_Home.bat 
 Preparing the development environment using Hyper-V with Windows Server 2025
 This will be the database server
 
