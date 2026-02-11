@@ -2,7 +2,7 @@
 @author        Rafael Binda
 @date          2026-02-08
 @version       1.0
-@task          A0002_PT_comandos_de_redes
+@task          A0005_comandos_de_redes
 @object        Annotation
 @environment   -
 @database      -

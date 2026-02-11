@@ -2,7 +2,7 @@
 @author        Rafael Binda
 @date          2026-02-09
 @version       1.0
-@task          A0001_PT_criando_o_ambiente_de_estudos
+@task          A0001_criando_o_ambiente_de_estudos
 @object        Annotation
 @environment   -
 @database      -
@@ -15,7 +15,7 @@ Histórico:
 Descrição:
 
 Habilitar o uso do Hyper-V no Windows Home
-Criação de uma Maquina Virtual usando Hyper-V + Windows Server 2025
+Criação de uma Maquina Virtual usando Hyper-V + Windows Server 2025 Evaluation
 
 Observações:
 Utiliza o arquivo .bat que está disponível em annotations\03_files\A0001_X_EnableHyperV_Windows_Home.bat
