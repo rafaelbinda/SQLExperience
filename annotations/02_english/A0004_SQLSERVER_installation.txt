@@ -1,0 +1,165 @@
+===============================================================================
+@author        Rafael Binda
+@date          2026-02-10
+@version       1.0
+@task          A0004_SQLSERVER_installation 
+@object        Annotation
+@environment   -
+@database      -
+@server        -
+===============================================================================
+
+History:
+1.0 - Creation of annotations
+
+Description:
+Document with information for SQL Server installation following real production best practices
+
+Notes:
+You must download SQL Server from the official Microsoft website
+
+My scenario:
+-> Version: SQL Server 2022
+-> Update: Cumulative Update 23 (CU23)
+-> Release Date: January 22, 2026
+-> Edition: Developer
+-> Operating System: Windows Server 2025 Evaluation
+-> Virtualized Environment with Hyper-V
+
+Configurations based on Microsoft recommendations and market best practices for production environments.
+
+==============================================================================================================================================================
+
+1 - Instance Type
+
+    -> Define whether a Default or Named Instance will be used
+    -> Default Instance uses port 1433
+    -> Named Instance must mandatorily use a fixed port
+    -> Do not use dynamic ports in production environments
+    -> Configure fixed port in SQL Server Configuration Manager
+    -> Validate port release in Windows Firewall
+    -> Validate port release in Network Firewall (if applicable)
+
+==============================================================================================================================================================
+
+2 - Services
+
+    -> Install only the services that will actually be used
+    -> Database Engine mandatory
+    -> SQL Server Agent enabled
+    -> Disable unused services
+    -> Startup Type set to Automatic for:
+        -> SQL Server Database Engine
+        -> SQL Server Agent
+
+==============================================================================================================================================================
+
+3 - Collation
+
+    -> Define Collation before installation
+    -> Recommended modern standard:
+        Latin1_General_100_CI_AI_SC_UTF8
+    -> Do not change Collation after environment is in production
+    -> Validate application compatibility before defining
+
+==============================================================================================================================================================
+
+4 - Windows Server
+
+    -> Server must be joined to a Domain (AD)
+    -> Avoid WORKGROUP environments in production
+    -> Create a dedicated AD account for SQL service
+    -> Account must not be Administrator
+
+    During Installation: The user performing the SQL Server installation requires administrative privileges.
+    However, during service configuration, you must specify a user account
+    (preferably domain-based) that is not an administrator.
+    Why not use Administrator?
+    Security Risk:
+    If the SQL Server service is compromised (for example, via SQL injection), the attacker will gain full control of the machine or domain.
+    Best Practices: It is recommended to use a regular domain user account or, preferably, Managed Service Accounts (MSAs) or Virtual Accounts.
+
+    -> Configure password to NEVER EXPIRE
+    -> Remove unnecessary privileges
+    -> Server preferably dedicated to SQL Server
+
+==============================================================================================================================================================
+
+5 - Performance Best Practices
+
+    Memory
+        -> Manually define maximum memory
+        -> Reserve between 4GB and 8GB for the Operating System
+        -> Example: server with 32GB RAM
+            -> Max Server Memory: 24576 MB (24GB)
+
+    MaxDOP
+        -> Follow Microsoft recommendation:
+        -> Up to 8 cores: MaxDOP = number of cores
+        -> Above 8 cores: MaxDOP = 8
+        -> Always validate if multiple NUMA nodes exist
+
+        Be careful with MaxDOP
+        Today in our production environment it was configured with 8 cores and BI executed a process
+        that used all cores at 100%, raising CPU usage of the database server to 90%
+        completely freezing the environment
+
+    Reference:
+    https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-max-degree-of-parallelism-server-configuration-option?view=sql-server-ver17
+
+    TempDB
+        -> Number of files = number of logical cores (up to 8 initially)
+        -> Same size for all files
+        -> Recommended minimum initial size: 512MB or 1GB per file
+        -> Fixed Autogrowth (e.g., 256MB or 512MB)
+        -> Do not use percentage growth
+        -> Data and Log on separate disk from Operating System
+        -> Instant File Initialization enabled
+
+==============================================================================================================================================================
+
+6 - Installation of a second/third instance for collation testing:
+
+    - Create a new user SQLServiceCollation and set password to never expire (instance test with different Collation)
+    - In Installation -> New Stand Alone
+    - Installation Type -> Perform a new installation
+    - Edition -> Developer
+    - License term -> accept
+    - Azure Extension -> Azure selection only if billing should occur in Azure account
+    - Feature Selection -> At minimum select Database Engine Services, Full-Text
+        -> Change Instance root to: C:\Microsoft SQL Server Instance III
+    - Instance and Configuration -> Name the instance (MSSQLSERVERIII) 3rd instance
+    (check) - Server Configuration
+    -> Change Account Name to SQLServiceCollation and enter password XYZ, set Startup Type to Automatic
+        -> SQL Server Agent
+        -> SQL Server Database Engine
+        -> Check Grant Perform Volume Maintenance Tasks privilege to SQL Server Database Engine Service
+        This privilege enables instant file initialization by avoiding zeroing of data pages. This may lead to information
+        disclosure by allowing deleted content to be accessed.
+        -> Define Collation -> Latin1_General_100_CI_AI_SC_UTF8
+
+    - Database Engine Configuration
+        - Server Configuration
+        -> Select Mixed Mode + enter password
+        -> Add Current User
+        -> Add User SQLServiceCollation
+
+        - Data Directories
+        -> Root: Keep as        C:\Microsoft SQL Server Instance III
+        -> User database directory     C:\Microsoft SQL Server Instance III\MSSQL_Data
+        -> User database log directory C:\Microsoft SQL Server Instance III\MSSQL_Log
+        -> Backup directory            C:\Microsoft SQL Server Instance III\MSSQL_Backup
+
+    - Temp DB
+        (check) -> Number of files (will always use number of processors)
+        -> Initial size        (100 mb - define)
+        -> Autogrowth          (100 mb - define)
+        -> Data directories    C:\Microsoft SQL Server Instance III\MSSQL_Temp
+        -> TempDB Log File Initial size (100 mb - define)
+        -> TempDB Autogrowth   (100 mb - define)
+        -> Log directory       C:\Microsoft SQL Server Instance III\MSSQL_Temp_Log
+        -> Be careful with MaxDOP
+
+    - Memory
+        -> Change to recommended and select Click here to accept the recommended memory configurations for the SQL Server Database Engine
+        (check) - FILESTREAM -> enable the first two options

@@ -1,0 +1,166 @@
+===============================================================================
+@author        Rafael Binda
+@date          2026-02-10
+@version       1.0
+@task          A0004_instalacao_SQLSERVER 
+@object        Annotation
+@environment   -
+@database      -
+@server        -
+===============================================================================
+
+Histórico:
+1.0 - Criacao das anotações
+
+Descrição:
+Documento com informações para instalacao do SQL Server seguindo boas praticas reais de producao
+
+Observações:
+Deverá fazer o download do SQL Server no site da Microsoft 
+
+Meu cenário:
+-> Versão: SQL Server 2022
+-> Atualização: Cumulative Update 23 (CU23)
+-> Data de liberação: Janeiro 22, 2026
+-> Edição: Developer
+-> Sistema Operacional: Windows Server 2025 Evaluation
+-> Ambiente Virtualizado com Hyper-V
+
+Configuracoes abaixo são baseadas em recomendacoes Microsoft e praticas de mercado para ambientes de produção.
+
+==============================================================================================================================================================
+
+1 - Tipo de Instancia
+
+    -> Definir se sera utilizada Instancia Padrao ou Nomeada
+    -> Instancia Padrao utiliza porta 1433
+    -> Instancia Nomeada deve obrigatoriamente utilizar porta fixa
+    -> Nao utilizar portas dinamicas em ambiente de producao
+    -> Configurar porta fixa no SQL Server Configuration Manager
+    -> Validar liberacao da porta no Firewall do Windows
+    -> Validar liberacao da porta no Firewall de rede (se existir)
+
+==============================================================================================================================================================
+
+2 - Servicos
+
+    -> Instalar apenas os servicos que realmente serao utilizados
+    -> Database Engine obrigatorio
+    -> SQL Server Agent habilitado
+    -> Desabilitar servicos nao utilizados
+    -> Startup Type como Automatic para:
+        -> SQL Server Database Engine
+        -> SQL Server Agent
+
+==============================================================================================================================================================
+
+3 - Collation
+
+    -> Definir Collation antes da instalacao
+    -> Padrao recomendado moderno:
+        Latin1_General_100_CI_AI_SC_UTF8
+    -> Nao alterar Collation apos ambiente estar em produção
+    -> Validar compatibilidade com aplicacoes antes da definicao
+
+==============================================================================================================================================================
+
+4 - Servidor Windows Server
+
+    -> Servidor deve estar ingressado em Dominio (AD)
+    -> Evitar ambiente WORKGROUP em producao
+    -> Criar conta dedicada no AD para o servico SQL
+    -> Conta nao deve ser Administrator
+	
+	Durante a Instalação: O usuário que está instalando o SQL Server precisa de privilégios de administrador. 
+	No entanto, durante a configuração dos serviços, deve especificar uma conta de usuário 
+	(de preferência de domínio) que não seja administradora.
+	Por que não usar Administrador?
+	Risco de Segurança: 
+	Se o serviço do SQL Server for comprometido (por exemplo, via injeção de SQL), o atacante terá controle total da máquina ou do domínio.
+	Melhores Práticas: A recomendação é usar uma conta de usuário de domínio comum ou, preferencialmente, Managed Service Accounts (MSAs) ou Virtual Accounts. 
+		
+    -> Configurar senha para NUNCA EXPIRAR
+    -> Remover privilegios desnecessarios
+    -> Servidor preferencialmente dedicado ao SQL Server
+
+==============================================================================================================================================================
+
+5 - Boas Praticas de Performance
+
+    Memory
+        -> Definir memória maxima manualmente
+        -> Reservar entre 4GB e 8GB para o Sistema Operacional
+        -> Exemplo: servidor 32GB RAM
+            -> Max Server Memory: 24576 MB (24GB)
+
+    MaxDOP
+        -> Seguir recomendacao Microsoft:
+        -> Ate 8 cores: MaxDOP = numero de cores
+        -> Acima de 8 cores: MaxDOP = 8
+        -> Sempre validar se ha multiplos NUMA nodes
+		
+		Cuidado com o MaxDOP 
+		Hoje em nosso ambiente de produção estava configurado com 8 cores e o BI executou um processo
+		que fez uso de todos os cores a 100% elevando o consumo de CPU do servidor de banco de dadosa 90% 
+		travando o ambiente completamente
+	
+	Referência:
+	https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-the-max-degree-of-parallelism-server-configuration-option?view=sql-server-ver17
+
+
+    TempDB
+        -> Numero de arquivos = numero de cores logicas (ate 8 inicialmente)
+        -> Mesmo tamanho para todos os arquivos
+        -> Tamanho inicial minimo recomendado: 512MB ou 1GB por arquivo
+        -> Autogrowth fixo (ex: 256MB ou 512MB)
+        -> Nao usar crescimento percentual
+        -> Data e Log em disco separado do sistema operacional
+        -> Instant File Initialization habilitado
+
+==============================================================================================================================================================
+
+6 - Instalação de uma segunda/terceira instância para testes com collation:
+
+	- Crio um novo usuário SQLServiceCollation e defino que a senha vai expirar nunca (teste de instancia com Collation diferente)
+	- Na instalação Instalation -> New Stand Alone
+	- Instalation Type -> Perform a new instalation 
+	- Edition -> Developer
+	- Licence term -> accept
+	- Azure Extension -> Marcação do Azure é só se for para que ocorra a cobrança lá na conta do Azure
+	- Feature Selection -> Marca no mínimo Database Engine Services, Full-Text 
+		-> Altera o Instance root: C:\Microsoft SQL Server Instance III
+	- Instance and Configuration -> Nomeia a instancia (MSSQLSERVERIII) 3ª instancia
+	(ver) - Server Configuration 	
+	-> Altera o Account Name para usar o usuário SQLServiceCollation e informa o password XYZ, alterar Startup Type para Automatic
+		-> SQL Server Agent 
+		-> SQL Server Database Engine
+		-> Marcar Grant Perform Volume Maintenance Tasks privilegie to SQL Server Database Engine Service 
+		This privilegie enables instant file initialization by avoiding zeroing of data pages. This may lead to information 
+		disclosure by allowing deleted contente to be accessed.
+		-> Definir uma Collation -> Latin1_General_100_CI_AI_SC_UTF8
+
+	- Database Engine Configuration 
+		- Server Configuration
+		-> Marco Mixed Mode + informo password
+		-> Add Current User
+		-> Add User SQLServiceCollation
+		
+		- Data Directories
+		-> Root: Mantem em 		C:\Microsoft SQL Server Instance III
+		-> User database directory 	C:\Microsoft SQL Server Instance III\MSSQL_Data
+		-> User database log directory 	C:\Microsoft SQL Server Instance III\MSSQL_Log
+		-> Backup directory 		C:\Microsoft SQL Server Instance III\MSSQL_Backup
+				
+	- Temp DB
+		(ver) -> Number of files (vai pegar sempre o número de processadores
+		-> Initial size 		(100 mb - descobrir)
+		-> Autogrowth 			(100 mb - descobrir)
+		-> Data directories 		C:\Microsoft SQL Server Instance III\MSSQL_Temp
+		-> TempDB Log File Initial size (100 mb - descobrir)
+		-> TempDB Autogrowth		(100 mb - descobrir)
+		-> Log directory		C:\Microsoft SQL Server Instance III\MSSQL_Temp_Log
+		-> Cuidado com o MaxDOP 
+	
+	- Memory
+		-> Alterar para recommeded e marcar Click here to accept the recommended mwmory configurations for the SQL Server Database Engine
+		(ver) - FILESTREAM 		-> habilita as duas primeiras opções
