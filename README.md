@@ -32,8 +32,14 @@ O conteúdo é focado exclusivamente em:
 
 ```text
 
-annotations                     # Anotações | Annotations
-├── Para leitura | For reading
+annotations/
+Seção do repositório dedicada a anotações técnicas, guias de troubleshooting e documentação de instalação criadas durante laboratórios práticos e simulações.
+Repository section dedicated to technical notes, troubleshooting guides and installation documentation created during hands-on labs and simulations.
+
+annotations/                    
+├── 01_portuguese/               # Portuguese version
+├── 02_english/                  # English version
+├── 03_files/                    # Arquivos auxiliares | Supporting files
 
 module_01_sql_on_premises/
 ├── 01_sql_introduction/        # Fundamentos de SQL Server | SQL Server fundamentals
