@@ -3,7 +3,7 @@
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure-0089D6?style=for-the-badge&logo=microsoft-azure&logoColor=white)
 
-Este repositório reúne scripts SQL referentes aos meus estudos diários e práticas de administração de banco de dados.
+Este repositório reúne scripts SQL referentes aos meus estudos diários e práticas de administração de banco de dados.  
 *This repository contains SQL scripts from my daily studies and database administration practices.*
 
 ---
@@ -121,5 +121,5 @@ Notes
    *(Feel free to use the codes as a basis for your own projects or labs.)*
 
 ---
-**Desenvolvido com foco em excelência e performance em SQL Server.**
+**Desenvolvido com foco em excelência e performance em SQL Server.**  
 **Developed with a focus on excellence and performance in SQL Server.**
