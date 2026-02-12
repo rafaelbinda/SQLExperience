@@ -33,13 +33,12 @@ O conteúdo é focado exclusivamente em:
 ```text
 
 annotations/
-Seção do repositório dedicada a anotações técnicas, guias de troubleshooting e documentação de instalação criadas durante laboratórios práticos e simulações.
-Repository section dedicated to technical notes, troubleshooting guides and installation documentation created during hands-on labs and simulations.
+Seção do repositório dedicada a anotações técnicas, guias de troubleshooting criadas durante laboratórios práticos e simulações.
+Repository section dedicated to technical notes, troubleshooting guides created during hands-on labs and simulations.
 
 annotations/                    
-├── 01_portuguese/               # Portuguese version
-├── 02_english/                  # English version
-├── 03_files/                    # Arquivos auxiliares | Supporting files
+├── files/                      # Arquivos auxiliares | Supporting files
+├── documents                   # Anotações em ordem cronológica dos estudos | Notes in chronological order of studies
 
 module_01_sql_on_premises/
 ├── 01_sql_introduction/        # Fundamentos de SQL Server | SQL Server fundamentals
@@ -66,6 +65,10 @@ module_04_sql_language/          # Linguagem SQL (T-SQL) | SQL Language
 
 module_05_query_tuning/          # Otimização de consultas | Query Tuning
 ├──
+
+dba_scripts/
+Diretório contendo consultas administrativas, diagnósticos e scripts de suporte utilizados em estudos, troubleshooting e simulações.
+Directory containing administrative queries, diagnostics and support scripts used during studies, troubleshooting and simulations.
 
 ```
 
