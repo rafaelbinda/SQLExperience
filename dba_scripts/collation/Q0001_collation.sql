@@ -1,4 +1,5 @@
 
+
 /*
 ===============================================================================
 @author        Rafael Binda
@@ -11,13 +12,13 @@
 @server        SRVSQLSERVER
 ===============================================================================
 
-Histórico:
-1.0 - Criacao do script  
+Histórico / History:
+1.0 - Criacao do script / Script creation
 
-Descrição:
-Consultas para identificar collation
+Descrição / Description:
+Consultas para identificar collation / Queries to identify collation
 
-Observações:
+Observações / Notes:
 
 ===============================================================================
 */
@@ -25,16 +26,16 @@ Observações:
 USE AdventureWorks;
 GO
  
---Collation do Servidor:
+--Collation do Servidor / Server Collation:
 
 SELECT SERVERPROPERTY('Collation');
 
---Collation dos Bancos:
+--Collation dos Bancos / Database Collation:
 
 SELECT name, collation_name 
 FROM sys.databases;
 
---Collation das Colunas:
+--Collation das Colunas / Column Collation:
 SELECT name, collation_name
 FROM sys.columns 
 WHERE object_id = OBJECT_ID('Person.Person');

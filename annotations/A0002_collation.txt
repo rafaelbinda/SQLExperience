@@ -276,3 +276,13 @@ incluindo impactos de desempenho e boas práticas de padronização
 	9 → Quanto maior o volume de dados, maior o impacto
 
 ==============================================================================================================================================================
+
+11 -	Boas práticas recomentadas
+
+	→ Definir Collation padrão no início do projeto
+	→ Manter mesma Collation em Servidor, TEMPDB e Bancos 
+	→ Evitar misturar SQL Collation com Windows Collation 
+	→ Evitar alterar Collation em ambiente produtivo
+	→ Documentar Collation no README do projeto
+
+==============================================================================================================================================================

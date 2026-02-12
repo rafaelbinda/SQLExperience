@@ -2,35 +2,35 @@
 @author        Rafael Binda
 @date          2026-02-10
 @version       1.0
-@task          A0004_SQLSERVER_connectivity_troubleshooting
+@task          A0004_troubleshooting_de_conectividade_SQLSERVER 
 @object        Annotation
 @environment   -
 @database      -
 @server        -
 ===============================================================================
 
-History:
-1.0 - Create annotation
+Histórico:
+1.0 - Criacao das anotações
 
-Description:
-Use the executable available at annotations\03_files\A0003_X_PortQry.zip
-SQL Server connectivity troubleshooting
+Descrição:
+Troubleshooting de conectividade SQLSERVER
 
-Notes:
-This document describes the step-by-step process for diagnosing SQL Server connectivity issues.
+Observações:
+Utiliza o executável que está disponível em annotations\files\A0003_X_PortQry.zip
+Este documento descreve o passo a passo para diagnóstico de conectividade com SQL Server
 
 ==============================================================================================================================================================
 
-1 - 	Test SQL SERVER BROWSER (UDP 1434) - The SQL Server Browser must be running
+1 - 	Testar SQL SERVER BROWSER (UDP 1434) - O SQL Server Browser tem que estar ligado
 
-	Objective:
-	- Verify that the SQL Server Browser service is active.
-	- Confirm that UDP port 1434 is accessible.
+	Objetivo:
+	- Verificar se o serviço SQL Server Browser está ativo.
+	- Confirmar se a porta UDP 1434 está acessível.
 
 	--->>> C:\TESTES\A0003_PortQry>PortQry.exe -n SRVSQLSERVER -p UDP -e 1434
 
 	------------------------------------------------------------------------------------------------------------------
-	Expected result:
+	Resultado esperado:
 	------------------------------------------------------------------------------------------------------------------
 	Querying target system called:
 	SRVSQLSERVER
@@ -48,63 +48,61 @@ This document describes the step-by-step process for diagnosing SQL Server conne
 	==== End of SQL Server query response ====
 
 	------------------------------------------------------------------------------------------------------------------
-	Possible results:
+	Possíveis resultados:
 	------------------------------------------------------------------------------------------------------------------
 
 	LISTENING
-	→ Service active and responding.
+	→ Serviço ativo e respondendo.
 
 	NOT LISTENING
-	→ Service stopped or not installed.
+	→ Serviço parado ou não instalado.
 
 	FILTERED
-	→ Firewall blocking UDP port 1434.
+	→ Firewall bloqueando a porta UDP 1434.
 
-	Note:
-	The SQL Server Browser is responsible for informing the TCP port used
-	by the instance when it is configured with dynamic ports.
+	Observação:
+	O SQL Server Browser é responsável por informar a porta TCP utilizada pela instância quando ela usa porta dinâmica.
 
 ==============================================================================================================================================================
-2 - 	Identify the real TCP port of SQL SERVER 
+2 - 	Identificar a porta TCP real do SQL SERVER 
 		
-	To discover the real port:
+	Para descobrir a porta real:
 
-	Option 1 – SQL Server Configuration Manager
+	Opção 1 – SQL Server Configuration Manager
 	- SQL Server Network Configuration
 	- Protocols for MSSQLSERVER
 	- TCP/IP → Properties → IPAll
-	- Check:
+	- Verificar:
 		TCP Dynamic Ports
 		TCP Port
 	
 	
-	If TCP 1433 is not working, the instance may be using a dynamic port.
+	Se o TCP 1433 não estiver funcionando, pode ser que a instância esteja usando porta dinâmica.
 
-	Option 2 – Executing inside SQL Server:
+	Opção 2 – Executando dentro do SQL Server:
 
-	Important note:
-	You must be connected remotely. Do not run this while connected locally
-	on the database server using SSMS.
+	Observação importante: 
+	Deve estar conectado remotamente não pode estar logado no SSMS dentro do próprio servidor de banco )
 
 	SELECT local_net_address, local_tcp_port
 	FROM sys.dm_exec_connections
 	WHERE session_id = @@SPID;
 
 	------------------------------------------------------------------------------------------------------------------
-	Expected result:
+	Resultado esperado:
 	------------------------------------------------------------------------------------------------------------------
 	local_tcp_port
 	49732
 
 ==============================================================================================================================================================
-3 - 	Test the real port using PortQry 
+3 - 	Testar a porta real usando o PortQry 
 
-	Example (assuming port 1433):
+	Exemplo (supondo porta 1433):
 
 	--->>> 	C:\TESTES\A0003_PortQry>PortQry.exe -n SRVSQLSERVER -p TCP -e 1433
 
 	------------------------------------------------------------------------------------------------------------------
-	Expected result:
+	Resultado esperado:
 	------------------------------------------------------------------------------------------------------------------
 	Querying target system called:
 	SRVSQLSERVER
@@ -114,29 +112,30 @@ This document describes the step-by-step process for diagnosing SQL Server conne
 	TCP port 1433 (ms-sql-s service): LISTENING
 
 	------------------------------------------------------------------------------------------------------------------
-	Possible results:
+	Possíveis resultados:
 	------------------------------------------------------------------------------------------------------------------
 
 	LISTENING
-	→ SQL Server accessible.
+	→ SQL Server acessível.
 
 	NOT LISTENING
-	→ SQL Server is not listening on this port.
+	→ SQL não está escutando nessa porta.
 
 	FILTERED
-	→ Firewall blocking the port.
+	→ Firewall bloqueando a porta.
 
 ==============================================================================================================================================================
-4 - 	Test a range of ports (IF NECESSARY)
+4 - 	Testar intervalo de portas (SE NECESSÁRIO)
 
-	Objective:
-	- Test multiple ports simultaneously.
-	- Useful when the exact port is unknown.
+	Objetivo:
+	- Testar múltiplas portas simultaneamente.
+	- Útil quando não se sabe a porta exata.
+
 
 	--->>> 	C:\TESTES\A0003_PortQry>PortQry.exe -n SRVSQLSERVER -p TCP -r 1400:1500
 
 	------------------------------------------------------------------------------------------------------------------
-	Expected result:
+	Resultado esperado:
 	------------------------------------------------------------------------------------------------------------------
 	
 	Querying target system called:
@@ -153,11 +152,11 @@ This document describes the step-by-step process for diagnosing SQL Server conne
 
 
 ==============================================================================================================================================================
-IMPORTANT NOTE
+OBSERVAÇÃO IMPORTANTE
 
-BE CAREFUL WITH CTRL+C / CTRL+V
+CUIDADO COM CTRL+C / CTRL+V
 
-When copying commands, the hyphen (-) may be automatically replaced with a similar character (–), causing the command to fail.
-Always verify that the hyphen used is the standard keyboard character.
+Ao copiar comandos, o hífen (-) pode ser substituído automaticamente por outro caractere semelhante (–), causando erro no comando.
+Sempre verifique se o hífen utilizado é o padrão do teclado.
 
 ==============================================================================================================================================================
