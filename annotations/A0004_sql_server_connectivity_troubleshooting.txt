@@ -1,7 +1,7 @@
 =====================================================================================================================================================
 @author        Rafael Binda
 @date          2026-02-10
-@version       2.0
+@version       3.0
 @task          A0004_sql_server_connectivity_troubleshooting
 @object        Annotation
 @environment   -
@@ -14,13 +14,14 @@ Histórico:
 
 Descrição:
 Troubleshooting de conectividade SQLSERVER
+Este documento descreve o passo a passo para diagnóstico de conectividade com SQL Server
 
 Observações:
 Utiliza o executável que está disponível em annotations\files\A0003_X_PortQry.zip
-Este documento descreve o passo a passo para diagnóstico de conectividade com SQL Server
-Este documento contém informações complementares ao documento A0005_network_commands
-Para versão do SQL Server utilizar a query disponível no arquivo Q0003_sql_version.sql
-Para informações a respeito da versão do SQL Server verificar o arquivo A0006_sql_server_version.txt
+Este documento contém informações complementares ao documento annotations\A0005_network_commands
+Para informações a respeito da versão do SQL Server verificar o arquivo annotations\A0006_sql_server_version.txt
+Para identificar a versão do SQL Server utilizar a query disponível no arquivo dba_scripts\SQL_instance_information\Q0003_sql_version.sql
+Para identificar se tem alguma conexão ativa através de Named Pipe utilizar a query dba_scripts\SQL_connections\Q0001_active_connections.sql
 
 =====================================================================================================================================================
 
@@ -69,6 +70,64 @@ Para informações a respeito da versão do SQL Server verificar o arquivo A0006
 	------------------------------------------------------------------------------------------------------------------
 	A VERSÃO CORRETA DO MEU SQL SERVER NA DATA DE 15/02/2026 16.0.4236.2 ULTIMA CU LANÇADA EM 29/01/2026
 	------------------------------------------------------------------------------------------------------------------	
+
+	------------------------------------------------------------------------------------------------------------------
+	(16/02/2026) Named Pipe (NP) - np \\XXXXXX\pipe\MSSQL$XXXXX\sql\query
+	------------------------------------------------------------------------------------------------------------------
+	
+	--->>> C:\TESTES\PortQry.exe -n Servidor -p TCP -e 445
+
+	------------------------------------------------------------------------------------------------------------------
+	Resultado - Exectado em outro ambiente com Named Pipe ativo
+	------------------------------------------------------------------------------------------------------------------
+	Server's response:
+	ServerName XXXXXX
+	InstanceName XXXXX
+	IsClustered No
+	Version 14.0.1000.169
+	tcp 49544
+	np \\XXXXXX\pipe\MSSQL$XXXXX\sql\query
+
+	O caminho típico é algo como:
+	\\Servidor\pipe\MSSQL$Instancia\sql\query
+		
+	→ Named Pipe = É um "túnel interno" do Windows usado para enviar comandos SQL entre cliente e servidor.
+	→ Named Pipe é apenas um método de conexão ao SQL Server, alternativo ao TCP.
+	→ É um protocolo de comunicação do Windows que permite que aplicações conversem entre si através de um "canal" lógico
+	  criado na memória do sistema.
+	→ É uma forma alternativa ao TCP/IP para clientes se conectarem ao SQL.
+	→ Usa a infraestrutura do Windows (SMB — porta 445).
+	→ \\Servidor\pipe não é um compartilhamento de rede comum como:
+		\\Servidor\C$
+		\\Servidor\Compartilhado
+	→ Isso é um namespace especial do Windows, não é uma pasta compartilhada.
+	→ Ele representa:
+		→ Named Pipes do sistema
+	→ Criadas dinamicamente em memória
+	→ Não aparecem em "Gerenciamento de Compartilhamentos"
+
+	------------------------------------------------------------------------------------------------------------------
+	Named Pipe - Como funciona internamente
+	------------------------------------------------------------------------------------------------------------------
+
+	→ Quando o serviço da instância XYZZZ do Microsoft SQL Server inicia ele cria dinamicamente:
+	\\.\pipe\MSSQL$Instancia\sql\query
+	→ Existem comandos que podem ser executados no PowerShell ou usando Sysinternals que listam as Pipes existentes
+
+	------------------------------------------------------------------------------------------------------------------
+	Named Pipe - Interpretação de segurança
+	------------------------------------------------------------------------------------------------------------------
+	Se 445 estiver fechada
+
+	→ Named Pipes não é acessível remotamente
+	→ Menor superfície de ataque
+
+	Se 445 estiver aberta
+
+	→ SMB está exposto
+	→ Named Pipes pode ser usado remotamente
+	→ Maior vetor para movimento lateral
+
 
 =====================================================================================================================================================
 2 - 	Identificar a porta TCP real do SQL SERVER 
