@@ -2,7 +2,7 @@
 @author        Rafael Binda
 @date          2026-02-09
 @version       1.0
-@task          A0001_criando_o_ambiente_de_estudos
+@task          A0001_study_environment_setup
 @object        Annotation
 @environment   -
 @database      -

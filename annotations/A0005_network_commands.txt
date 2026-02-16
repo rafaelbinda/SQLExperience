@@ -2,7 +2,7 @@
 @author        Rafael Binda
 @date          2026-02-08
 @version       1.0
-@task          A0005_comandos_de_redes
+@task          A0005_network_commands
 @object        Annotation
 @environment   -
 @database      -
@@ -18,6 +18,10 @@ Descrição:
 2 - Saber/Descobrir o nome de uma máquina na rede   
 3 - Saber a porta está ativa 
 4 - Lista completa de conexões abertas, tanto ativas quanto aguardando conexões 
+
+Observações:
+Este documento contém informações complementares ao documento A0004_sql_server_connectivity_troubleshooting
+
 
 ===============================================================================
 

@@ -2,7 +2,7 @@
 @author        Rafael Binda
 @date          2026-02-10
 @version       1.0
-@task          A0003_instalacao_SQLSERVER 
+@task          A0003_sqlserver_installation
 @object        Annotation
 @environment   -
 @database      -

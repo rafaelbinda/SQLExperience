@@ -1,4 +1,4 @@
-===============================================================================
+=====================================================================================================================================================
 @author        Rafael Binda
 @date          2026-02-11
 @version       2.0
@@ -7,19 +7,19 @@
 @environment   -
 @database      -
 @server        -
-===============================================================================
+=====================================================================================================================================================
 
 Histórico:
 1.0 - Criacao das anotações
 
 Descrição:
-Anotações sobre Code Page, Unicode e Collation no SQL Server
-
-Observações:
 Documento técnico resumido sobre Code Page, Unicode e Collation no SQL Server, 
 incluindo impactos de desempenho e boas práticas de padronização
 
-===============================================================================
+Observações:
+Script disponível em dba_scripts\SQL_instance_information\Q0001_collation.sql
+
+=====================================================================================================================================================
 
 1 - 	Code Page x Unicode
 

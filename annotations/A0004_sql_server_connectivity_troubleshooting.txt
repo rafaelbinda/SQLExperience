@@ -1,13 +1,13 @@
-===============================================================================
+=====================================================================================================================================================
 @author        Rafael Binda
 @date          2026-02-10
-@version       1.0
-@task          A0004_troubleshooting_de_conectividade_SQLSERVER 
+@version       2.0
+@task          A0004_sql_server_connectivity_troubleshooting
 @object        Annotation
 @environment   -
 @database      -
 @server        -
-===============================================================================
+=====================================================================================================================================================
 
 Histórico:
 1.0 - Criacao das anotações
@@ -18,8 +18,11 @@ Troubleshooting de conectividade SQLSERVER
 Observações:
 Utiliza o executável que está disponível em annotations\files\A0003_X_PortQry.zip
 Este documento descreve o passo a passo para diagnóstico de conectividade com SQL Server
+Este documento contém informações complementares ao documento A0005_network_commands
+Para versão do SQL Server utilizar a query disponível no arquivo Q0003_sql_version.sql
+Para informações a respeito da versão do SQL Server verificar o arquivo A0006_sql_server_version.txt
 
-==============================================================================================================================================================
+=====================================================================================================================================================
 
 1 - 	Testar SQL SERVER BROWSER (UDP 1434) - O SQL Server Browser tem que estar ligado
 
@@ -63,7 +66,11 @@ Este documento descreve o passo a passo para diagnóstico de conectividade com S
 	Observação:
 	O SQL Server Browser é responsável por informar a porta TCP utilizada pela instância quando ela usa porta dinâmica.
 
-==============================================================================================================================================================
+	------------------------------------------------------------------------------------------------------------------
+	A VERSÃO CORRETA DO MEU SQL SERVER NA DATA DE 15/02/2026 16.0.4236.2 ULTIMA CU LANÇADA EM 29/01/2026
+	------------------------------------------------------------------------------------------------------------------	
+
+=====================================================================================================================================================
 2 - 	Identificar a porta TCP real do SQL SERVER 
 		
 	Para descobrir a porta real:
@@ -94,7 +101,7 @@ Este documento descreve o passo a passo para diagnóstico de conectividade com S
 	local_tcp_port
 	49732
 
-==============================================================================================================================================================
+=====================================================================================================================================================
 3 - 	Testar a porta real usando o PortQry 
 
 	Exemplo (supondo porta 1433):
@@ -124,7 +131,7 @@ Este documento descreve o passo a passo para diagnóstico de conectividade com S
 	FILTERED
 	→ Firewall bloqueando a porta.
 
-==============================================================================================================================================================
+=====================================================================================================================================================
 4 - 	Testar intervalo de portas (SE NECESSÁRIO)
 
 	Objetivo:
@@ -151,7 +158,7 @@ Este documento descreve o passo a passo para diagnóstico de conectividade com S
 	TCP port 1435 (unknown service): NOT LISTENING
 
 
-==============================================================================================================================================================
+=====================================================================================================================================================
 OBSERVAÇÃO IMPORTANTE
 
 CUIDADO COM CTRL+C / CTRL+V
@@ -159,4 +166,4 @@ CUIDADO COM CTRL+C / CTRL+V
 Ao copiar comandos, o hífen (-) pode ser substituído automaticamente por outro caractere semelhante (–), causando erro no comando.
 Sempre verifique se o hífen utilizado é o padrão do teclado.
 
-==============================================================================================================================================================
+=====================================================================================================================================================
