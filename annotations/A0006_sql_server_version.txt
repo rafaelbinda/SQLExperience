@@ -1,7 +1,7 @@
 =====================================================================================================================================================
 @author        Rafael Binda
 @date          2026-02-15
-@version       2.0
+@version       3.0
 @task          A0006_sql_server_version
 @object        Annotation
 @environment   -
@@ -90,5 +90,13 @@ Script disponível em dba_scripts\SQL_instance_information\Q0003_sql_version.sql
 	→ Bugs conhecidos continuam existindo
 	→ Problemas de performance não são corrigidos
 	→ Você pode ficar "preso" em limitações já resolvidas na linha CU
+
+	------------------------------------------------------------------------------------------------------------------
+	- Níveis de versão
+	------------------------------------------------------------------------------------------------------------------
+	→ RTM	Versão inicial
+	→ SP	Grande pacote acumulativo (modelo antigo)
+	→ CU	Atualização cumulativa mensal
+	→ GDR	Apenas correção de segurança
 
 =====================================================================================================================================================
