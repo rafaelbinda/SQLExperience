@@ -1,7 +1,7 @@
 =====================================================================================================================================================
 @author        Rafael Binda
 @date          2026-02-10
-@version       3.0
+@version       4.0
 @task          A0004_sql_server_connectivity_troubleshooting
 @object        Annotation
 @environment   -
@@ -128,7 +128,20 @@ Para identificar se tem alguma conexão ativa através de Named Pipe utilizar a 
 	→ Named Pipes pode ser usado remotamente
 	→ Maior vetor para movimento lateral
 
+	------------------------------------------------------------------------------------------------------------------
+	Named Pipe sendo listado no EventViewer mesmo estando desabilitado
+	------------------------------------------------------------------------------------------------------------------
+	
+	1º - Olhando o SQL Server Configuration Manager	→ Protocols for MSSQLSERVER	→ Named Pipes = Disabled
+	2º - Ao iniciar o Windows quando olho no Event Viewer é possível ver a seguinte mensagem:
+		Server local connection provider is ready to accept connection on [ \\.\pipe\SQLLocal\MSSQLSERVER ]
 
+	Porque ele está sendo listado se está como Disabled?
+	→ Isso é um Named Pipe interno/local, usado pelo próprio mecanismo do Microsoft SQL Server para conexões locais internas.
+	→ Ele faz parte do Shared Memory / Local DB stack, e não do Named Pipes configurável que você vê no:
+	  SQL Server Configuration Manager → Protocols for MSSQLSERVER
+	→ Ele continua funcionando mesmo com Named Pipes desabilitado.
+ 
 =====================================================================================================================================================
 2 - 	Identificar a porta TCP real do SQL SERVER 
 		
