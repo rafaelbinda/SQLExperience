@@ -17,6 +17,7 @@ Documento com informações para instalacao do SQL Server seguindo boas praticas
 
 Observações:
 Deverá fazer o download do SQL Server no site da Microsoft 
+Para informações a respeito de COLLATION verificar o arquivo annotations\A0002_collation.txt
 
 Meu cenário:
 -> Versão: SQL Server 2022
@@ -44,10 +45,10 @@ Configuracoes abaixo são baseadas em recomendacoes Microsoft e praticas de merc
 
 2 - Servicos
 
-    -> Instalar apenas os servicos que realmente serao utilizados
+    -> De acordo com o professor Landry Dualibe DBA SQL Server ele instala todos os serviços mesmo que a empresa não utilize e deixa desabilitado 
+	   o que não for utilizado
     -> Database Engine obrigatorio
     -> SQL Server Agent habilitado
-    -> Desabilitar servicos nao utilizados
     -> Startup Type como Automatic para:
         -> SQL Server Database Engine
         -> SQL Server Agent

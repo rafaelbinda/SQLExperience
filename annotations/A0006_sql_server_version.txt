@@ -16,7 +16,7 @@ Descrição:
 Informações a respeito da versão do SQL SERVER
 
 Observações:
-UUtiliza o executável que está disponível em annotations\files\A0003_X_PortQry.zip
+Utiliza o executável que está disponível em annotations\files\A0003_X_PortQry.zip
 Script disponível em dba_scripts\SQL_instance_information\Q0003_sql_version.sql
 
 =====================================================================================================================================================

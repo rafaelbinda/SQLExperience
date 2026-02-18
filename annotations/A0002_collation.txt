@@ -1,7 +1,7 @@
 =====================================================================================================================================================
 @author        Rafael Binda
 @date          2026-02-11
-@version       2.0
+@version       3.0
 @task          A0002_collation
 @object        Annotation
 @environment   -
@@ -42,6 +42,9 @@ Script disponível em dba_scripts\SQL_instance_information\Q0001_collation.sql
 	→ Cada caractere utiliza 1 byte para ser armazenado
 	→ Cada caractere é armazenado como um número
 	→ Máximo de 256 caracteres (não cabem todos os caracteres do mundo)
+	→ Os primeiros 128 caracteres são sempre idênticos para todas as Code Pages (letras de "a" a "z" maiúsculas e minúsculas sem acentuação, 
+	  números de "0" a "9") 
+	→ A faixa acima de 128 contém os caracteres especiais (essa muda de Code Page para Code Page)
 	→ Criaram mais de uma Code Page mudando os caracteres de acordo com a língua
 	→ Existem varias Code Pages dependendo da lingua
 
@@ -50,12 +53,7 @@ Script disponível em dba_scripts\SQL_instance_information\Q0001_collation.sql
 	→ Code Page 437 → Voltada para Inglês, não possui acentuação
 	→ Code Page 850 → Chamada de multilíngue (atende várias línguas inclusive o português), tem acentuação
 
-	→ Observações: - Os primeiros 128 caracteres são sempre idênticos para todas as Code Pages (letras de "a" a "z" maiúsculas e minúsculas sem acentuação, 
-	números de "0" a "9") 
-	→ A faixa acima de 128 contém os caracteres especiais (essa muda de Code Page para Code Page)
-
 	Tipos de dados que usam Code Page:
-
 	-   CHAR
 	-   VARCHAR
 	-   TEXT
@@ -195,18 +193,36 @@ Script disponível em dba_scripts\SQL_instance_information\Q0001_collation.sql
 ==============================================================================================================================================================
 8 -		Ordem da Collation
 
-	Ordem Binaria (termina com BIN ou BIN2)
-    Exemplo: Latin1_General_BIN2
-    → Ordena pelos valores numericos internos (codigo do caractere)
-    → Mais rapida
-    → Sensivel a maiusculas/minusculas e acentos
-    → Utilizada em aplicacoes antigas e cenarios tecnicos especificos
-
-    Ordem Dicionario
+	Ordem Dicionário
     Exemplo: Latin1_General_CI_AS
-    → Ordena seguindo regras linguisticas (AaBbCc...)
+    → Ordena seguindo regras linguísticas (AaBbCc...)
     → Considera regras culturais do idioma
     → Mais comum em sistemas corporativos
+	→ Dá um pouco mais de trabalho para o SQL Server (overhead) mas hoje temos muito poder computacional 
+	→ É mais utilizada atualmente
+
+	Exemplo:
+	Quando fazer um ORDER BY é mais confortável para gente pois vai trazer junto "A" maúsculo, "a" minúsculo, "Á" maiúsculo acentuado, "a" minúsculo acentuado 
+
+	Ordem Binária (termina com BIN ou BIN2)
+    Exemplo: Latin1_General_BIN2
+    → Ordena pelos valores numericos internos (código do caractere)
+    → Mais rápida
+    → Sensível a maiusculas/minusculas e acentos
+    → Utilizada em aplicações antigas e cenarios técnicos especificos
+	→ Hoje já não é mais tão utilizada para criação de novos sistemas computacionais
+
+	Exemplo:
+	O "maiúsculo" tem um número menor de codificação
+	O "minúsculo" tem um número um pouco maior de codificação
+	Os "acentos" vão estar numa posição maior que 128 então
+	Quando rodar o ORDER BY vai vir primeiro as letras maiúsculas, depois as minúsculas e lá no final o "Á" e "á" com acento agudo então é uma ordem que
+	teoricamente não estamos muito acostumados a usar
+
+	No passado fazia sentido na versão 6, 7, SQL 2000 não chegava nem perto do poder computacional atual ai o que ocorria é que colocavam essa ordem binária
+	mas a aplicação só aceitava caracteres sem acentuação 
+	Um caso real é o Protheus da TOTVS que eu trabalho desde 2010 ele até hoje se mantem com Latim1_General_BIN
+
 
 ==============================================================================================================================================================
 9 -		Alteração de Collation

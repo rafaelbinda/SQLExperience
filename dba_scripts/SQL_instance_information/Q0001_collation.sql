@@ -44,4 +44,10 @@ FROM sys.databases;
 SELECT name, collation_name
 FROM sys.columns 
 WHERE object_id = OBJECT_ID('Person.Person');
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+--Para obter a lista de collations existentes    							|	To get a list of all existing collations																				
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+SELECT * FROM sys.fn_helpcollations()
  
