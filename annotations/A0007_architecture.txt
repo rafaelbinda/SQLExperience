@@ -1,0 +1,130 @@
+=====================================================================================================================================================
+@author        Rafael Binda
+@date          2026-02-18
+@version       1.0
+@task          A0007_architecture
+@object        Annotation
+@environment   -
+@database      -
+@server        -
+=====================================================================================================================================================
+
+Histórico:
+1.0 - Criacao das anotações
+
+Descrição:
+Informações a respeito arquitetura do SQL SERVER
+
+Observações:
+Conteúdo adicional:
+https://docs.microsoft.com/en-us/sql/relational
+
+=====================================================================================================================================================
+
+1 - 	Arquitetura do SQL Server
+
+	→ Recomendado pela Microsoft manter essas extensões
+	→ .mdf = Arquivo de dados
+	→ .ldf = Arquivo de logs
+
+	------------------------------------------------------------------------------------------------------------------
+	.mdf
+	------------------------------------------------------------------------------------------------------------------
+	→ .mdf é sempre o arquivo primário
+	→ Só existe 1
+	
+	------------------------------------------------------------------------------------------------------------------
+	.ndf
+	------------------------------------------------------------------------------------------------------------------
+	→ São arquivos secundários 
+	→ Pode ter "n" secundários
+
+	Porque criar mais de um arquivo de dados?
+	
+	1º motivo - Aumentar a capacidade de armazenamento
+	Exemplo: 
+	Meu espaço de armazenamento do arquivo primário está se esgotando, posso criar um arquivo secundário em outro diretório
+
+	2º motivo - Desempenho / Paralelismo de I/O
+	Exemplo:
+	2.1 - Tenho dois arquivos de dados cada um em um volume diferente lá no storage
+	2.2 - Eu crio uma tabela em arquivo de dados em um volume XYZ do storage
+	2.3 - Eu crio uma tabela em outro arquivo de dados em um volume YYY do storage
+	2.4 - Quando eu fizer uma operação de JOIN entre essas tabelas o SQL consegue ler em paralelo essas tabelas
+	Porque? 
+	Ele cria uma thread por arquivo de dados
+	Estando esses arquivos de dados em discos diferentes ele tem como operar em paralelo ganhando desempenho
+
+	------------------------------------------------------------------------------------------------------------------
+	.ldf
+	------------------------------------------------------------------------------------------------------------------
+	→ É um registro sequencial das operações de atualização que ocorrem no banco de dados
+	→ Obrigatório pelo menos 1 arquivo de log
+	→ É um arquivo de escrita sequencial (LSN - Log Sequence Number)
+
+	Existe algum motivo de criar mais de um arquivo de log?
+	→ Para desempenho não adianta nada devido a escrita sequencial
+	→ Aumentar o armazenamento
+	Exemplo:
+	1 - O arquivo de log está em um disco que está sem espaço
+	2 - É criado um segundo arquivo de log em outro disco/volume
+	3 - Quando encerra a gravação completa do log no primeiro arquivo e não tem mais espaço físico ele começa a gravar no segundo arquivo de log.
+
+
+=====================================================================================================================================================
+
+2 - 	Arquitetura interna do arquivo de dados
+	
+	------------------------------------------------------------------------------------------------------------------
+	- Extents
+	------------------------------------------------------------------------------------------------------------------
+	→ Os dados são gravados em páginas de tamanho fixo
+	→ Uma extent possui 8 páginas de 8 KB totalizando 64 KB
+	→ Essa é a unidade de crescimento ou redução do arquivo
+	→ Sempre cresce multiplo de 64 KB
+
+
+=====================================================================================================================================================
+
+3 - 	Bancos de Dados de Sistema
+
+	------------------------------------------------------------------------------------------------------------------
+	MASTER
+	------------------------------------------------------------------------------------------------------------------
+	→ Mais importante de todos. 
+	→ Catálogo da instância, com informações de Metadata dos objetos de instância
+	→ Tem o nome dos bancos de dados que existem no banco
+	→ É nele que está a localização dos arquivos de dados e logs de todos os bancos de dados existentes
+	→ No processo de inicialização é o primeiro banco a ser inicializado
+	→ Sem ele inicializado o SQL não abre
+
+	------------------------------------------------------------------------------------------------------------------
+	MSDB			
+	------------------------------------------------------------------------------------------------------------------
+	→ Armazena Metadata de diversas funcionalidades como SQL Agent, 
+	→ Armazena Metadata de histórico Backup e Restore 
+	
+	------------------------------------------------------------------------------------------------------------------
+	TEMPDB			
+	------------------------------------------------------------------------------------------------------------------
+	→ Rascunho do SQL Server
+	→ Banco de dados de operações temporárias
+
+	------------------------------------------------------------------------------------------------------------------
+	MODEL	
+	------------------------------------------------------------------------------------------------------------------
+	→ Modelo de criação para novos bancos de dados
+	→ É um template
+	
+	------------------------------------------------------------------------------------------------------------------
+	DISTRIBUTION	
+	------------------------------------------------------------------------------------------------------------------
+	→ Metadata da Replicação 
+	→ Nem sempre está presente no SQL Server
+	→ Só vai aparecer se for configurado banco de dados distribuído
+	→ Mantém 3 papéis:
+		Publishier	- origem dos dados
+		Distributor - quem gerencia
+		Subscriber	- destino dos dados
+
+
