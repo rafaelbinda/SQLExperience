@@ -1,145 +1,134 @@
-﻿===============================================================================
-@author        Rafael Binda
-@date          2026-02-09
-@version       1.0
-@task          A0001_study_environment_setup
-@object        Annotation
-@environment   -
-@database      -
-@server        -
-===============================================================================
+# A0001 – Study Environment Setup
+>
+> **Author:** Rafael Binda  
+> **Version:** 2.0  
+> **Last Updated:** 2026-02-09
 
-Histórico:
-1.0 - Criacao das anotações
+## Descrição:
 
-Descrição:
+Provisionamento de ambiente de laboratório para Microsoft SQL Server utilizando Hyper-V no Windows Home.
 
-Habilitar o uso do Hyper-V no Windows Home
-Criação de uma Maquina Virtual usando Hyper-V + Windows Server 2025 Evaluation
 
-Observações:
-Utiliza o arquivo .bat que está disponível em annotations\files\A0001_X_EnableHyperV_Windows_Home.bat
-Criação do ambiente de desenvolvimento usando Hyper-V com Windows Server 2025
-Este será o servidor de banco de dados
+## Ambiente Utilizado
 
-===============================================================================
+- Windows Home
+- Hyper-V
+- Windows Server 2025 Evaluation
+- Microsoft SQL Server (uso em laboratório)
 
-1º - 	Habilitar o uso do Hyper-V no Windows Home 
+## Observação
 
-	--->>> Instalar o pack A0001_X_EnableHyperV_Windows_Home.bat 
+Este ambiente é destinado exclusivamente para estudo e não deve ser utilizado em produção.
 
-==============================================================================================================================================================
+---
+# Procedimento Completo
+---
 
-2º - 	Pós instalação 
+## 1. Habilitar Hyper-V no Windows Home  
 
-	--->>> Reinicia o computador 
+Executar a instalação do arquivo: `01-sql-introduction\tools\A0001_X_EnableHyperV_Windows_Home.bat`  
+Reiniciar o computador 
 
-==============================================================================================================================================================
+---
 
-3º - 	Pós reinicialização verificar se o Hyper-V foi habilitado 
+## 2. Verificar se o Hyper-V foi habilitado  
 
-	Execute no CMD
-	--->>> systeminfo
+No CMD, executar: `systeminfo`  
+Deve aparecer:  
+Requisitos do Hyper-V: Hipervisor detectado. Recursos necessários para o Hyper-V não serão exibidos.
 
-	Vai ter que listar:
-	Requisitos do Hyper-V: Hipervisor detectado. Recursos necessários para o Hyper-V não serão exibidos.
+---
 
-==============================================================================================================================================================
+## 3. Confirmar Recursos do Hyper-V   
 
-4º - 	Habilitar o uso do Hyper-V 
+No CMD, execute: `optionalfeatures`
 
-	Execute no CMD 
-	--->>> optionalfeatures
+Marcar todos os itens: 
+- [X] Hyper-V
+  - [X] Hyper-V Management Tools
+  - [X] Hyper-V PowerShell Module
+- [X] Hyper-V Platform
+  - [X] Hypervisor
+  - [X] Hyper-V Services
 
-	Em Hyper-V vai ter que estar tudo selecionado
-	Hyper-V
-	-> Ferramentas de Gerenciamento do Hyper-V
-	-> Módulo do Hyper-V para Windows Power Shell
-	Plataforma Hyper V
-	-> Hipervisor do Hyper-V
-	-> Serviços do Hyper-V
+---
 
-==============================================================================================================================================================
+## 4. Criar Comutador Virtual Externo  
 
-5º -	Menu iniciar do Windows -> Gerenciador do Hyper-V
+Lado esquerdo -> Gerenciador do Hyper-V -> Clicar sobre o nome da máquina corrente DESKTOP-F86B6PH  
+Lado direito  -> Gerenciador de Comutador Virtual -> Cria um NOVO EXTERNO para que as máquina enxerguem fora do host  
+Informar um Nome: REDEEXTERNA  
+Selecionar Realtek (não usar wireless)  
+Salvar, nesse momento Vai desligar a rede e religar
 
-	Lado esquerdo -> Gerenciador do Hyper-V -> Clica sobre o nome da máquina corrente DESKTOP-F86B6PH
-    Lado direito  -> Gerenciador de Comutador Virtual -> Cria um NOVO EXTERNO para que as máquina enxerguem fora do host
-	Nome: REDEEXTERNA
-	Observação: Possibilita comunicação de dentro da vm com o mundo externo 
-	Rede externa: Selecionada Realtek (NÃO USAR WIRELESS)
-	Salvar: Vai desligar a rede e religar
+---
 
-==============================================================================================================================================================
-
-6º - 	Adicionar nova máquina virtual
+## 5. Criar Nova Máquina Virtual
 	
-	De um nome: SRVSQLSERVER
-	Identifica o diretório que vai ficar salva a VM
-	Selecionar Geração 2
-	Informar quantidade de memória (desmarcar dinâmica)
-	Conexao: Escolhe a REDEEXTERNA
-	Anexar um disco rígido mais tarde
-	Concluir
+De um nome: SRVSQLSERVER  
+Identificar o diretório que vai ficar salva a VM  
+Selecionar Geração 2  
+Informar quantidade de memória (desmarcar dinâmica)  
+Conexao: Escolher a REDEEXTERNA que foi criada anteriormente  
+Anexar um disco rígido mais tarde  
+Concluir
 
-==============================================================================================================================================================
+---
 
-7º - Sobre a VM SRVSQLSERVER -> Acessar Configurações
-	
-	Alterar o número de processadores (escolhi 4)
-	Criar o disco rígido "virtual" em Controlador SCSI 
-	-> Adicionar 
-	→ Novo 
-	→ Expansão dinâmica
-	→ Dá um nome: SRVSQLSERVER_disk0.vhdx
-	→ Local: E:\SQLEXPERIENCE\MAQUINAVIRTUAL\SRVSQLSERVER\Virtual Machines\HD\
-	→ Tamanho: 127 GB
+## 6. Configurar Hardware da VM  
 
-==============================================================================================================================================================
+Sobre a VM SRVSQLSERVER -> Acessar Configurações e:  
+Alterar o número de processadores (escolhi 4)  
+Criar o disco rígido "virtual" em Controlador SCSI  
+Clicar em Adicionar → Novo → Expansão dinâmica  
+Definir um nome: SRVSQLSERVER_disk0.vhdx  
+Definir um local: E:\SQLEXPERIENCE\MAQUINAVIRTUAL\SRVSQLSERVER\Virtual Machines\HD\  
+Definir um tamanho: 127 GB  
 
-8º - 	Adicionar a ISO -> Acessar Controlador SCSI
-	
-	→ Selecionar Unidade de DVD
-	→ Adicionar
-	→ Arquivo de imagem
-	→ Procurar: E:\SQLEXPERIENCE\M02A01 - Windows Server 2025.iso
-	→ Aplicar
+---
 
-==============================================================================================================================================================
+## 7. Adicionar a ISO 
 
-9º - 	Vai em Firmware
-	→ Mover a Unidade de DVD como primeiro item da lista (para que de o boot pela ISO)
-	→ Mover o Disco Rígido como 2º item da lista
-	→ Aplicar
+Acessar Controlador SCSI → Selecionar Unidade de DVD → Adicionar → Arquivo de imagem  
+Procurar: E:\SQLEXPERIENCE\M02A01 - Windows Server 2025.iso  
+Aplicar  
 
-==============================================================================================================================================================
+---
 
-10º -	Iniciar	-> Tem que clicar no ESPAÇO dentro da VM para que ela inicie pelo CD / DVD
+## 8. Ajustar Firmware
 
-==============================================================================================================================================================
+Mover a Unidade de DVD como primeiro item da lista (para que de o boot pela ISO)  
+Mover o Disco Rígido como 2º item da lista  
+Aplicar
 
-11º -	Instalar o Windows
+---
 
-	→ Selecionar Required Only 
-	→ Try Windows Admin Center ... (Marcar Don't show this message again)
+## 9. Iniciar VM
 
-==============================================================================================================================================================
+É necessário clicar dentro da VM para iniciar pelo DVD
 
-12º -	Local Server
+---
 
-	→ Ajustar Time Zone 
-	→ Ajustar Data Portuguese 	
-	→ Remote Desktop -> Habilitar para usar o RDP
-	→ Renomear a máquina para SRVSQLSERVER
+## 10. Instalar o Windows
 
-==============================================================================================================================================================
+Selecionar Required Only  
+Try Windows Admin Center ... (Marcar Don't show this message again)
 
-13º -	Limite de uso/tempo máximo do dessa versão do Windows é 180 dias
-	
-	-> Verificar prazo de validade: 
-	comando: slmgr.vbs /dlv
+---
 
-	-> É possível renovar até 6x usando o comando abaixo
-	comando: slmgr.vbs /rearm
-	
-==============================================================================================================================================================
+## 11. Configuração Inicial Local Server
+
+Ajustar Time Zone  
+Ajustar idioma para Português   	
+Habilitar Remote Desktop  
+Renomear a máquina para SRVSQLSERVER
+
+---
+
+## 12. Licenciamento Windows 2025 Evaluation
+
+O Limite de uso/tempo máximo do dessa versão do Windows é 180 dias  
+Para Verificar prazo de validade utilizando o CMD utilizar o comando: `slmgr.vbs /dlv`  
+É possível renovar até 6x usando o comando: `slmgr.vbs /rearm`
+
+---
