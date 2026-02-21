@@ -1,304 +1,374 @@
-=====================================================================================================================================================
-@author        Rafael Binda
-@date          2026-02-11
-@version       3.0
-@task          A0002_collation
-@object        Annotation
-@environment   -
-@database      -
-@server        -
-=====================================================================================================================================================
+# A0002 – Collation
+>
+> **Author:** Rafael Binda  
+> **Version:** 4.0  
+> **Last Updated:** 2026-02-20
 
-Histórico:
-1.0 - Criacao das anotações
+## Descrição:
+Documento técnico resumido sobre Code Page, Unicode e Collation no SQL Server, incluindo impactos de desempenho e boas práticas de padronização
 
-Descrição:
-Documento técnico resumido sobre Code Page, Unicode e Collation no SQL Server, 
-incluindo impactos de desempenho e boas práticas de padronização
+## Material Complementar
 
-Observações:
-Script disponível em dba_scripts\SQL_instance_information\Q0001_collation.sql
+Script disponível em: `scripts/Q0001_collation.sql`
 
-=====================================================================================================================================================
+---
 
-1 - 	Code Page x Unicode
+## 1. Code Page vs Unicode
 
-	→ O SQL armazena números, não letras.
-	→ Utiliza uma tabela de conversão.
+O SQL Server armazena dados como valores numéricos, não como letras propriamente ditas.  
+Para exibir caracteres, ele utiliza uma tabela de conversão.
 
-	Exemplo: 
-	→ 35 = a (a minúsculo)
-	→ 36 = c (c minúsculo)
+Exemplo simplificado:
 
-	Existem 2 tipos de tabela de conversão: 
-	→ Code Page 
-	→ Unicode
+- 35 → 'a'
+- 36 → 'c'
 
-==============================================================================================================================================================
+Existem dois principais mecanismos de conversão de caracteres:
 
-2 -		Code Page
+- Code Page
+- Unicode
 
-	→ Mais antiga
-	→ Cada caractere utiliza 1 byte para ser armazenado
-	→ Cada caractere é armazenado como um número
-	→ Máximo de 256 caracteres (não cabem todos os caracteres do mundo)
-	→ Os primeiros 128 caracteres são sempre idênticos para todas as Code Pages (letras de "a" a "z" maiúsculas e minúsculas sem acentuação, 
-	  números de "0" a "9") 
-	→ A faixa acima de 128 contém os caracteres especiais (essa muda de Code Page para Code Page)
-	→ Criaram mais de uma Code Page mudando os caracteres de acordo com a língua
-	→ Existem varias Code Pages dependendo da lingua
+---
 
-	Exemplos:
+# Code Page
 
-	→ Code Page 437 → Voltada para Inglês, não possui acentuação
-	→ Code Page 850 → Chamada de multilíngue (atende várias línguas inclusive o português), tem acentuação
+→ Mais antiga  
+→ Cada caractere utiliza 1 byte para ser armazenado  
+→ Cada caractere é armazenado como um número  
+→ Máximo de 256 caracteres (não cabem todos os caracteres do mundo)  
+→ Os primeiros 128 caracteres são sempre idênticos para todas as Code Pages (letras de "a" a "z" maiúsculas e minúsculas sem  
+  acentuação, números de "0" a "9")  
+→ A faixa acima de 128 contém os caracteres especiais (essa muda de Code Page para Code Page)  
+→ Criaram mais de uma Code Page mudando os caracteres de acordo com a língua  
+→ Existem varias Code Pages dependendo da lingua  
 
-	Tipos de dados que usam Code Page:
-	-   CHAR
-	-   VARCHAR
-	-   TEXT
+## Exemplos
 
-	Exemplo: CHAR(10) = 10 bytes
+→ Code Page 437 → Voltada para Inglês, não possui acentuação  
+→ Code Page 850 → Chamada de multilíngue (atende várias línguas inclusive o português), tem acentuação  
 
-	------------------------------------------------------------------------------------------------------------------
-	Problema clássico (B.O.):
-	------------------------------------------------------------------------------------------------------------------
+## Tipos de dados que usam Code Page
+
+- CHAR  
+- VARCHAR  
+- TEXT  
+
+Exemplo:
+
+CHAR(10) = 10 bytes  
+
+---
+
+## Problema clássico (B.O.)
+
+→ Na troca de informações entre bancos com Code Pages diferentes há risco de perda de caracteres.  
+→ Se eu tenho um banco com Code Page 850 e transportar os dados para outro banco com Code Page 437, o "á" pode virar um caractere  
+  estranho (ex: carinha sorrindo), pois o "á" não existe naquela Code Page.
+
+---
+
+## 3 - Unicode
+
+→ Codificação única  
+→ Mais recente  
+→ Cada caractere utiliza 2 bytes para ser armazenado  
+→ Cada caractere é armazenado como número  
+→ Máximo de 65.563 caracteres  
+→ Não há risco de perda de acentos, símbolos ou caracteres internacionais  
+→ Cabe TODOS os caracteres/símbolos/letras/números existentes no mundo  
+→ Unicode é o padrão global  
+→ UTF-8 e UTF-16 são formas de representá-lo  
+→ UTF-16: Forma de codificação usada por NVARCHAR  
+→ UTF-8: Forma de codificação usada por VARCHAR (SQL 2019+)  
+
+## Tipos de dados que usam Unicode
+
+- NCHAR  
+- NVARCHAR  
+- NTEXT  
+
+Exemplo:  
+NCHAR(10) = 20 bytes (ocupa o dobro do espaço comparado ao Code Page)
+
+---
+
+## Impacto
+
+→ Maior volume de dados armazenados  
+→ Mais I/O → maior consumo de recursos  
+→ Possível impacto em desempenho  
+
+---
+
+## 4 - UTF-8 (SQL Server 2019+)
+
+→ Disponivel a partir do SQL Server 2019  
+→ Ele substitui a limitação histórica de Code Page  
+→ UTF-8 está relacionado a Unicode, mas não é a mesma coisa que os tipos NCHAR / NVARCHAR  
+→ UTF-8 é uma forma de codificação do padrão Unicode  
+
+Exemplo:  
+Latin1_General_100_CI_AS_SC_UTF8  
+
+---
+
+## Vantagens
+
+→ Permite armazenar Unicode usando VARCHAR  
+→ Economiza espaco comparado ao NVARCHAR  
+→ Ideal para sistemas modernos multilíngues  
+
+---
+
+## Diferença prática
+
+### Antes (Unicode clássico)
+
+Ex: NVARCHAR(100)
+
+→ Usa UTF-16  
+→ Usa 2 bytes por caractere  
+→ Sempre ocupa o dobro do espaço comparado a VARCHAR tradicional  
+
+---
+
+### Agora com UTF-8 usando Collation _UTF8
+
+Ex: VARCHAR(100)
+
+→ Pode armazenar caracteres internacionais  
+→ Usa menos espaço para caracteres latinos  
+→ Melhor aproveitamento de storage  
+→ Reduz IO  
 	
-	→ Na troca de informações entre bancos com Code Pages diferentes há risco de perda de caracteres.	
-	→ Se eu tenho um banco com Code Page 850 e transportar os dados para outro banco com Code Page 437, o "á" pode virar 
-	um caractere estranho (ex: carinha sorrindo), pois o "á" não existe naquela Code Page.
+---
 
-==============================================================================================================================================================
-3 - 	Unicode
+## 5 - Collation
 
-	→ Codificação única
-	→ Mais recente
-	→ Cada caractere utiliza 2 bytes para ser armazenado
-	→ Cada caractere é armazenado como número
-	→ Máximo de 65.563 caracteres
-	→ Não há risco de perda de acentos, símbolos ou caracteres internacionais
-	→ Cabe TODOS os caracteres/símbolos/letras/números existentes no mundo
-	→ Unicode é o padrão global
-	→ UTF-8 e UTF-16 são formas de representá-lo
-	→ UTF-16: Forma de codificação usada por NVARCHAR
-	→ UTF-8: Forma de codificação usada por VARCHAR (SQL 2019+)
+→ Define as regras de:  
+- Armazenamento  
+- Manipulação de caracteres  
+- Comparacao  
+- Ordenacao de caracteres  
 
-	Tipos de dados que usam Unicode:
-	-   NCHAR
-	-   NVARCHAR
-	-   NTEXT
+Exemplo:  
+Latin1_General_CI_AS  
+→ Code Page 1252  
 
-	Exemplo: NCHAR(10) = 20 bytes (ocupa o dobro do espaço comparado ao code page)
+→ Quando não está explícito "CP" na Collation, significa que usa a Code Page padrão definida pela padronização ANSI  
 
-	Impacto: 
-	→ Maior volume de dados armazenados 
-	→ mais I/O → maior consumo de recursos 
-	→ possível impacto em desempenho
+---
 
-==============================================================================================================================================================
+## Sufixos
 
-4 -	UTF-8 (SQL Server 2019+)
+- CI = Case Insensitive  
+- CS = Case Sensitive  
+- AS = Accent Sensitive  
+- AI = Accent Insensitive  
 
-	→ Disponivel a partir do SQL Server 2019
-	→ Ele substitui a limitação histórica de Code Page
-	→ UTF-8 está relacionado a Unicode, mas não é a mesma coisa que os tipos NCHAR / NVARCHAR
-	→ UTF-8 é uma forma de codificação do padrão Unicode
-	
-	Exemplo: Latin1_General_100_CI_AS_SC_UTF8
+---
 
-	Vantagens: 
-	→ Permite armazenar Unicode usando VARCHAR 
-	→ Economiza espaco comparado ao NVARCHAR 
-	→ Ideal para sistemas modernos multilíngues
-	
-	------------------------------------------------------------------------------------------------------------------
-	Diferença prática
-	------------------------------------------------------------------------------------------------------------------
-	
-	Antes (Unicode clássico) 
-	Ex: NVARCHAR(100)
-	
-	→ Usa UTF-16
-	→ Usa 2 bytes por caractere
-	→ Sempre ocupa o dobro do espaço comparado a VARCHAR tradicional
-	
-	Agora com UTF-8 usando Collation _UTF8 
-	Ex: VARCHAR(100)
-	
-	→ Pode armazenar caracteres internacionais
-	→ Usa menos espaço para caracteres latinos
-	→ Melhor aproveitamento de storage
-	→ Reduz IO
-	
-==============================================================================================================================================================
+## 6 - Tipos de Collation
 
-5 - 	Collation
+### Windows Collation (recomendado)
 
-	→ Define as regras de:
-	- 	Armazenamento 
-	-	Manipulação de caracteres 
-	-	Comparacao
-	-	Ordenacao de caracteres
+→ Sempre que possível utilizar essa (não começa com "SQL_").  
 
-	Exemplo: Latin1_General_CI_AS 
-	→ Code Page 1252
+---
 
-	Quando não está explícito "CP" na Collation, significa que usa a Code Page padrão definida pela padronização ANSI
+### SQL Collation
 
-	Sufixos:
+→ Começa com "SQL_" (ex: SQL_Latin1_General_CP1_CI_AS)  
+→ Mantida para compatibilidade com SQL 7, SQL 2000  
 
-	-   CI = Case Insensitive
-	-   CS = Case Sensitive
-	-   AS = Accent Sensitive
-	-   AI = Accent Insensitive
+---
 
-==============================================================================================================================================================
+→ Quanto mais bancos com a mesma Collation, menor a chance de problemas.
 
-6 - 	Tipos de Collation
+---
+## 7 - Hierarquia da Collation
 
-	Windows Collation (recomendado)
-	→ Sempre que possível utilizar essa (não começa com "SQL_").
+Ordem de prioridade:  
+Coluna > Banco > Servidor  
 
-	SQL Collation
-	→ Começa com "SQL_" (ex: SQL_Latin1_General_CP1_CI_AS)
-	→ Mantida para compatibilidade com SQL 7, SQL 2000
+---
 
-	Quanto mais bancos com a mesma Collation, menor a chance de problemas.
+### 7.1 - Collation do Servidor
 
-==============================================================================================================================================================
-7 - 	Hierarquia da Collation  
+→ Definida durante a instalação do SQL Server  
+→ Define a Collation padrão do banco model  
+→ Impacta a criação do TEMPDB  
 
-	Ordem de prioridade: Coluna > Banco > Servidor
+---
 
-	1 - Collation do Servidor
-	→ Definida durante a instalação do SQL Server
-	→ Define a Collation padrão do banco model
-	→ Impacta a criação do TEMPDB
+### 7.2 - Collation do Banco de Dados
 
-	2 - Collation do Banco de Dados
-	→ Por padrão herda a Collation do servidor
-	→ Pode ser diferente da Collation do servidor
-	→ Define a Collation padrão das colunas criadas sem especificação explícita
+→ Por padrão herda a Collation do servidor  
+→ Pode ser diferente da Collation do servidor  
+→ Define a Collation padrão das colunas criadas sem especificação explícita  
 
-	3 - Collation da Coluna
-	→ Pode ser definida individualmente
-	→ Pode ser diferente da Collation do banco
-	→ Tem prioridade sobre a Collation do banco na comparação de dados
+---
 
-	4 - Collation na Query (COLLATE)
-	→ Pode ser definida diretamente na consulta
-	→ Tem prioridade máxima
-	→ Usada para resolver conflitos entre bancos com Collations diferentes
+### 7.3 - Collation da Coluna
 
-==============================================================================================================================================================
-8 -		Ordem da Collation
+→ Pode ser definida individualmente  
+→ Pode ser diferente da Collation do banco  
+→ Tem prioridade sobre a Collation do banco na comparação de dados  
 
-	Ordem Dicionário
-    Exemplo: Latin1_General_CI_AS
-    → Ordena seguindo regras linguísticas (AaBbCc...)
-    → Considera regras culturais do idioma
-    → Mais comum em sistemas corporativos
-	→ Dá um pouco mais de trabalho para o SQL Server (overhead) mas hoje temos muito poder computacional 
-	→ É mais utilizada atualmente
+---
 
-	Exemplo:
-	Quando fazer um ORDER BY é mais confortável para gente pois vai trazer junto "A" maúsculo, "a" minúsculo, "Á" maiúsculo acentuado, "a" minúsculo acentuado 
+### 7.4 - Collation na Query (COLLATE)
 
-	Ordem Binária (termina com BIN ou BIN2)
-    Exemplo: Latin1_General_BIN2
-    → Ordena pelos valores numericos internos (código do caractere)
-    → Mais rápida
-    → Sensível a maiusculas/minusculas e acentos
-    → Utilizada em aplicações antigas e cenarios técnicos especificos
-	→ Hoje já não é mais tão utilizada para criação de novos sistemas computacionais
+→ Pode ser definida diretamente na consulta  
+→ Tem prioridade máxima  
+→ Usada para resolver conflitos entre bancos com Collations diferentes  
 
-	Exemplo:
-	O "maiúsculo" tem um número menor de codificação
-	O "minúsculo" tem um número um pouco maior de codificação
-	Os "acentos" vão estar numa posição maior que 128 então
-	Quando rodar o ORDER BY vai vir primeiro as letras maiúsculas, depois as minúsculas e lá no final o "Á" e "á" com acento agudo então é uma ordem que
-	teoricamente não estamos muito acostumados a usar
+---
 
-	No passado fazia sentido na versão 6, 7, SQL 2000 não chegava nem perto do poder computacional atual ai o que ocorria é que colocavam essa ordem binária
-	mas a aplicação só aceitava caracteres sem acentuação 
-	Um caso real é o Protheus da TOTVS que eu trabalho desde 2010 ele até hoje se mantem com Latim1_General_BIN
+## 8 - Ordem da Collation
+
+### Ordem Dicionário
+
+Exemplo:  
+Latin1_General_CI_AS  
+
+→ Ordena seguindo regras linguísticas (AaBbCc...)  
+→ Considera regras culturais do idioma  
+→ Mais comum em sistemas corporativos  
+→ Dá um pouco mais de trabalho para o SQL Server (overhead), mas hoje temos muito poder computacional  
+→ É mais utilizada atualmente  
+
+Exemplo:
+
+Quando fazer um ORDER BY é mais confortável para gente pois vai trazer junto  
+"A" maiúsculo, "a" minúsculo, "Á" maiúsculo acentuado, "a" minúsculo acentuado  
+
+---
+
+### Ordem Binária (termina com BIN ou BIN2)
+
+Exemplo:  
+Latin1_General_BIN2  
+
+→ Ordena pelos valores numericos internos (código do caractere)  
+→ Mais rápida  
+→ Sensível a maiusculas/minusculas e acentos  
+→ Utilizada em aplicações antigas e cenarios técnicos especificos  
+→ Hoje já não é mais tão utilizada para criação de novos sistemas computacionais  
+
+Exemplo:  
+O "maiúsculo" tem um número menor de codificação  
+O "minúsculo" tem um número um pouco maior de codificação  
+Os "acentos" vão estar numa posição maior que 128  
+
+Quando rodar o ORDER BY vai vir primeiro as letras maiúsculas, depois as minúsculas e lá no final o "Á" e "á" com acento agudo,  
+então é uma ordem que teoricamente não estamos muito acostumados a usar  
+
+---
+
+No passado fazia sentido na versão 6, 7, SQL 2000 não chegava nem perto do poder computacional atual  
+ai o que ocorria é que colocavam essa ordem binária  
+mas a aplicação só aceitava caracteres sem acentuação  
+
+Um caso real é o Protheus da TOTVS que eu trabalho desde 2010  
+ele até hoje se mantem com Latim1_General_BIN  
+
+---
+
+## 9 - Alteração de Collation
+
+→ Processo extremamente complexo e de alto risco em ambiente de produção  
+
+---
+
+### Se apenas alterar a Collation do banco
+
+→ A alteração NÃO modifica automaticamente as colunas já existentes  
+→ Apenas novas colunas criadas herdarão a nova Collation  
+→ Colunas antigas continuam com a Collation original  
+→ Pode continuar ocorrendo conflito de Collation  
+
+---
+
+### Para alterar corretamente
+
+→ Remover TODAS as constraints  
+→ Remover Primary Keys  
+→ Remover Foreign Keys  
+→ Remover índices  
+→ Alterar a Collation das colunas manualmente  
+→ Realizar rebuild das tabelas (quando necessário)  
+→ Recriar constraints, chaves, índices e demais objetos  
+
+---
+
+### Observação
+
+→ Processo pode gerar indisponibilidade  
+→ Deve ser planejado com janela de manutenção  
+→ Sempre realizar backup completo antes  
+
+---
+
+## 10 - Problemas clássicos
+
+### Primeiro: Exemplo de Problema com Collation Diferente da TempDB
+
+1 → Banco criado com Code Page 437  
+2 → TEMPDB é criado automaticamente com a mesma Collation do Servidor (437)  
+3 → Outro banco é criado com Collation 1252 (com suporte a acentos)  
+4 → Executo um SELECT grande com ORDER BY  
+5 → A consulta necessita ordenar grande volume de dados  
+6 → A memória concedida (Memory Grant) não é suficiente para concluir a ordenação totalmente em RAM  
+7 → O SQL Server realiza spill para TempDB (grava dados temporários em disco)  
+8 → Dados originalmente em 1252 passam a ser manipulados dentro da TempDB 437  
+9 → Pode ocorrer conversão implícita de Collation  
+10 → Resultado pode apresentar comportamento inesperado ou erro de comparação  
+11 → Impacto direto de performance devido ao uso adicional de I/O  
+
+#### Observação importante sobre "falta de memória"
+
+→ Não significa que o servidor ficou sem RAM física  
+→ Significa que a memória concedida para execução da consulta não foi suficiente  
+→ O SQL Server então utiliza a TempDB para continuar o processamento  
+→ Esse processo é chamado de "Spill to TempDB"  
+→ Pode ser identificado no plano de execução como Warning de Sort ou Hash  
+
+---
+
+### Segundo: Exemplo de Problema Bancos com Collations Diferentes
+
+1 → Dois bancos possuem Collations diferentes  
+2 → Colunas de mesmo tipo (ex: VARCHAR) possuem regras distintas de comparação  
+3 → Ao realizar um JOIN entre esses bancos pode ocorrer erro de conflito de Collation  
+
+Exemplo de erro:  
+Cannot resolve the collation conflict between 'SQL_Latin1_General_CP1_CI_AS' and 'Latin1_General_CI_AS' in the equal to operation
 
 
-==============================================================================================================================================================
-9 -		Alteração de Collation
+4 → Necessário tratar explicitamente na query utilizando COLLATE  
 
-	Processo extremamente complexo e de alto risco em ambiente de produção
-	
-	Se apenas alterar a Collation do banco:
-	→ A alteração NÃO modifica automaticamente as colunas já existentes
-	→ Apenas novas colunas criadas herdarão a nova Collation
-	→ Colunas antigas continuam com a Collation original
-	→ Pode continuar ocorrendo conflito de Collation
+Exemplo:
 
-	Para alterar corretamente:
-	→ Remover TODAS as constraints
-	→ Remover Primary Keys
-	→ Remover Foreign Keys
-	→ Remover índices
-	→ Alterar a Collation das colunas manualmente
-	→ Realizar rebuild das tabelas (quando necessário)
-	→ Recriar constraints, chaves, índices e demais objetos
+``` Script
+ON TabelaA.Coluna COLLATE Latin1_General_CI_AS = TabelaB.Coluna
+```
 
-	Observação:
-	→ Processo pode gerar indisponibilidade
-	→ Deve ser planejado com janela de manutenção
-	→ Sempre realizar backup completo antes
 
-==============================================================================================================================================================
-10 -	Problemas clássicos
+5 → O uso de COLLATE na consulta pode gerar conversão implícita  
+6 → Conversão implícita pode impedir uso eficiente de índices  
+7 → Impacto direto no desempenho  
+8 → Pode causar aumento de CPU e I/O  
+9 → Quanto maior o volume de dados, maior o impacto  
 
-	Primeiro: Exemplo de Problema com Collation Diferente da TempDB
+---
 
-	1 → Banco criado com Code Page 437
-	2 → TEMPDB é criado automaticamente com a mesma Collation do Servidor (437)
-	3 → Outro banco é criado com Collation 1252 (com suporte a acentos)
-	4 → Executo um SELECT grande com ORDER BY
-	5 → A consulta necessita ordenar grande volume de dados
-	6 → A memória concedida (Memory Grant) não é suficiente para concluir a ordenação totalmente em RAM
-	7 → O SQL Server realiza spill para TempDB (grava dados temporários em disco)
-	8 → Dados originalmente em 1252 passam a ser manipulados dentro da TempDB 437
-	9 → Pode ocorrer conversão implícita de Collation
-	10 → Resultado pode apresentar comportamento inesperado ou erro de comparação
-	11 → Impacto direto de performance devido ao uso adicional de I/O
+## 11 - Boas práticas recomendadas
 
-	Observação importante sobre "falta de memória":
-	→ Não significa que o servidor ficou sem RAM física
-	→ Significa que a memória concedida para execução da consulta não foi suficiente
-	→ O SQL Server então utiliza a TempDB para continuar o processamento
-	→ Esse processo é chamado de "Spill to TempDB"
-	→ Pode ser identificado no plano de execução como Warning de Sort ou Hash
+→ Definir Collation padrão no início do projeto  
+→ Manter mesma Collation em Servidor, TEMPDB e Bancos  
+→ Evitar misturar SQL Collation com Windows Collation  
+→ Evitar alterar Collation em ambiente produtivo  
+→ Documentar Collation no README do projeto  
 
-	Segundo: Exemplo de Problema Bancos com Collations Diferentes
-
-	1 → Dois bancos possuem Collations diferentes
-	2 → Colunas de mesmo tipo (ex: VARCHAR) possuem regras distintas de comparação
-	3 → Ao realizar um JOIN entre esses bancos pode ocorrer erro de conflito de Collation
-	Exemplo de erro:
-	Cannot resolve the collation conflict between 'SQL_Latin1_General_CP1_CI_AS' and 'Latin1_General_CI_AS' in the equal to operation
-
-	4 → Necessário tratar explicitamente na query utilizando COLLATE
-	Exemplo:
-	ON TabelaA.Coluna COLLATE Latin1_General_CI_AS = TabelaB.Coluna
-
-	5 → O uso de COLLATE na consulta pode gerar conversão implícita
-	6 → Conversão implícita pode impedir uso eficiente de índices
-	7 → Impacto direto no desempenho
-	8 → Pode causar aumento de CPU e I/O
-	9 → Quanto maior o volume de dados, maior o impacto
-
-==============================================================================================================================================================
-
-11 -	Boas práticas recomentadas
-
-	→ Definir Collation padrão no início do projeto
-	→ Manter mesma Collation em Servidor, TEMPDB e Bancos 
-	→ Evitar misturar SQL Collation com Windows Collation 
-	→ Evitar alterar Collation em ambiente produtivo
-	→ Documentar Collation no README do projeto
-
-==============================================================================================================================================================
+---
