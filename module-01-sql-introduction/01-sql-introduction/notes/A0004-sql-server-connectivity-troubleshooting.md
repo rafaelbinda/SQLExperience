@@ -20,7 +20,7 @@ Este documento descreve o passo a passo para diagnóstico de conectividade com o
 - Para informações sobre a versão do SQL Server, verificar: `notes\A0006-sql-server-version.md`  
 - Para identificar a versão do SQL Server, usar a query disponível em: `dba-scripts\SQL-instance-information\Q0003-sql-version.sql`  
 - Para identificar se há alguma conexão ativa através de Named Pipe, usar a query: `dba-scripts\SQL-connections\Q0001-active-connections.sql`  
-### Este documento apresenta apenas recomendações, não uma lista completa de procedimentos.
+**Este documento apresenta apenas recomendações, não uma lista completa de procedimentos** 
 
 ---
 
@@ -236,3 +236,4 @@ C:\TESTES\A0003_PortQry>PortQry.exe -n SRVSQLSERVER -p TCP -r 1400:1500
 → Sempre verifique se o hífen utilizado é o padrão do teclado.  
 
 ---
+
