@@ -16,7 +16,7 @@ Documento com informações para instalação do SQL Server seguindo boas práti
 
 - Necessário fazer o download do SQL Server no site da Microsoft.
 - Necessário fazer o download do SQL Server Management Studio no site da Microsoft.  
-- Para informações a respeito de Collation, verificar o arquivo: `notes\A0002_collation.txt`
+- Para informações a respeito de Collation, verificar o arquivo: `notes\A0002-collation.txt`
 
 ---
 

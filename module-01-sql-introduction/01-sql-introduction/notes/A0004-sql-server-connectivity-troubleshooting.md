@@ -16,10 +16,10 @@ Este documento descreve o passo a passo para diagnóstico de conectividade com o
 ## Observações
 
 - Utiliza o executável disponível em: `tools\A0003_X_PortQry.zip`  
-- Este documento contém informações complementares ao documento: `notes\A0005_network_commands.md`  
-- Para informações sobre a versão do SQL Server, verificar: `notes\A0006_sql_server_version.md`  
-- Para identificar a versão do SQL Server, usar a query disponível em: `dba_scripts\SQL_instance_information\Q0003_sql_version.sql`  
-- Para identificar se há alguma conexão ativa através de Named Pipe, usar a query: `dba_scripts\SQL_connections\Q0001_active_connections.sql`  
+- Este documento contém informações complementares ao documento: `notes\A0005-network-commands.md`  
+- Para informações sobre a versão do SQL Server, verificar: `notes\A0006-sql-server-version.md`  
+- Para identificar a versão do SQL Server, usar a query disponível em: `dba-scripts\SQL-instance-information\Q0003-sql-version.sql`  
+- Para identificar se há alguma conexão ativa através de Named Pipe, usar a query: `dba-scripts\SQL-connections\Q0001-active-connections.sql`  
 ### Este documento apresenta apenas recomendações, não uma lista completa de procedimentos.
 
 ---
@@ -201,7 +201,8 @@ C:\TESTES\A0003_PortQry>PortQry.exe -n SRVSQLSERVER -p TCP -e 1433
 - FILTERED  
 → Firewall bloqueando a porta UDP 1434.
 
-=====================================================================================================================================================
+---
+
 ## 5. Testar intervalo de portas (SE NECESSÁRIO)
 
 → Objetivo:
