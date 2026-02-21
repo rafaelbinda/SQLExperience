@@ -17,13 +17,13 @@
 
 ## Observações
 Este documento contém informações complementares ao documento A0004-sql-server-connectivity-troubleshooting.  
-Este documento apresenta apenas recomendações, não uma lista completa de procedimentos.
+**Este documento apresenta apenas recomendações, não uma lista completa de procedimentos.**
 
 ---
 
 ## 1. Descobrir o ip do google usando CMD
 
-→ Opção 1 - Comando digitado utilizando CMD:  
+**Opção 1 - Comando digitado utilizando CMD:**  
 ```cmd
 ping google.com.br
 ```
@@ -36,7 +36,7 @@ Reply from 172.217.172.163: bytes=32 time=15ms TTL=117
 Reply from 172.217.172.163: bytes=32 time=16ms TTL=117
 ```
 
-→ Opção 2 - Comando digitado utilizando CMD:   
+**Opção 2 - Comando digitado utilizando CMD:** 
 ```cmd
 nslookup google.com
 ```
@@ -138,3 +138,4 @@ sqlservr.exe                  7212 Services                   0    769.400 K
 ```
 
 ---
+
