@@ -9,7 +9,7 @@ Documento técnico resumido sobre Code Page, Unicode e Collation no SQL Server, 
 
 ## Material Complementar
 
-Script disponível em: `scripts/Q0001_collation.sql`
+Script disponível em: `scripts/Q0001-collation.sql`
 
 ---
 
