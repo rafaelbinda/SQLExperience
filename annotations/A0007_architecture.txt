@@ -1,7 +1,7 @@
 =====================================================================================================================================================
 @author        Rafael Binda
 @date          2026-02-18
-@version       1.0
+@version       2.0
 @task          A0007_architecture
 @object        Annotation
 @environment   -
@@ -16,6 +16,8 @@ Descrição:
 Informações a respeito arquitetura do SQL SERVER
 
 Observações:
+Script disponível em dba_scripts\SQL_examples\CREATE_DATABASE.sql
+
 Conteúdo adicional:
 https://docs.microsoft.com/en-us/sql/relational
 
@@ -128,3 +130,25 @@ https://docs.microsoft.com/en-us/sql/relational
 		Subscriber	- destino dos dados
 
 
+=====================================================================================================================================================
+
+4 - 	Checkpoint
+
+	O que que acontece quando a gente atualiza um dado no SQL?
+	→ Vamos imaginar que uma aplicação está conectada no SQL Server e envia uma atualização / UPDATE que vai alterar alguns dados em uma tabela
+	1º - O SQL primeiramente executa o UPDATE em memória no Buffer Cache ou também chamada de Data Cache
+		→ O SQL Server mantém em memória somente os dados mais acessados ele não carrega em cache todos os dados assim ele consegue ter desempenho
+	2º - O SQL olha no cache para ver se os dados que sofrerão o UPDATE estão em memória e se encontrar realiza a atualização 
+	3º - Se o SQL não encontrar na memória ele vai lá no disco captura as informações e traz para memória e realiza o UPDATE 
+	4º - Se alguem chegar no servidor e "derrubar" ele já era e para não acontecer isso ele grava no arquivo de LOG .ldf as alterações realizadas
+		→ Data Pages localizados ou são lidos para o buffer cache e modificados
+		→ Vai no último LSN e realiza o registro nos próximos LSN
+		→ Ele guarda os dados de antes da atualização e os dados "novos" de após a atualização e libera o usuário para prosseguir com o que ele desejar
+	5º - Esse processo vai se repetindo por determinado tempo, alterando os dados em memória
+		→ Altera em memória e registra no log
+		→ Altera em memória e registra no log ...
+	6º - De tempos em tempos ocorre um processo chamado de Checkpoint que escreve as transações finalizadas nos arquivos de dados 
+		→ Dessa maneira ele ganha desempenho pois iria custar muito caro ficar indo localizar os dados e alterar em tempo real diretamente no disco
+		→ Se ele fizesse isso iria ocorrer Page Split direto pois iria ultrapassar continuamente o tamanho das extents que é de 64 kb 
+
+=====================================================================================================================================================
