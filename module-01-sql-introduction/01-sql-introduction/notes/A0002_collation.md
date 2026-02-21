@@ -1,8 +1,8 @@
 # A0002 – Collation
 >
 > **Author:** Rafael Binda  
-> **Version:** 4.0  
-> **Last Updated:** 2026-02-20
+> **Created:** 2026-02-11  
+> **Version:** 4.0 
 
 ## Descrição:
 Documento técnico resumido sobre Code Page, Unicode e Collation no SQL Server, incluindo impactos de desempenho e boas práticas de padronização
