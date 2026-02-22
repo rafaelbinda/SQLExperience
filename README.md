@@ -96,6 +96,7 @@ Example:
     Q0002-Create-Database.sql
     E0001-STRING_SPLIT.sql
     A0007-SQL-Server-Architecture.md
+```
 
 ---
 
