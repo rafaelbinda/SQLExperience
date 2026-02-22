@@ -26,11 +26,6 @@ SELECT * FROM sys.fn_helpcollations();
 SELECT SERVERPROPERTY('Collation');
 
 -------------------------------------------------------------------------------
-
-USE AdventureWorks;
-GO
-
--------------------------------------------------------------------------------
 --Database Collation
 -------------------------------------------------------------------------------
 
@@ -40,6 +35,10 @@ FROM sys.databases;
 -------------------------------------------------------------------------------
 --Column Collation
 -------------------------------------------------------------------------------
+
+--Lab Database Example
+USE AdventureWorks;
+GO
 
 SELECT name, collation_name
 FROM sys.columns 
