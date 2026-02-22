@@ -1,125 +1,137 @@
-# 📊 SQL Scripts Repository
+# 📊 SQL Server DBA Study Repository
 
-![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
+![SQL
+Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure-0089D6?style=for-the-badge&logo=microsoft-azure&logoColor=white)
 
-Este repositório reúne scripts SQL referentes aos meus estudos diários e práticas de administração de banco de dados.  
-*This repository contains SQL scripts from my daily studies and database administration practices.*
+------------------------------------------------------------------------
 
----
+## 📌 Overview
 
-## 🎯 Objetivos | Objectives
+This repository contains structured SQL Server study materials, scripts,
+and architectural notes developed during my continuous learning journey.
 
-* **Organização:** Centralizar scripts de estudo de forma estruturada.  
-  *(**Organization:** Centralize study scripts in a structured way.)*
-* **Referência:** Servir de base para consultas rápidas no desenvolvimento de atividades.  
-  *(**Reference:** Serve as a base for quick consultation in task development.)*
-* **Compartilhamento:** Disseminar conhecimento sobre o ecossistema Microsoft SQL.  
-  *(**Sharing:** Disseminate knowledge about the Microsoft SQL ecosystem.)*
+------------------------------------------------------------------------
 
----
+## 🎯 Purpose
 
-## 🛠️ Escopo Técnico | Technical Scope
+-   Centralize SQL Server study scripts
+-   Maintain structured technical documentation
+-   Simulate enterprise database architecture practices
+-   Track long-term technical evolution
 
-O conteúdo é focado exclusivamente em:  
-*(The content is focused exclusively on:)*
-* **Microsoft SQL Server On-Premises**
-* **Azure SQL Database / Managed Instance**
+------------------------------------------------------------------------
 
----
+## 🏗️ Technical Scope
 
-## 📂 Estrutura do Repositório | Repository Structure
+Focused exclusively on Microsoft ecosystem technologies:
 
-```text
+-   Microsoft SQL Server (On-Premises)
+-   Azure SQL Database
+-   Azure SQL Managed Instance
+-   T-SQL Development
+-   Query Optimization
+-   Storage Architecture
+-   Backup & Recovery Strategies
+-   High Availability Concepts
 
-annotations/
-Seção do repositório dedicada a anotações técnicas, guias de troubleshooting criadas durante laboratórios práticos e simulações.
-Repository section dedicated to technical notes, troubleshooting guides created during hands-on labs and simulations.
+------------------------------------------------------------------------
 
-annotations/                    
-├── files/                      # Arquivos auxiliares | Supporting files
-├── documents                   # Anotações em ordem cronológica dos estudos | Notes in chronological order of studies
+## 📂 Repository Architecture
 
-module_01_sql_on_premises/
-├── 01_sql_introduction/        # Fundamentos de SQL Server | SQL Server fundamentals
-├── 02_administration/          # Administração | Administration
-├── 03_backup_and_restore/      # Backup e Restauração | Backup and Restore
-├── 04_recovery_databases/      # Recuperação de dados | Data recovery
-├── 05_tables_and_indexes/      # Tabelas e Índices | Tables and Indexes
-├── 06_security/                # Segurança | Security
-├── 07_in_memory_oltp/          # OLTP em memória | In-memory OLTP
-├── 08_automating_tasks/        # Automação de tarefas | Automating tasks
-├── 09_monitoring_sql_server/   # Monitoramento | Monitoring
-├── 10_concurrency_control/     # Controle de concorrência | Concurrency control
-├── 11_highavailability/        # Alta disponibilidade | High Availability
-└── 12_Replication/             # Replicação | Replication
-
-module_02_azure_infrastructure/  # Infraestrutura Azure | Azure Infrastructure
-├──
-
-module_03_azure_sqlserver/       # Azure SQL Server
-├──
-
-module_04_sql_language/          # Linguagem SQL (T-SQL) | SQL Language
-├──
-
-module_05_query_tuning/          # Otimização de consultas | Query Tuning
-├──
-
-dba_scripts/
-Diretório contendo consultas administrativas, diagnósticos e scripts de suporte utilizados em estudos, troubleshooting e simulações.
-Directory containing administrative queries, diagnostics and support scripts used during studies, troubleshooting and simulations.
-
+``` text
+dba-scripts/
+│
+├── SQL-connections/
+├── SQL-examples/
+├── SQL-instance-information/
+│
+├── module-01-sql-on-premises/
+│   ├── 01-sql-introduction/
+│   │   ├── notes/        → Study notes (chronological order)
+│   │   ├── scripts/      → SQL scripts
+│   │   └── tools/        → Utilities and supporting tools
+│   │
+│   ├── 02-administration/
+│   │   ├── notes/
+│   │   ├── scripts/
+│   │   └── tools/
+│   │
+│   ├── 03-backup-and-restore/
+│   │   ├── notes/
+│   │   ├── scripts/
+│   │   └── tools/
+│   │
+│   ├── 04-recovery-databases/
+│   ├── 05-tables-and-indexes/
+│   ├── 06-security/
+│   ├── 07-in-memory-oltp/
+│   ├── 08-automating-tasks/
+│   ├── 09-monitoring-sql-server/
+│   ├── 10-concurrency-control/
+│   ├── 11-high-availability/
+│   └── 12-replication/
+│
+├── module-02-azure-infrastructure/
+├── module-03-azure-sql-server/
+├── module-04-sql-language/
+└── module-05-query-tuning/
 ```
 
-* O repositório está dividido em **05 módulos** principais para facilitar a navegação.  
-  *(The repository is divided into **05 main modules** for easier navigation.)*
-* Os scripts foram organizados de forma clara para facilitar consultas rápidas.  
-  *(Scripts are clearly organized for quick consultation.)*
+------------------------------------------------------------------------
+
+## 🧩 Naming Convention Standard
+
+``` text
+  Prefix     Meaning
+  ---------- -------------------------
+  A+Number   Notes / Articles
+  Q+Number   Queries / Scripts
+  E+Number   Examples
+  C+Number   Checklists (future use)
+  L+Number   Labs (future use)
+
+Example:
+
+    Q0002-Create-Database.sql
+    E0001-STRING_SPLIT.sql
+    A0007-SQL-Server-Architecture.md
 
 ---
 
-## 📝 Padrão de Documentação | Documentation Standard
+## 📝 Documentation Header Standard
 
-Todos os scripts seguem um padrão de documentação para garantir a consistência e rastreabilidade:  
-*(All scripts follow a documentation standard to ensure consistency and traceability:)*
+All SQL scripts follow a standardized header:
 
-```sql
-/*
+``` sql
 ===============================================================================
-@author        My Name
-@date          yyyy-mm-dd
-@version       1.0
-@task          Task
-@object        Script | Procedure | Function | View | Annotation
-@environment   DEV
-@database      DatabaseName
-@server        ServerName
+Author      : Rafael Binda
+Created     : yyyy-mm-dd
+Version     : 1.0
+Task        : -
+Object      : Script | Procedure | Function | View | Notes
+Description : -
+Notes       : -
 ===============================================================================
-
-Histórico / History:
-1.0 - Criacao do script / Script creation
-
-Descrição / Description:
-Descreva aqui o que o script faz / Describe here what the script does
-
-Observações / Notes:
-Notes
-===============================================================================
-*/
 ```
 
 ---
 
-## 🚀 Como utilizar | How to use
+## 🚀 Usage
 
-1. Navegue pelo módulo desejado através das pastas.  
-   *(Navigate to the desired module through the folders.)*
-2. Os scripts estão numerados por `#task` para facilitar o acompanhamento do progresso.  
-   *(Scripts are numbered by `#task` to facilitate progress tracking.)*
-3. Sinta-se à vontade para utilizar os códigos como base para seus próprios projetos ou laboratórios.  
-   *(Feel free to use the codes as a basis for your own projects or labs.)*
+1.  Navigate to the desired module.
+2.  Review notes before executing scripts.
+3.  Use scripts as lab references.
+4.  Adapt patterns to your own SQL Server test environments.
 
 ---
-**Desenvolvido com foco em excelência e performance em SQL Server.**  
-**Developed with a focus on excellence and performance in SQL Server.**
+
+## 📈 Continuous Improvement
+
+This repository is continuously updated as new concepts are studied and
+validated in lab environments.
+
+---
+
+**Built with discipline, structured thinking, and a long-term DBA
+vision.**
