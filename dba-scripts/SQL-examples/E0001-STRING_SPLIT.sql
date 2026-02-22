@@ -14,10 +14,10 @@ Description : Demonstrate how to use STRING_SPLIT to handle values
 -- Creating the database
 -------------------------------------------------------------------------------
 
-CREATE DATABASE EXAMPLES;
+SET NOCOUNT ON;
 GO
 
-USE EXAMPLES;
+USE ExamplesDB;
 GO
  
 -------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ GO
 CREATE TABLE PaymentExample
 (
     Id INT IDENTITY(1,1) PRIMARY KEY,
-    Forms VARCHAR(100) NOT NUL
+    Forms VARCHAR(100) NOT NULL
 );
 GO
 
