@@ -12,7 +12,8 @@
 ---
 
 ## Observações
-Script disponível em scripts\Q0002-create-database.sql
+scripts\Q0002-create-database.sql
+scripts\Q0004-physical-storage-layout.sql
 
 ## Conteúdo adicional
 - https://docs.microsoft.com/en-us/sql/relational
