@@ -28,7 +28,7 @@ https://learn.microsoft.com/pt-br/troubleshoot/sql/releases/download-and-install
 ### PROBLEMA:
 
 →  Se um invasor souber que um servidor roda SQL Server 2022 versão 16.0.1000.6 (RTM / sem atualizações), ele pode pesquisar no site de atualizações da Microsoft e identificar CVEs como CVE-2024-49021 e CVE-2024-49043, que permitem execução remota de código.  
-→ CVE = Common Vulnerabilities and Exposures/Vulnerabilidades e Exposições Comuns. 
+→ CVE = Common Vulnerabilities and Exposures/Vulnerabilidades e Exposições Comuns.   
 → Com isso, teoricamente, um atacante sem autorização poderia explorar a falha e infiltrar-se no servidor.  
 	
 - CVE-2024-49021 – Vulnerabilidade de execução remota de código do Microsoft SQL Server
@@ -84,3 +84,4 @@ https://learn.microsoft.com/pt-br/troubleshoot/sql/releases/download-and-install
 - GDR  → 	Apenas correção de segurança
 
 ---
+
