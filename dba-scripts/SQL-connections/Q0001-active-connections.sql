@@ -1,35 +1,21 @@
 /*
-=====================================================================================================================================================
-@author        Rafael Binda
-@date          2026-02-16
-@version       1.0
-@task          Q0001_active_connections
-@object        Script
-@environment   DEV
-@database      AdventureWorks
-@server        SRVSQLSERVER
-=====================================================================================================================================================
-
-Histórico                                                                   |   History:
-1.0 - Criacao do script                                                     |   1.0 - Script creation
-
-Descrição                                                                   |   Description:
-Consulta para ver TODAS as conexões ativas                                  |   Query to identify all active connections
-Consulta conexões ativas através de Named Pipes                             |   Query to list active connections using Named Pipes
-
-Observações:                                                                |   Notes:
-                                                                            |   
-=====================================================================================================================================================
+===============================================================================
+Author      : Rafael Binda
+Created     : 2026-02-16
+Version     : 2.0
+Task        : Q0001 - Active Connections
+Object      : Script
+Description : Query to identify active SQL Server connections
+              Includes detection of connections using Named Pipes.
+===============================================================================
 */
 
-
-USE AdventureWorks;
+SET NOCOUNT ON;
 GO
- 
------------------------------------------------------------------------------------------------------------------------------------------------------
---Consulta para ver TODAS as conexões ativas                                |    Query to identify all active connections
------------------------------------------------------------------------------------------------------------------------------------------------------
 
+-------------------------------------------------------------------------------
+-- Active User Connections
+-------------------------------------------------------------------------------
 SELECT
     s.session_id,
     s.login_name,
@@ -49,12 +35,11 @@ JOIN sys.dm_exec_connections c
     ON s.session_id = c.session_id
 WHERE s.is_user_process = 1
 ORDER BY c.connect_time DESC;
- 
+GO
 
------------------------------------------------------------------------------------------------------------------------------------------------------
---Consulta conexões ativas através de Named Pipes                            |    Query to list active connections using Named Pipes
------------------------------------------------------------------------------------------------------------------------------------------------------
-
+-------------------------------------------------------------------------------
+-- Active Connections Using Named Pipes
+-------------------------------------------------------------------------------
 SELECT
     s.session_id,
     s.login_name,
@@ -75,4 +60,4 @@ JOIN sys.dm_exec_connections c
 WHERE s.is_user_process = 1
 AND c.net_transport = 'Named pipe'
 ORDER BY c.connect_time DESC;
- 
+GO
