@@ -12,7 +12,7 @@
 ---
 
 ## Observações
-scripts\Q0002-create-database.sql
+scripts\Q0002-create-database.sql  
 scripts\Q0004-physical-storage-layout.sql
 
 ## Conteúdo adicional
@@ -226,3 +226,4 @@ Se cada UPDATE fosse gravado imediatamente no disco:
 7. Checkpoint grava definitivamente nos Data Files
 
 ---
+
