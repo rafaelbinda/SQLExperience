@@ -18,7 +18,10 @@ GO
 --The minimum code to create a database
 -------------------------------------------------------------------------------
 
-DROP DATABASE IF EXISTS ExamplesDB;
+IF DB_ID('ExamplesDB') IS NULL
+BEGIN
+    CREATE DATABASE ExamplesDB;
+END
 GO
 
 CREATE DATABASE [ExamplesDB]
