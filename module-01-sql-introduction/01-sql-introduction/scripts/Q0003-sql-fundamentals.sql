@@ -2,7 +2,7 @@
 ===============================================================================
 Author      : Rafael Binda
 Created     : 2026-02-24
-Version     : 1.0
+Version     : 2.0
 Task        : Q0003 - SQL Fundamentals
 Databases   : ExamplesDB, AdventureWorks
 Object      : Script
@@ -232,4 +232,92 @@ GO
 Result:
 WithoutParentheses	WithParentheses
 20	                30
+*/
+
+-------------------------------------------------------------------------------
+-- 6 - Dynamic SQL (EXEC + safer option with sp_executesql)
+-------------------------------------------------------------------------------
+/*
+Simple dynamic SQL.
+Better approach: use QUOTENAME for object names and sp_executesql for parameters
+
+Explanation:
+Why do I use EXEC() in this example?
+When I put it inside EXEC('...'), I am saying:
+→ "Execute this string as a T-SQL command"
+→ This is called Dynamic SQL
+→ The item 6 includes more examples about it
+
+*/
+
+/*
+SYSNAME is an internal SQL Server alias for NVARCHAR(128), which is exactly the 
+maximum size allowed for identifiers in SQL Server.
+It is recommended when the variable represents an object name (database, schema, 
+table, login).
+*/
+
+-- Database name
+DECLARE @DB SYSNAME = N'AdventureWorks';
+
+-- Schema name + table name (2-part name)
+DECLARE @RealTable NVARCHAR(256) = N'Production.Product';
+
+/*
+Split schema and object using PARSENAME.
+PARSENAME() is a function that breaks a multipart name into parts separated by a dot "."
+It works well for up to 4 parts (server.database.schema.object), counting from right to left.
+*/
+DECLARE @Schema SYSNAME = PARSENAME(@RealTable, 2);
+DECLARE @Object SYSNAME = PARSENAME(@RealTable, 1);
+
+-- If the object is NULL for some reason, assume dbo
+IF @Object IS NULL
+BEGIN
+    SET @Object = @RealTable;
+    SET @Schema = N'dbo';
+END;
+
+IF @Schema IS NULL
+    SET @Schema = N'dbo';
+
+-- Build the fully qualified name using QUOTENAME for each part
+DECLARE @FullTable NVARCHAR(300) = QUOTENAME(@Schema) + N'.' + QUOTENAME(@Object);
+
+-- 1) Simple execution (no parameters)
+-- FIX: add semicolon/newline after USE to avoid "USE AdventureWorksSELECT ..."
+DECLARE @SQL NVARCHAR(MAX) =
+    N'USE ' + QUOTENAME(@DB) + N'; ' +
+    N'SELECT TOP (5) Name FROM ' + @FullTable + N';';
+
+EXEC sys.sp_executesql @SQL;
+
+/*
+Result:
+Adjustable Race
+All-Purpose Bike Stand
+AWC Logo Cap
+BB Ball Bearing
+Bearing Ball
+*/
+
+-- 2) Execution with a filter parameter (sp_executesql)
+SET @SQL =
+    N'USE ' + QUOTENAME(@DB) + N'; ' +
+    N'SELECT TOP (5) Name
+      FROM ' + @FullTable + N'
+      WHERE Name LIKE @P1;';
+
+EXEC sys.sp_executesql
+    @SQL,
+    N'@P1 NVARCHAR(100)',
+    @P1 = N'%B%';
+
+/*
+Result:
+Adjustable Race
+All-Purpose Bike Stand
+BB Ball Bearing
+Bearing Ball
+Bike Wash - Dissolver
 */
