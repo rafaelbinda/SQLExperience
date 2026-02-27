@@ -1,22 +1,13 @@
-﻿# A0008 – Sql Server Fundamentals
+﻿# A0009 – Sql Data Querying 
 
 > **Author:** Rafael Binda  
-> **Created:** 2026-02-23  
+> **Created:** 2026-02-27 
 > **Version:** 1.0 
 
 ---
 
 ## Descrição
-
-- Tipos de instruções SQL
-- Ferramentas para executar SQL
-- Bath
-- Comentário
-- Regras para nomes de objetos
-- Variáveis
-- Operadores
-- Instruções dinâmicas
-- Controlando o fluxo de execução
+Este documento apresenta os fundamentos de consulta de dados utilizando SELECT, filtros, agrupamentos e junções no SQL Server.
 
 ---
 
@@ -25,198 +16,202 @@
 
 ---
 
-## 1 - Tipos de instruções SQL
+## 1 - Consultando Dados — Introdução ao SELECT
 
-### DDL — Data Definition Language
-- `CREATE`
-- `ALTER`
-- `DROP`
-  
-→ Usado para **definir / alterar estruturas** (tabelas, índices, schemas, views, procedures etc.)
+A instrução SELECT é a base da consulta de dados no SQL Server.  
+Ela é utilizada para recuperar informações armazenadas em uma ou mais tabelas, retornando um conjunto de resultados (result set) em formato tabular.  
+Compreender corretamente o funcionamento do SELECT é essencial antes de avançar para junções, agregações e otimizações.  
 
-### DCL — Data Control Language
-- `GRANT`
-- `DENY`
-- `REVOKE`
+### Conceitos Fundamentais
+→ O SELECT permite extrair dados de:  
 
-→ Usado para **permissões** (controle de acesso)
+- Uma única tabela
+- Múltiplas tabelas (utilizando JOIN)
+- Visões (views)
+- Subconsultas
+   
 
-### DML — Data Manipulation Language
-- `INSERT`
-- `UPDATE`
-- `DELETE`
+### SELECT List (Filtro Vertical)
+→ Define quais colunas aparecerão no resultado
+→ É chamado de filtro vertical, pois controla as colunas retornadas
+→ Se nenhuma coluna específica for definida, pode-se usar *, que retorna todas as colunas da tabela
 
-→ Usado para **manipular dados** (linhas)
+Apesar de válido, o uso de SELECT * não é recomendado, pois:
+- Aumenta I/O desnecessariamente  
+- Pode impactar performance  
+- Pode quebrar aplicações caso a estrutura da tabela mude
 
-### DQL — Data Query Language
-- `SELECT`
 
-→ Usado para **consultar dados**
+### WHERE (Filtro Horizontal)
+→ A cláusula WHERE define quais linhas serão retornadas  
+→ É chamada de filtro horizontal, pois restringe registros (linhas) com base em uma condição lógica
+→ Sem a cláusula WHERE, todas as linhas da tabela serão retornadas
 
-**Em algumas literaturas, DQL é tratado como parte de DML**
+
+### FROM
+→ A cláusula FROM define a origem dos dados  
+→ Ela pode conter:
+- Uma tabela
+- Múltiplas tabelas
+- Junções (JOIN)
+- Subconsultas
+ 
+### Menor Comando SELECT Possível 
+→ Mesmo sendo sintaticamente correto, recomenda-se sempre especificar explicitamente as colunas desejadas
+Exemplo:
+``` sql
+SELECT * FROM tabela;
+``` 
+ 
+### Sintaxe Geral com as Principais Cláusulas
+
+``` sql
+SELECT [ALL | DISTINCT] <lista_de_colunas>      -- Filtro vertical
+FROM <tabela_ou_origem>
+JOIN <tabela> ON <condicao_join>
+WHERE <condicao_de_pesquisa>                    -- Filtro horizontal
+GROUP BY <lista_de_colunas>
+HAVING <condicao_de_grupo>
+ORDER BY <lista_de_colunas>; 
+``` 
+
+### Ordem Lógica de Processamento
+
+→ Embora a instrução comece com SELECT, o SQL Server processa logicamente a consulta na seguinte ordem:
+- 1º FROM 
+- 2º JOIN 
+- 3º WHERE 
+- 4º GROUP BY 
+- 5º HAVING 
+- 6º SELECT
+- 7º ORDER BY
+
+→ Entender essa ordem ajuda a compreender:
+- Por que aliases não funcionam no WHERE
+- Por que agregações não podem ser usadas diretamente no WHERE
+- Por que o HAVING filtra grupos e não linhas individuais
+ 
+---
+
+## 2 — GROUP BY
+
+Permite fazer agrupamento de linhas  
+A cláusula GROUP BY é utilizada para agrupar linhas que possuem valores iguais em determinadas colunas,  
+permitindo a aplicação de funções de agregação sobre esses grupos  
+Ela é fundamental quando precisamos transformar dados detalhados em dados consolidados  
+O GROUP BY agrupa registros com base em uma ou mais colunas
+
+Por exemplo:
+- Agrupar vendas por cliente
+- Agrupar pedidos por data
+- Agrupar produtos por categoria
+- Cada combinação única das colunas especificadas gera um grupo
+
+→ O WHERE é aplicado antes do agrupamento  
+→ A cláusula WHERE é executada antes do GROUP BY  
+
+Isso significa que:
+- Apenas os registros que satisfazem a condição do WHERE serão considerados
+- O agrupamento ocorre somente sobre o conjunto já filtrado
+
+Ordem lógica relevante:
+- FROM
+- WHERE
+- GROUP BY
+
+### Usado para realizar cálculos (Agregações)
+O GROUP BY normalmente é utilizado em conjunto com funções de agregação, como:
+- COUNT() → Contagem de registros
+- SUM() → Soma
+- AVG() → Média
+- MIN() → Menor valor
+- MAX() → Maior valor
+
+→ Sem o GROUP BY, essas funções retornam um único resultado global
+→ Com o GROUP BY, elas retornam um resultado para cada grupo
+
+###Regra Importante
+→ Ao utilizar GROUP BY toda coluna presente no SELECT deve:
+- Estar dentro de uma função de agregação ou
+- Estar declarada na cláusula GROUP BY
+Caso contrário, o SQL Server retornará erro  
+Essa regra existe porque, ao agrupar, o banco precisa saber como consolidar cada coluna  
+
+### Diferença entre WHERE e HAVING
+Embora ambos filtrem dados, eles atuam em momentos diferentes:
+- WHERE → Filtra linhas antes do agrupamento
+- HAVING → Filtra grupos após o agrupamento
+
+Resumo lógico:
+``` sql
+WHERE → filtra linhas
+GROUP BY → cria grupos
+HAVING → filtra grupos
+```
 
 ---
 
-## 2 - Ferramentas para executar SQL
+## 3 - JOIN
 
-→ Para enviar comandos para o servidor, é preciso de um **cliente** que se conecte no SQL Server e execute as operações
+A cláusula JOIN é utilizada para combinar dados de duas ou mais tabelas com base em uma relação entre colunas  
+Ela permite consultar dados relacionados que estão distribuídos em tabelas diferentes  
 
-Exemplos:
-- SQL Server Management Studio (SSMS)
-- Azure Data Studio
-- SQLCMD.EXE
+### Sintaxes de JOIN
+Existem duas formas de escrever junções no SQL Server:
 
----
-
-## 3 - Batch e o `GO`
-
-### O que é um batch?
-→ Um **batch** é um conjunto de comandos SQL que o servidor executa como uma unidade
-
-### O que é `GO`?
-- `GO` **não é comando T-SQL**
-- É um **separador de batch** entendido somente pelo **SSMS** e pelo **SQLCMD**
-- Ao usar `GO`, eu "quebro" o script em batches independentes
-
-### Tipos de erro dentro de um batch
-
-- Erro de sintaxe
-→ O servidor detecta antes de executar  
-
-- Erro de execução
-→ A sintaxe passa, mas falha ao executar  
-
----
-
-## 4 - Erro de sintaxe X Erro de execução (comportamento)
-
-### Erro de sintaxe
-- Quando eu executo um batch, o SQL Server **primeiro valida a sintaxe do batch inteiro**
-- Se existir erro de sintaxe no meio, ele **não executa** o batch
-
-### Erro de execução
-- A sintaxe é válida.
-- O SQL Server começa a executar e pode falhar no meio:
-  - comandos anteriores podem ter sido aplicados
-  - comandos posteriores podem não executar
-
-→ Em transações (BEGIN TRAN / COMMIT / ROLLBACK) é possível controlar atomicidade
-
----
-
-## 5 - Comentários
-
-- Comentário de linha: `--`
-- Comentário de bloco: `/* ... */`
-
----
-
-## 6 - Regras para nomes de objetos
-
-- Máximo de 128 caracteres
-- 1º caractere: usar letra
-→ Boa prática: na prática SQL Server permite mais coisas, mas é melhor evitar dor de cabeça  
-- Demais: letras, números e alguns símbolos como por exemplo:  
-→ `@`   variável  
-→ `#`   tabela temporária  
-→ `##`  tabela temporária global  
-→ `_`   apenas organização visual  
-→ `$`   permitido mas sem função especial
-
-### Delimitadores
-- `[ ... ]` ou `" ... "` podem delimitar nome de objeto (ex.: `[first name]`)
-- Boa prática: usar `[ ... ]`
-
-Sugestão:  
-→ Evitar aspas duplas `"..."` porque o `QUOTED_IDENTIFIER` pode mudar o comportamento e gerar confusão.
-
-- `' ... '` delimita **string**
-
-### Nome completo (4-part name)
-`instância.banco.schema.objeto`
-
-- **instância:** nome do servidor/instância
-- **banco:** database
-- **schema:** “pasta lógica” de objetos (muitos bancos usam só `dbo`)
-- **objeto:** nome real (tabela/view/proc)
-
-**Por que qualificar `schema.objeto`?**
-- Boa prática: sempre qualificar
-- Evita ambiguidades principalmente se existirem objetos com mesmo nome em schemas diferentes
-- Melhora previsibilidade e manutenção
-- Reduz chance de resolver objeto errado por default schema do usuário
-
----
-
-## 7 - Variáveis
-
-### Variáveis locais
-
-- Definidas pelo usuário com `DECLARE`
-- Sempre começam com `@`
-- Armazenam valores temporários durante a execução do script
-- Recebem valores com `SET` ou `SELECT`
-
-**Sintaxe:** `DECLARE @Nome Tipo(Tamanho)`
+**Sintaxe Antiga (Não Recomendada)**
+- Também conhecida como sintaxe implícita
+- Utiliza vírgula , para separar tabelas
+- A condição de junção fica dentro do WHERE
+- Mistura filtro com relacionamento
+- Menor legibilidade e maior risco de erro
 
 Exemplo:
 ``` sql
-DECLARE @X INT;
-SET @X = 10;
+SELECT P.FirstName, SOH.CustomerID, SOD.OrderQty
+FROM Person.Person P, Sales.SalesOrderHeader SOH, Sales.SalesOrderDetail SOD
+WHERE SOH.SalesOrderID = SOD.SalesOrderID
+  AND SOH.CustomerID IS NOT NULL
+  AND SOD.OrderQty > 2;
+``` 
 
-SELECT @X AS Valor;
-```
-
-→ A variável existe apenas dentro do **batch** onde foi declarada  
-→ Quando o SQL Server encontra um `GO`, o batch é encerrado  
-→ Após o `GO`, a variável deixa de existir
+**Sintaxe Padrão ANSI (Recomendada)**
+- Utiliza a palavra-chave JOIN
+- A condição de relacionamento fica no ON
+- O WHERE é usado apenas para filtro
+- Melhor organização e legibilidade
 
 Exemplo:
 ``` sql
-DECLARE @X INT = 10;
-GO
-SELECT @X;  -- Erro: variável não existe mais
+SELECT P.FirstName, SOH.CustomerID, SOD.OrderQty
+FROM Sales.SalesOrderHeader SOH
+JOIN Sales.SalesOrderDetail SOD 
+    ON SOH.SalesOrderID = SOD.SalesOrderID
+JOIN Sales.Customer C
+    ON SOH.CustomerID = C.CustomerID
+JOIN Person.Person P
+    ON C.PersonID = P.BusinessEntityID
+WHERE SOD.OrderQty > 2;
 ```
 
-> **Importante:** variáveis não são globais na sessão inteira. Elas são válidas apenas no batch atual
+### Tipos de JOIN
 
-### Variáveis de sistema (globais)
+- INNER JOIN
+→ Retorna apenas registros que possuem correspondência em ambas as tabelas.
 
-- Começam com `@@`
-- São fornecidas pelo SQL Server
-- Retornam informações do ambiente ou da execução
+- LEFT JOIN
+→ Retorna todos os registros da tabela da esquerda, mesmo sem correspondência na direita
 
-Exemplos:
-- `@@ERROR` → código de erro da última instrução executada
-- `@@VERSION` → versão do SQL Server
-- `@@ROWCOUNT` → quantidade de linhas afetadas pela última instrução
+- RIGHT JOIN
+→ Retorna todos os registros da tabela da direita, mesmo sem correspondência na esquerda
 
----
+- FULL JOIN
+→ Retorna todos os registros de ambas as tabelas, combinando quando houver correspondência
 
-## 8 - Operadores
+- CROSS JOIN
+→ Retorna o produto cartesiano entre as tabelas (todas as combinações possíveis)
 
-### Tipos
-- Aritméticos: `+ - * /`
-- Comparação: `= <> > < >= <=`
-- Concatenação: `+` (string)
-- Lógicos: `AND OR NOT`
 
-Precedência: Usar `(...)` para deixar explícito
+### Processamento dos JOIN (Ordem Lógica)
+Dentro do fluxo geral da query, os JOINs são processados após o FROM e antes do WHERE
 
----
-
-## 9 - Instruções dinâmicas (Dynamic SQL)
-
-- `EXEC()` executa uma string como comando
-- Se concatenar valores não-string é preciso converter com `CAST`, `CONVERT`, `STR`
-- Boa prática: preferir `sp_executesql` (permite parâmetros, fica mais seguro e reaproveita plano)
-- Atenção com SQL Injection quando houver entrada externa
-
----
-
-## 10) Controlando fluxo de execução
-
-- Bloco: `BEGIN ... END`
-- Condicional: `IF ... ELSE`
-- Loop: `WHILE`
-- Lista/decisão: `CASE`
