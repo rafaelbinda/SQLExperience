@@ -7,7 +7,7 @@
 ---
 
 ## Descrição
-Este documento apresenta os fundamentos de consulta de dados utilizando SELECT, filtros, agrupamentos e junções no SQL Server.
+Este documento apresenta os fundamentos de consulta de dados utilizando SELECT, filtros, agrupamentos e junções no SQL Server
 
 ---
 
@@ -20,10 +20,10 @@ Este documento apresenta os fundamentos de consulta de dados utilizando SELECT, 
 
 → A instrução **SELECT** é a base da consulta de dados no SQL Server  
 → Ela é utilizada para recuperar informações armazenadas em uma ou mais tabelas, retornando um conjunto de resultados (result set) em formato tabular  
-→ Compreender corretamente o funcionamento do SELECT é essencial antes de avançar para junções, agregações e otimizações  
+→ Compreender corretamente o funcionamento do **SELECT** é essencial antes de avançar para junções, agregações e otimizações  
 
 ### Conceitos Fundamentais
-→ O SELECT permite extrair dados de:  
+→ O **SELECT** permite extrair dados de:  
 
 - Uma única tabela
 - Múltiplas tabelas (utilizando JOIN)
@@ -34,21 +34,21 @@ Este documento apresenta os fundamentos de consulta de dados utilizando SELECT, 
 ### SELECT List (Filtro Vertical)
 → Define quais colunas aparecerão no resultado  
 → É chamado de filtro vertical, pois controla as colunas retornadas  
-→ Se nenhuma coluna específica for definida, pode-se usar *, que retorna todas as colunas da tabela  
-→ Apesar de válido, o uso de SELECT * não é recomendado, pois:  
+→ Se nenhuma coluna específica for definida, pode-se usar **`*`**, que retorna todas as colunas da tabela  
+→ Apesar de válido, o uso de **`SELECT *`** não é recomendado, pois:  
 - Aumenta I/O desnecessariamente  
 - Pode impactar performance  
 - Pode quebrar aplicações caso a estrutura da tabela mude
 
 
 ### WHERE (Filtro Horizontal)
-→ A cláusula WHERE define quais linhas serão retornadas  
+→ A cláusula **WHERE** define quais linhas serão retornadas  
 → É chamada de filtro horizontal, pois restringe registros (linhas) com base em uma condição lógica  
-→ Sem a cláusula WHERE, todas as linhas da tabela serão retornadas
+→ Sem a cláusula **WHERE**, todas as linhas da tabela serão retornadas
 
 
 ### FROM
-→ A cláusula FROM define a origem dos dados  
+→ A cláusula **FROM** define a origem dos dados  
 → Ela pode conter:
 - Uma tabela
 - Múltiplas tabelas
@@ -76,7 +76,7 @@ ORDER BY <lista_de_colunas>;
 
 ### Ordem Lógica de Processamento
 
-→ Embora a instrução comece com SELECT, o SQL Server processa logicamente a consulta na seguinte ordem:
+→ Embora a instrução comece com **SELECT**, o SQL Server processa logicamente a consulta na seguinte ordem:
 - 1º FROM 
 - 2º JOIN 
 - 3º WHERE 
@@ -86,9 +86,9 @@ ORDER BY <lista_de_colunas>;
 - 7º ORDER BY
 
 → Entender essa ordem ajuda a compreender:
-- Por que aliases não funcionam no WHERE
-- Por que agregações não podem ser usadas diretamente no WHERE
-- Por que o HAVING filtra grupos e não linhas individuais
+- Por que aliases não funcionam no **WHERE**
+- Por que agregações não podem ser usadas diretamente no **WHERE**
+- Por que o **HAVING** filtra grupos e não linhas individuais
  
 ---
 
@@ -98,14 +98,14 @@ ORDER BY <lista_de_colunas>;
 → A cláusula **GROUP BY** é utilizada para agrupar linhas que possuem valores iguais em determinadas colunas, permitindo a aplicação de funções de agregação sobre esses grupos  
 → Ela é fundamental quando precisamos transformar dados detalhados em dados consolidados  
 → O **GROUP BY** agrupa registros com base em uma ou mais colunas  
-→ A cláusula **WHERE** é executada antes do **GROUP BY** ou seja O WHERE é aplicado antes do agrupamento, isso significa que:
+→ A cláusula **WHERE** é executada antes do **GROUP BY**, ou seja, O **WHERE** é aplicado antes do agrupamento, isso significa que:
 - Apenas os registros que satisfazem a condição do **WHERE** serão considerados
 - O agrupamento ocorre somente sobre o conjunto já filtrado
   
 → Ordem lógica relevante:
-- FROM
-- WHERE
-- GROUP BY
+- 1º FROM
+- 2º WHERE
+- 3º GROUP BY
 
 → É usado por exemplo para:
 - Agrupar vendas por cliente
@@ -156,7 +156,7 @@ Existem duas formas de escrever junções no SQL Server:
 **Sintaxe Antiga (Não Recomendada)**
 - Também conhecida como sintaxe implícita
 - Utiliza vírgula , para separar tabelas
-- A condição de junção fica dentro do WHERE
+- A condição de junção fica dentro do **WHERE**
 - Mistura filtro com relacionamento
 - Menor legibilidade e maior risco de erro
 
@@ -190,23 +190,19 @@ WHERE SOD.OrderQty > 2;
 
 ### Tipos de JOIN
 
-- INNER JOIN
-→ Retorna apenas registros que possuem correspondência em ambas as tabelas.
+- **INNER JOIN** → Retorna apenas registros que possuem correspondência em ambas as tabelas.
 
-- LEFT JOIN
-→ Retorna todos os registros da tabela da esquerda, mesmo sem correspondência na direita
+- **LEFT JOIN** → Retorna todos os registros da tabela da esquerda, mesmo sem correspondência na direita
 
-- RIGHT JOIN
-→ Retorna todos os registros da tabela da direita, mesmo sem correspondência na esquerda
+- **RIGHT JOIN** → Retorna todos os registros da tabela da direita, mesmo sem correspondência na esquerda
 
-- FULL JOIN
-→ Retorna todos os registros de ambas as tabelas, combinando quando houver correspondência
+- **FULL JOIN** → Retorna todos os registros de ambas as tabelas, combinando quando houver correspondência
 
-- CROSS JOIN
-→ Retorna o produto cartesiano entre as tabelas (todas as combinações possíveis)
+- **CROSS JOIN** → Retorna o produto cartesiano entre as tabelas (todas as combinações possíveis)
 
 
 ### Processamento dos JOIN (Ordem Lógica)
 Dentro do fluxo geral da query, os JOINs são processados após o **FROM** e antes do **WHERE**
+
 
 
