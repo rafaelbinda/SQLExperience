@@ -1,7 +1,7 @@
 ﻿# A0009 – Sql Data Querying 
 
 > **Author:** Rafael Binda  
-> **Created:** 2026-02-27 
+> **Created:** 2026-02-27  
 > **Version:** 1.0 
 
 ---
@@ -12,15 +12,15 @@ Este documento apresenta os fundamentos de consulta de dados utilizando SELECT, 
 ---
 
 ## Observações
-`scripts\Q0003-sql-fundamentals.sql`  
+`scripts\Q0004-sql-data-querying.sql`  
 
 ---
 
 ## 1 - Consultando Dados — Introdução ao SELECT
 
-A instrução SELECT é a base da consulta de dados no SQL Server.  
-Ela é utilizada para recuperar informações armazenadas em uma ou mais tabelas, retornando um conjunto de resultados (result set) em formato tabular.  
-Compreender corretamente o funcionamento do SELECT é essencial antes de avançar para junções, agregações e otimizações.  
+→ A instrução **SELECT** é a base da consulta de dados no SQL Server  
+→ Ela é utilizada para recuperar informações armazenadas em uma ou mais tabelas, retornando um conjunto de resultados (result set) em formato tabular  
+→ Compreender corretamente o funcionamento do SELECT é essencial antes de avançar para junções, agregações e otimizações  
 
 ### Conceitos Fundamentais
 → O SELECT permite extrair dados de:  
@@ -32,11 +32,10 @@ Compreender corretamente o funcionamento do SELECT é essencial antes de avança
    
 
 ### SELECT List (Filtro Vertical)
-→ Define quais colunas aparecerão no resultado
-→ É chamado de filtro vertical, pois controla as colunas retornadas
-→ Se nenhuma coluna específica for definida, pode-se usar *, que retorna todas as colunas da tabela
-
-Apesar de válido, o uso de SELECT * não é recomendado, pois:
+→ Define quais colunas aparecerão no resultado  
+→ É chamado de filtro vertical, pois controla as colunas retornadas  
+→ Se nenhuma coluna específica for definida, pode-se usar *, que retorna todas as colunas da tabela  
+→ Apesar de válido, o uso de SELECT * não é recomendado, pois:  
 - Aumenta I/O desnecessariamente  
 - Pode impactar performance  
 - Pode quebrar aplicações caso a estrutura da tabela mude
@@ -44,7 +43,7 @@ Apesar de válido, o uso de SELECT * não é recomendado, pois:
 
 ### WHERE (Filtro Horizontal)
 → A cláusula WHERE define quais linhas serão retornadas  
-→ É chamada de filtro horizontal, pois restringe registros (linhas) com base em uma condição lógica
+→ É chamada de filtro horizontal, pois restringe registros (linhas) com base em uma condição lógica  
 → Sem a cláusula WHERE, todas as linhas da tabela serão retornadas
 
 
@@ -57,7 +56,7 @@ Apesar de válido, o uso de SELECT * não é recomendado, pois:
 - Subconsultas
  
 ### Menor Comando SELECT Possível 
-→ Mesmo sendo sintaticamente correto, recomenda-se sempre especificar explicitamente as colunas desejadas
+→ Mesmo sendo sintaticamente correto, recomenda-se sempre especificar explicitamente as colunas desejadas  
 Exemplo:
 ``` sql
 SELECT * FROM tabela;
@@ -95,50 +94,45 @@ ORDER BY <lista_de_colunas>;
 
 ## 2 — GROUP BY
 
-Permite fazer agrupamento de linhas  
-A cláusula GROUP BY é utilizada para agrupar linhas que possuem valores iguais em determinadas colunas,  
-permitindo a aplicação de funções de agregação sobre esses grupos  
-Ela é fundamental quando precisamos transformar dados detalhados em dados consolidados  
-O GROUP BY agrupa registros com base em uma ou mais colunas
+→ Permite fazer agrupamento de linhas  
+→ A cláusula **GROUP BY** é utilizada para agrupar linhas que possuem valores iguais em determinadas colunas, permitindo a aplicação de funções de agregação sobre esses grupos  
+→ Ela é fundamental quando precisamos transformar dados detalhados em dados consolidados  
+→ O **GROUP BY** agrupa registros com base em uma ou mais colunas  
+→ A cláusula **WHERE** é executada antes do **GROUP BY** ou seja O WHERE é aplicado antes do agrupamento, isso significa que:
+- Apenas os registros que satisfazem a condição do **WHERE** serão considerados
+- O agrupamento ocorre somente sobre o conjunto já filtrado
+  
+→ Ordem lógica relevante:
+- FROM
+- WHERE
+- GROUP BY
 
-Por exemplo:
+→ É usado por exemplo para:
 - Agrupar vendas por cliente
 - Agrupar pedidos por data
 - Agrupar produtos por categoria
 - Cada combinação única das colunas especificadas gera um grupo
 
-→ O WHERE é aplicado antes do agrupamento  
-→ A cláusula WHERE é executada antes do GROUP BY  
-
-Isso significa que:
-- Apenas os registros que satisfazem a condição do WHERE serão considerados
-- O agrupamento ocorre somente sobre o conjunto já filtrado
-
-Ordem lógica relevante:
-- FROM
-- WHERE
-- GROUP BY
-
 ### Usado para realizar cálculos (Agregações)
-O GROUP BY normalmente é utilizado em conjunto com funções de agregação, como:
+→ O **GROUP BY** normalmente é utilizado em conjunto com funções de agregação, como:
 - COUNT() → Contagem de registros
 - SUM() → Soma
 - AVG() → Média
 - MIN() → Menor valor
 - MAX() → Maior valor
 
-→ Sem o GROUP BY, essas funções retornam um único resultado global
-→ Com o GROUP BY, elas retornam um resultado para cada grupo
+→ Sem o **GROUP BY**, essas funções retornam um único resultado global  
+→ Com o **GROUP BY**, elas retornam um resultado para cada grupo  
 
-###Regra Importante
-→ Ao utilizar GROUP BY toda coluna presente no SELECT deve:
+### Regra Importante
+→ Ao utilizar **GROUP BY** toda coluna presente no SELECT deve:
 - Estar dentro de uma função de agregação ou
-- Estar declarada na cláusula GROUP BY
-Caso contrário, o SQL Server retornará erro  
-Essa regra existe porque, ao agrupar, o banco precisa saber como consolidar cada coluna  
+- Estar declarada na cláusula **GROUP BY**
+→ Caso contrário, o SQL Server retornará erro  
+→ Essa regra existe porque, ao agrupar, o banco precisa saber como consolidar cada coluna  
 
 ### Diferença entre WHERE e HAVING
-Embora ambos filtrem dados, eles atuam em momentos diferentes:
+→ Embora ambos filtrem dados, eles atuam em momentos diferentes:
 - WHERE → Filtra linhas antes do agrupamento
 - HAVING → Filtra grupos após o agrupamento
 
@@ -153,8 +147,8 @@ HAVING → filtra grupos
 
 ## 3 - JOIN
 
-A cláusula JOIN é utilizada para combinar dados de duas ou mais tabelas com base em uma relação entre colunas  
-Ela permite consultar dados relacionados que estão distribuídos em tabelas diferentes  
+→ A cláusula **JOIN** é utilizada para combinar dados de duas ou mais tabelas com base em uma relação entre colunas  
+→ Ela permite consultar dados relacionados que estão distribuídos em tabelas diferentes  
 
 ### Sintaxes de JOIN
 Existem duas formas de escrever junções no SQL Server:
@@ -168,28 +162,28 @@ Existem duas formas de escrever junções no SQL Server:
 
 Exemplo:
 ``` sql
-SELECT P.FirstName, SOH.CustomerID, SOD.OrderQty
+SELECT P.FirstName AS PRIMEIRO_NOME, SOH.CustomerID, SOD.OrderQty
 FROM Person.Person P, Sales.SalesOrderHeader SOH, Sales.SalesOrderDetail SOD
 WHERE SOH.SalesOrderID = SOD.SalesOrderID
-  AND SOH.CustomerID IS NOT NULL
-  AND SOD.OrderQty > 2;
+AND SOH.CustomerID IS NOT NULL
+AND SOD.OrderQty > 2;
 ``` 
 
 **Sintaxe Padrão ANSI (Recomendada)**
-- Utiliza a palavra-chave JOIN
-- A condição de relacionamento fica no ON
-- O WHERE é usado apenas para filtro
+- Utiliza a palavra-chave **JOIN**
+- A condição de relacionamento fica no **ON**
+- O **WHERE** é usado apenas para filtro
 - Melhor organização e legibilidade
 
 Exemplo:
 ``` sql
 SELECT P.FirstName, SOH.CustomerID, SOD.OrderQty
 FROM Sales.SalesOrderHeader SOH
-JOIN Sales.SalesOrderDetail SOD 
+INNER JOIN Sales.SalesOrderDetail SOD 
     ON SOH.SalesOrderID = SOD.SalesOrderID
-JOIN Sales.Customer C
+INNER JOIN Sales.Customer C
     ON SOH.CustomerID = C.CustomerID
-JOIN Person.Person P
+INNER JOIN Person.Person P
     ON C.PersonID = P.BusinessEntityID
 WHERE SOD.OrderQty > 2;
 ```
@@ -213,5 +207,6 @@ WHERE SOD.OrderQty > 2;
 
 
 ### Processamento dos JOIN (Ordem Lógica)
-Dentro do fluxo geral da query, os JOINs são processados após o FROM e antes do WHERE
+Dentro do fluxo geral da query, os JOINs são processados após o **FROM** e antes do **WHERE**
+
 
