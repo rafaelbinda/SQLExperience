@@ -2,7 +2,7 @@
 ===============================================================================
 Author      : Rafael Binda
 Created     : 2026-02-24
-Version     : 2.0
+Version     : 3.0
 Task        : Q0003 - SQL Fundamentals
 Databases   : ExamplesDB, AdventureWorks
 Object      : Script
@@ -320,4 +320,92 @@ All-Purpose Bike Stand
 BB Ball Bearing
 Bearing Ball
 Bike Wash - Dissolver
+*/
+
+-------------------------------------------------------------------------------
+-- 7 - Flow control (IF/ELSE, WHILE, CASE)
+-------------------------------------------------------------------------------
+-- IF/ELSE demo
+DECLARE @Rows INT;
+
+SELECT @Rows = COUNT(1) FROM dbo.TableDbo;
+
+IF @Rows > 0
+    BEGIN
+        SELECT 'dbo.TableDbo has rows' AS Info, @Rows AS RowCountA;
+    END
+ELSE
+    BEGIN
+        SELECT 'dbo.TableDbo is empty' AS Info, @Rows AS RowCountB;
+    END
+GO
+
+/*
+Result:
+Info	                RowCountA
+dbo.TableDbo has rows	7
+*/
+
+-- WHILE demo (insert 5 rows)
+DECLARE @i INT = 1;
+
+WHILE @i <= 5
+BEGIN
+    INSERT dbo.TableDbo (Info)
+    VALUES (CONCAT('Loop row ', @i));
+
+    SET @i += 1;
+END
+GO
+
+SELECT * 
+FROM dbo.TableDbo 
+ORDER BY Id DESC;
+GO
+
+/*
+Result after 3 runs:
+Id	Info
+22	Loop row 5      --3
+21	Loop row 4
+20	Loop row 3
+19	Loop row 2
+18	Loop row 1
+17	Loop row 5      --2
+16	Loop row 4
+15	Loop row 3
+14	Loop row 2
+13	Loop row 1
+12	Loop row 5      --1
+11	Loop row 4
+10	Loop row 3
+9	Loop row 2
+8	Loop row 1
+7	Row in dbo
+6	Row in dbo
+5	Row in dbo
+4	Row in dbo
+3	Row in dbo
+2	Row in dbo
+1	Row in dbo
+*/
+
+-- CASE demo (label row count)
+DECLARE @Total INT;
+SELECT @Total = COUNT(1) FROM dbo.TableDbo;
+
+SELECT
+    @Total AS TotalRows,
+    CASE
+        WHEN @Total = 0 THEN 'Empty'
+        WHEN @Total BETWEEN 1 AND 5 THEN 'Small'
+        WHEN @Total BETWEEN 6 AND 35 THEN 'Medium'
+        ELSE 'Large'
+    END AS SizeLabel;
+GO
+
+/*
+Result:
+TotalRows	SizeLabel
+22	        Medium
 */
