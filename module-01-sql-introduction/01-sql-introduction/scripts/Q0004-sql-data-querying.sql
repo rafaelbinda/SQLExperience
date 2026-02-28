@@ -8,7 +8,7 @@ Databases   : AdventureWorks
 Object      : Script
 Description : Examples demonstrating data retrieval using SELECT, filtering, 
               grouping, and joins in SQL Server. 
-Notes       : 
+Notes       : A0009-sql-data-querying.md
 ===============================================================================
 */
 

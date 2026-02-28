@@ -8,7 +8,7 @@ Databases   : ExamplesDB, AdventureWorks
 Object      : Script
 Description : Examples for command types, batches, errors, naming, variables,
               operators, dynamic SQL and flow control 
-Notes       : -
+Notes       : A0008-sql-fundamentals.md
 ===============================================================================
 */
 

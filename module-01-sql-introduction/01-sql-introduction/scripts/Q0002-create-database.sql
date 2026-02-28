@@ -6,7 +6,7 @@ Version     : 1.0
 Task        : Q0002 - Create Database
 Object      : Script
 Description : Queries using create database 
-Notes       : -
+Notes       : notes/A0007-sql-server-architecture.md
 ===============================================================================
 */
 
