@@ -2,7 +2,7 @@
 
 > **Author:** Rafael Binda  
 > **Created:** 2026-02-28  
-> **Version:** 2.0 
+> **Version:** 3.0 
 
 ---
 
@@ -16,7 +16,7 @@ Este documento apresenta os tipos de Dados no SQL Server
 
 ---
 
-## 1 - Tipos de dados STRING
+## 1 - Tipos de Dados String
 
 No SQL Server, os tipos de dados para texto (caracteres) são divididos em dois grandes grupos:
 
@@ -130,10 +130,23 @@ NVARCHAR(10)
 - Utilizar `VARCHAR(MAX)` ou `NVARCHAR(MAX)` para grandes volumes de texto
 - Considerar o impacto de armazenamento ao utilizar Unicode pois consome o dobro de espaço
 
+---
+
+**Resumo Tipos de Dados String:**
+
+| Tipo | Descrição | Tamanho Máximo | Observação |
+|-----|-----------|---------------|-----------|
+| CHAR(n) | Texto de tamanho fixo | 8.000 bytes | Sempre ocupa o tamanho definido |
+| VARCHAR(n) | Texto de tamanho variável | 8.000 bytes | Usa apenas o espaço necessário |
+| VARCHAR(MAX) | Texto longo | ~2 GB | Substitui TEXT |
+| NCHAR(n) | Unicode tamanho fixo | 4.000 caracteres | 2 bytes por caractere |
+| NVARCHAR(n) | Unicode variável | 4.000 caracteres | Suporte a múltiplos idiomas |
+| NVARCHAR(MAX) | Unicode longo | ~2 GB | Substitui NTEXT |
+
 
 ---
 
-## 2 - Tipos de dados Numéricos
+## 2 - Tipos de Dados Numéricos
 
 Os tipos de dados numéricos no SQL Server são divididos em quatro categorias principais:
 
@@ -366,6 +379,22 @@ Por que isso acontece?
 - **Recomendação:** Preferir `DECIMAL` para valores financeiros
 
 ---
+**Resumo Tipos de Dados Numéricos:**
+
+| Categoria | Tipo | Bytes | Precisão / Intervalo | Observação |
+|---|---|---|---|---|
+| Inteiro | TINYINT | 1 | 0 a 255 | Não aceita valores negativos |
+| Inteiro | SMALLINT | 2 | -32.768 a 32.767 | Inteiro de pequeno intervalo |
+| Inteiro | INT | 4 | -2.147.483.648 a 2.147.483.647 | Inteiro mais utilizado |
+| Inteiro | BIGINT | 8 | -9.223.372.036.854.775.808 a 9.223.372.036.854.775.807 | Inteiros muito grandes |
+| Decimal (exato) | DECIMAL(p,s) | 5–17 | Precisão definida | Número decimal com precisão e escala |
+| Decimal (exato) | NUMERIC(p,s) | 5–17 | Igual ao DECIMAL | Sinônimo de DECIMAL |
+| Aproximado | REAL | 4 | ~7 dígitos de precisão | FLOAT(24) |
+| Aproximado | FLOAT(53) | 8 | ~15–16 dígitos de precisão | Ponto flutuante |
+| Monetário | MONEY | 8 | 4 casas decimais | Pode causar arredondamentos |
+| Monetário | SMALLMONEY | 4 | 4 casas decimais | Intervalo menor que MONEY ||
+
+---
 
 ### 3 - Tipo Lógico
 
@@ -465,12 +494,386 @@ Quando dizemos `O controle de NULL é feito na null bitmap`, significa que:
 → Ele usa um bit indicando ausência de valor  
 → Esse bit fica numa área específica da linha  
 
+**Resumo do Tipo de Dado Lógico**
+| Tipo | Valores |
+|-----|---------|
+| BIT | 0, 1 ou NULL |
 
 ---
 
+### 4 - Tipos de Dados de Data e Hora
+
+Os tipos de dados de **data e hora** no SQL Server permitem armazenar datas, horários ou ambos  
+Alguns tipos existem desde as primeiras versões do SQL Server, enquanto outros foram introduzidos no **SQL Server 2008**
+
+--- 
+
+**Tipos Disponíveis em Todas as Versões**   
+
+**DATETIME**
+
+- Intervalo de 1753-01-01 até 9999-12-31
+- Precisão aproximada: **3,33 milissegundos**
+- Armazenamento: **8 bytes**
+- Armazena **data e hora juntos**
+- Foi o tipo mais utilizado historicamente
+- Hoje é recomendado usar **DATETIME2**, que possui maior precisão
+  
+---
+
+**SMALLDATETIME**
+
+- Intervalo de 1900-01-01 até 2079-06-06
+- Precisão: **1 minuto**
+- Armazenamento: **4 bytes**
+- Armazena **data e hora**
+- Segundos e milissegundos são sempre **00**
+- Hoje é pouco utilizado devido às limitações de precisão e intervalo
+
+---
+
+**A partir do SQL Server 2008 foram introduzidos novos tipos mais precisos e flexíveis**
+
+**DATE**
+
+- Armazena **apenas a data**
+- Intervalo de 0001-01-01 até 9999-12-31
+- Precisão: **1 dia**
+- Armazenamento: **3 bytes**
+- Ideal quando **não é necessário armazenar horário**
+
+---
+
+**TIME**
+- Armazena **apenas horário**
+- Intervalo de 00:00:00.0000000 até 23:59:59.9999999
+- Precisão máxima: **100 nanossegundos**
+- Armazenamento: **3 a 5 bytes** dependendo da precisão definida
+
+Exemplo:
+
+```sql
+TIME(7)
+```
+- O número indica a quantidade de casas decimais da fração de segundo
+
+---
+
+**DATETIME2**
+- Armazena **data e hora**
+- Intervalo de 0001-01-01 até 9999-12-31
+- Precisão: até **100 nanossegundos**
+- Armazenamento: **6 a 8 bytes** dependendo da precisão
+
+Vantagens sobre `DATETIME`:
+- Maior precisão
+- Maior intervalo de datas
+- Armazenamento mais eficiente
+- Tipo recomendado para novos projetos
+
+---
+
+**DATETIMEOFFSET**
+- Muito comum em sistemas **distribuídos ou globais**
+- Igual ao **DATETIME2**, mas inclui **informação de fuso horário (timezone)**
+- Intervalo de timezone: -14:00 até +14:00  
+
+Exemplo:
+```sql
+2026-03-03 21:30:00 -03:00
+```
+
+Utilizado quando é necessário registrar:  
+→ Hora  
+→ Data  
+→ Fuso horário  
+
+---
+
+**Boas Práticas**
+
+- Prefirir **DATETIME2** em novos projetos
+- Usar **DATE** quando precisar apenas da data
+- Usar **TIME** quando precisar apenas do horário
+- Usar **DATETIMEOFFSET** quando o sistema precisar armazenar **timezone**
+- Evitar **SMALLDATETIME** devido à baixa precisão
+
+---
+
+**Resumo Tipos de Dados de Data e Hora**
+| Tipo | Data | Hora | Precisão | Intervalo | Bytes | Observação |
+|-----|-----|-----|-----|-----|-----|-----|
+| DATE | ✔ | ❌ | 1 dia | 0001-01-01 a 9999-12-31 | 3 | Armazena apenas data |
+| TIME | ❌ | ✔ | até 100 ns | 00:00:00 a 23:59:59.9999999 | 3–5 | Armazena apenas hora |
+| DATETIME | ✔ | ✔ | 3,33 ms | 1753-01-01 a 9999-12-31 | 8 | Tipo tradicional |
+| SMALLDATETIME | ✔ | ✔ | 1 minuto | 1900-01-01 a 2079-06-06 | 4 | Baixa precisão |
+| DATETIME2 | ✔ | ✔ | até 100 ns | 0001-01-01 a 9999-12-31 | 6–8 | Recomendado para novos sistemas |
+| DATETIMEOFFSET | ✔ | ✔ | até 100 ns | 0001-01-01 a 9999-12-31 | 8–10 | Inclui timezone (-14:00 a +14:00) |
 
 
+---
 
+### 5 - Tipos de Dados Especiais no SQL Server
+
+O SQL Server possui alguns tipos de dados específicos utilizados para cenários especiais como:
+
+- Identificação global
+- Controle de concorrência
+- Armazenamento binário
+- Estruturas hierárquicas
+- Dados espaciais
+- Estruturas XML
+
+---
+
+**UNIQUEIDENTIFIER**
+- Armazena um identificador único global (**GUID – Global Unique Identifier**)  
+- Tamanho: **16 bytes**
+- Único mesmo entre servidores diferentes
+- Muito utilizado em **replicação**
+- Pode ser gerado automaticamente
+- O algoritmo utiliza diferentes componentes (tempo, aleatoriedade e outros dados) para garantir unicidade
+ 
+Exemplo:
+
+```sql
+SELECT NEWID()
+```
+
+Resultado de exemplo:
+
+```
+550e8400-e29b-41d4-a716-446655440000
+```
+
+**Funções relacionadas:**
+| Função | Descrição |
+|------|------|
+| NEWID() | Gera um GUID aleatório |
+| NEWSEQUENTIALID() | Gera GUID sequencial (melhor para índices) |
+
+---
+
+**ROWVERSION**
+- Tipo utilizado para **controle de versão de linha**
+- Tamanho: **8 bytes**
+- Valor gerado automaticamente pelo SQL Server
+- Sempre que uma linha é modificada, o valor do `ROWVERSION` é atualizado automaticamente
+- É frequentemente utilizado em controle de **concorrência otimista**, onde o valor da versão da linha é verificado durante o UPDATE para garantir que o registro não foi alterado por outra transação desde a última leitura
+
+**O que é concorrência otimista?**  
+→ Concorrência acontece quando duas ou mais transações tentam alterar o mesmo registro ao mesmo tempo  
+→ Existem duas estratégias comuns:  
+
+|Estratégia|Ideia|
+|-----------|------|
+|Concorrência pessimista	| Bloqueia o registro para evitar conflitos |
+|Concorrência otimista	| Assume que conflitos são raros e verifica apenas no momento do UPDATE |
+
+### Exemplo prático em ordem cronológica 
+
+**1** - Estado inicial da tabela
+|Id|Preco|RowVersion| 
+|-----------|------|	------|	
+1	| 50	| 0x00000000000007D3| 
+
+**2** - Aplicação lê o registro
+```sql
+SELECT Id, Preco, RowVersion
+FROM Produtos
+WHERE Id = 1
+```
+
+**3** - Resultado:  
+→ Preço = `50`  
+→ RowVersion = `0x00000000000007D3`  
+→ A aplicação guarda esse valor  
+
+**4** - Aconteçe o UPDATE
+
+```sql
+UPDATE Produtos
+SET Preco = 100
+WHERE Id = 1
+AND RowVersion = @RowVersionOriginal
+```
+→ Nesse momento @RowVersionOriginal = 0x00000000000007D3
+
+**4.1 - Cenário 1** 
+Ninguém alterou o registro  
+→ O valor ainda é o mesmo      
+→ `UPDATE` funciona  
+→ E o SQL Server gera um novo `ROWVERSION`  
+
+**4.2 - Cenário 2** 
+Outro usuário alterou antes executando um `UPDATE` como este abaixo  
+```sql
+UPDATE Produtos
+SET Preco = 80
+WHERE Id = 1
+```
+**4.2.1** - Agora o ROWVERSION se torna `0x00000000000007D4`  
+**4.2.2** - Então, o UPDATE com RowVersion = `0x00000000000007D3` não encontra nenhuma linha e o resultado é `0 rows affected`  
+Isso indica conflito, assim, a aplicação pode entender que o registro foi alterado por outro usuário e pode:  
+→ Avisar o usuário  
+→ Recarregar o registro  
+→ Tentar novamente  
+
+**Vantagem desse método**  
+- Não precisa bloquear registro
+- Funciona bem em sistemas web  
+- Muito usado em:  
+→ Entity Framework  
+→ APIs REST  
+→ Sistemas multiusuário  
+
+---
+
+**TIMESTAMP** (nome antigo)
+- `TIMESTAMP` é apenas um **sinônimo de ROWVERSION** no SQL Server
+- Isso gera confusão porque:  
+→ Na **ANSI SQL**, `TIMESTAMP` significa **Data + Hora**  
+→ No **SQL Server** ele representa apenas **um número binário sequencial**  
+- Por isso a Microsoft recomenda utilizar `ROWVERSION`  
+
+---
+
+**IMAGE** (Deprecated)
+- Tipo utilizado para armazenar dados binários grandes
+- Capacidade: **até 2 GB**
+- A recomendação atual da Microsoft é utilizar `VARBINARY(MAX)`
+
+---
+
+**BINARY**
+- Armazena dados binários de **tamanho fixo**
+- No exemplo abaixo sempre ocupará exatamente **10 bytes**
+
+```sql
+BINARY(10)
+```
+
+---
+
+**VARBINARY**
+- Armazena dados binários de **tamanho variável**
+- Capacidade: até 2 GB
+- Versão para grandes dados: `VARBINARY(MAX)`
+- Armazena apenas a quantidade real de bytes do valor armazenado, acrescido de 2 bytes utilizados pelo SQL Server para registrar o tamanho do dado
+- Muito utilizado para:  
+→ imagens  
+→ documentos  
+→ arquivos  
+→ hashes criptográficos  
+
+Exemplo:  
+
+```sql
+VARBINARY(100)
+```
+
+---
+
+**XML**
+- Tipo de dado utilizado para armazenar documentos **XML**
+- Capacidade máxima: **2 GB**
+- Possui suporte a métodos específicos para manipulação de XML
+
+Exemplo:
+
+```sql
+SELECT XmlCol.query('/clientes/cliente')
+FROM TabelaXML
+```
+
+Vantagens:  
+→ Validação de estrutura XML  
+→ Métodos nativos para consulta e manipulação  
+→ Integração com XQuery  
+
+
+---
+
+**SQL_VARIANT**
+- Tipo que pode armazenar **diferentes tipos de dados**  
+- Pode conter valores como:  
+→ INT  
+→ VARCHAR  
+→ DATETIME  
+→ DECIMAL  
+- Mas cada valor armazena também metadados indicando qual tipo foi utilizado
+- **Recomendação:** evitar usar quando possível
+
+Motivos:  
+→ Maior complexidade  
+→ Impacto em performance  
+→ Dificuldade de indexação   
+
+---
+
+**TABLE**
+- Tipo utilizado para declarar **variáveis do tipo tabela**
+- Funciona de forma semelhante a uma **tabela temporária**, mas:  
+→ Existe apenas dentro do escopo da variável  
+→ Não é visível fora do batch ou procedure  
+
+Exemplo:  
+
+```sql
+DECLARE @TabelaExemplo TABLE (
+    Id INT,
+    Nome VARCHAR(50)
+)
+```
+
+---
+
+**HIERARCHYID**  
+- Tipo especializado para armazenar **estruturas hierárquicas**  
+
+Exemplo de uso:  
+→ Estrutura organizacional  
+→ Árvore de categorias  
+→ Estruturas de diretórios  
+
+Permite navegar facilmente entre:  
+→ pai  
+→ filho  
+→ descendentes  
+
+---
+
+**GEOMETRY**  
+- Tipo utilizado para armazenar **dados espaciais em plano cartesiano (flat-earth)**  
+- Usado em cenários como:  
+→ mapas locais  
+→ plantas  
+→ coordenadas em plano  
+
+---
+
+**GEOGRAPHY**  
+- Tipo utilizado para armazenar **dados espaciais considerando a curvatura da Terra (round-earth)**  
+- Usado para:  
+→ coordenadas GPS  
+→ latitude e longitude  
+→ cálculos de distância geográfica  
+
+---
+
+**Resumo Tipos de Dados Especiais**
+| Tipo | Uso principal |
+|-----|---------------|
+| UNIQUEIDENTIFIER | Identificador único global |
+| ROWVERSION | Controle de versão de linha |
+| BINARY | Dados binários fixos |
+| VARBINARY | Dados binários variáveis |
+| XML | Armazenamento de documentos XML |
+| SQL_VARIANT | Armazenar múltiplos tipos |
+| TABLE | Variável do tipo tabela |
+| HIERARCHYID | Estruturas hierárquicas |
+| GEOMETRY | Dados espaciais em plano |
+| GEOGRAPHY | Dados espaciais globais |
 
 
 
