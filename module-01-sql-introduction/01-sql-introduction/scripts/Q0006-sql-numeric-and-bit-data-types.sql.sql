@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-03-04
 Version     : 1.0
-Task        : Q0006 - sql-numeric-and-bit-data-types.sql
+Task        : Q0006-sql-numeric-and-bit-data-types.sql
 Databases   : ExamplesDB
 Object      : Script
 Description : Examples demonstrating numeric and bit data types in SQL Server
