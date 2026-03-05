@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-03-04
 Version     : 1.0
-Task        : Q0005 - sql-string-data-types.sql
+Task        : Q0005-sql-string-data-types.sql
 Databases   : ExamplesDB
 Object      : Script
 Description : Examples demonstrating string data types in SQL Server
