@@ -225,7 +225,7 @@ ConcatenationExample    =   SQL Server
 */
 
 -------------------------------------------------------------------------------
--- 9 - Converting values to strings
+-- 10 - Converting values to strings
 -------------------------------------------------------------------------------
 
 SELECT 
@@ -237,4 +237,63 @@ GO
 Result:
 CastExample	    DateToString
 123	            2026-03-04
+*/
+
+-------------------------------------------------------------------------------
+-- 11 - Comparison between CHAR and VARCHAR
+-------------------------------------------------------------------------------
+
+-- 11.1 - Creating an example table
+CREATE TABLE Example_Char_Varchar
+(
+    Code_CHAR    CHAR(10),
+    Code_VARCHAR VARCHAR(10)
+);
+GO
+
+-- 11.2 - Inserting data
+INSERT INTO Example_Char_Varchar
+VALUES ('SQL', 'SQL');
+
+INSERT INTO Example_Char_Varchar
+VALUES ('DATABASE', 'DATABASE');
+GO
+
+-- 11.3 Comparing LEN() vs DATALENGTH()
+
+SELECT
+Code_CHAR,
+LEN(Code_CHAR) AS LEN_CHAR,
+DATALENGTH(Code_CHAR) AS BYTES_CHAR,
+
+Code_VARCHAR,
+LEN(Code_VARCHAR) AS LEN_VARCHAR,
+DATALENGTH(Code_VARCHAR) AS BYTES_VARCHAR
+FROM Example_Char_Varchar;
+GO
+
+/*
+Result:
+Code_CHAR	LEN_CHAR	BYTES_CHAR	Code_VARCHAR	LEN_VARCHAR	BYTES_VARCHAR
+SQL       	    3	        10	    SQL	                3	        3
+DATABASE  	    8	        10	    DATABASE	        8	        8
+
+*/
+
+-------------------------------------------------------------------------------
+-- 12 - Demonstrating padding
+-------------------------------------------------------------------------------
+
+SELECT 
+'SQL' + 'X'        AS NormalConcat,
+Code_CHAR + 'X'    AS CHAR_Concat,
+Code_VARCHAR + 'X' AS VARCHAR_Concat
+FROM Example_Char_Varchar;
+GO
+
+/*
+Result:
+NormalConcat	CHAR_Concat	    VARCHAR_Concat
+SQLX	        SQL       X	    SQLX
+SQLX	        DATABASE  X	    DATABASEX
 */
