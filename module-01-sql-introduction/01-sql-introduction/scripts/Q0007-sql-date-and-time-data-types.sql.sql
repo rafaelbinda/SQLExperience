@@ -49,7 +49,23 @@ Id	CreatedAt
 3	9999-12-31 00:00:00.000
 */
 
---Demonstrating DATETIME rounding (~3.33 ms increments)
+--1.1 - Checking storage size
+SELECT
+Id,
+CreatedAt,
+DATALENGTH(CreatedAt) AS BytesStored
+FROM Example_Datetime;
+GO
+
+/*
+Result:
+Id	CreatedAt	                BytesStored
+1	1753-01-01 00:00:00.000	    8
+2	2026-03-05 23:01:57.447	    8
+3	9999-12-31 00:00:00.000	    8
+*/
+
+--1.2 - Demonstrating DATETIME rounding (~3.33 ms increments)
 
 CREATE TABLE Example_DatetimeRounding
 (
@@ -122,6 +138,23 @@ Id	CreatedAt
 3	2079-06-06 00:00:00
 */
 
+--2.1 - Checking storage size
+SELECT
+Id,
+CreatedAt,
+DATALENGTH(CreatedAt) AS BytesStored
+FROM Example_SmallDatetime;
+GO
+
+/*
+Result:
+Id	CreatedAt	            BytesStored
+1	1900-01-01 00:00:00	    4
+2	2026-03-05 23:05:00	    4
+3	2079-06-06 00:00:00	    4
+*/
+
+
 -------------------------------------------------------------------------------
 -- 3 - DATE
 -------------------------------------------------------------------------------
@@ -156,6 +189,23 @@ Id	OrderDate
 3	9999-12-31
 */
 
+--3.1 - Checking storage size
+SELECT
+Id,
+OrderDate,
+DATALENGTH(OrderDate) AS BytesStored
+FROM Example_Date;
+GO
+
+/*
+Result:
+Id	OrderDate	BytesStored
+1	0001-01-01	3
+2	2026-03-05	3
+3	9999-12-31	3
+*/
+
+
 -------------------------------------------------------------------------------
 -- 4 - TIME
 -------------------------------------------------------------------------------
@@ -186,6 +236,22 @@ Id	EventTime
 1	00:00:00.0000000
 2	23:11:01.4300000
 3	23:59:59.9999999
+*/
+
+--4.1 - Checking storage size
+SELECT
+Id,
+EventTime,
+DATALENGTH(EventTime) AS BytesStored
+FROM Example_Time;
+GO
+
+/*
+Result:
+Id	EventTime	        BytesStored
+1	00:00:00.0000000	5
+2	23:11:01.4300000	5
+3	23:59:59.9999999	5
 */
 
 -------------------------------------------------------------------------------
@@ -219,6 +285,23 @@ Id	CreatedAt
 2	2026-03-05 23:12:55.0367388
 3	9999-12-31 00:00:00.0000000
 */
+
+--5.1 - Checking storage size
+SELECT
+Id,
+CreatedAt,
+DATALENGTH(CreatedAt) AS BytesStored
+FROM Example_Datetime2;
+GO
+
+/*
+Result:
+Id	CreatedAt	                    BytesStored
+1	0001-01-01 00:00:00.0000000	        8
+2	2026-03-05 23:12:55.0367388	        8
+3	9999-12-31 00:00:00.0000000	        8
+*/
+
 
 -------------------------------------------------------------------------------
 -- 6 - DATETIMEOFFSET
@@ -258,7 +341,25 @@ Id	Location	    EventTime	                        CurrentServerTime
 5	Greenland	    2026-03-06 00:15:43.0045824 -02:00	2026-03-05 23:16:24.7890977 -03:00
 */
 
---Returns all time zones available in the instance
+--6.1 - Checking storage size
+SELECT
+Id,
+Location,
+DATALENGTH(EventTime) AS BytesStored
+FROM Example_DatetimeOffset;
+GO
+
+/*
+Result:
+Id	Location	        BytesStored
+1	Brazil	            10
+2	USA (New York)	    10
+3	China	            10
+4	Dubai	            10
+5	Greenland	        10
+*/
+
+--6.2 - Returns all time zones available in the instance
 SELECT *
 FROM sys.time_zone_info;
 
@@ -275,8 +376,9 @@ Dateline Standard Time	        -12:00	                0
 UTC-11	                        -11:00	                0
 Aleutian Standard Time	        -10:00	                0
 Hawaiian Standard Time	        -10:00	                0
+...
 Easter Island Standard Time	    -05:00	                1
-
+...
 */
 
 -------------------------------------------------------------------------------
