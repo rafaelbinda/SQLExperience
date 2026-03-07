@@ -16,7 +16,7 @@
 ---
 
 ## Observações
-Este documento contém informações complementares ao documento A0004-sql-server-connectivity-troubleshooting.  
+Este documento contém informações complementares ao documento [SQL Server Connectivity Troubleshooting](../notes/A0004-sql-server-connectivity-troubleshooting.md)    
 **Este documento apresenta apenas recomendações, não uma lista completa de procedimentos.**
 
 ---
@@ -138,5 +138,6 @@ sqlservr.exe                  7212 Services                   0    769.400 K
 ```
 
 ---
+
 
 
