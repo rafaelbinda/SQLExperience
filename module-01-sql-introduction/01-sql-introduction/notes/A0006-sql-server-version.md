@@ -11,13 +11,15 @@ Informações a respeito da versão do SQL SERVER
 
 ---
 
+## Hands-on
+`dba-scripts\SQL-instance-information\Q0003-sql-version.sql`
+
+---
+
 ## Observações
 - Utiliza o executável que está disponível em:  
 `module-01-sql-introduction\tools\A0003_X_PortQry.zip`
 
-## Hands-on  
-- Script disponível em:  
-`dba-scripts\SQL-instance-information\Q0003-sql-version.sql`
 ---
 
 ## 1. Versão do SQL Server
@@ -88,5 +90,6 @@ https://learn.microsoft.com/pt-br/troubleshoot/sql/releases/download-and-install
 - GDR  → 	Apenas correção de segurança
 
 ---
+
 
 
