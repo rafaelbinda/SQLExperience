@@ -12,13 +12,15 @@ Informações a respeito da versão do SQL SERVER
 ---
 
 ## Hands-on
-`dba-scripts\SQL-instance-information\Q0003-sql-version.sql`
+[SQL Version and Compatibility](../../../dba-scripts/SQL-instance-information/Q0003-version-and-compatibility.sql)  
 
 ---
 
 ## Observações
-- Utiliza o executável que está disponível em:  
-`module-01-sql-introduction\tools\A0003_X_PortQry.zip`
+- Neste capítulo é utilizado o executável que está disponível para download em [A0003_X_PortQry.zip](../tools/A0003_X_PortQry.zip)  
+1.1 - Na página do GitHub, clique em View ou Raw para baixar o arquivo  
+1.2 - Após o download, extraia o arquivo PortQry.exe em algum diretório de sua preferência  
+1.3 - Não há necessidade de realizar instalação  
 
 ---
 
@@ -90,6 +92,7 @@ https://learn.microsoft.com/pt-br/troubleshoot/sql/releases/download-and-install
 - GDR  → 	Apenas correção de segurança
 
 ---
+
 
 
 
