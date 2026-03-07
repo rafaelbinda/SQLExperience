@@ -12,7 +12,7 @@ Este documento apresenta os fundamentos de consulta de dados utilizando SELECT, 
 ---
 
 ## Hands-on
-`scripts\Q0004-sql-data-querying.sql`  
+[SQL Server Data Querying](../scripts/Q0004-sql-data-querying.sql) 
 
 ---
 
@@ -203,6 +203,7 @@ WHERE SOD.OrderQty > 2;
 
 ### Processamento dos JOIN (Ordem Lógica)
 Dentro do fluxo geral da query, os JOINs são processados após o **FROM** e antes do **WHERE**
+
 
 
 
