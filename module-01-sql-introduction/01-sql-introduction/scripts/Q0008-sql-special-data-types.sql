@@ -652,5 +652,467 @@ Feature	        TABLE Variable	            #Temp Table	        ##Temp Table
 Scope	        Current batch/procedure	    Current session	    All sessions
 Name Prefix     @	                        #	                ##
 Storage	        tempdb	                    tempdb	            tempdb
-Lifetime	    Batch execution	Session     lifetime	        Until last session closes
+Lifetime	    Batch execution	Session     lifetime	        Until last 
+                                                                session closes
 */
+
+
+-------------------------------------------------------------------------------
+-- 7 - HIERARCHYID 
+-------------------------------------------------------------------------------
+/*
+→ HIERARCHYID represents hierarchical relationships
+→ GetRoot() returns the root node
+→ Parse() converts a string path into a HIERARCHYID
+→ GetDescendant() generates new nodes without restructuring the tree
+→ ToString() converts the hierarchy path into a readable format
+→ The GetLevel() method returns the depth level of a node in the hierarchy
+*/
+
+CREATE TABLE dbo.Example_Hierarchy
+(
+    Id INT IDENTITY(1,1),
+    Node HIERARCHYID,
+    EmployeeName VARCHAR(50)
+);
+GO
+
+-- 7.1 - Simple representation
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES
+(hierarchyid::GetRoot(), 'CEO'),
+(hierarchyid::Parse('/1/'), 'Sales Manager'),
+(hierarchyid::Parse('/2/'), 'IT Manager'),
+(hierarchyid::Parse('/1/1/'), 'Sales Representative'),
+(hierarchyid::Parse('/2/1/'), 'System Administrator');
+GO
+
+-- 7.1.1 - Viewing the Hierarchy
+SELECT 
+EmployeeName,
+Node.ToString() AS HierarchyPath
+FROM dbo.Example_Hierarchy
+ORDER BY Node;
+
+/*
+Result:
+EmployeeName	        HierarchyPath
+CEO	                    /
+Sales Manager	        /1/
+Sales Representative	/1/1/
+IT Manager	            /2/
+System Administrator	/2/1/
+*/
+
+-- 7.1.2 - Getting the Parent Node
+SELECT 
+EmployeeName,
+Node.GetAncestor(1).ToString() AS ParentNode
+FROM dbo.Example_Hierarchy;
+
+/*
+Result:
+EmployeeName	        ParentNode
+CEO	                    NULL
+Sales Manager	        /
+IT Manager	            /
+Sales Representative	/1/
+System Administrator	/2/
+*/
+
+-- 7.2 - Example Using GetDescendant()
+/*
+→ The `GetDescendant()` method generates a new child node between two existing 
+  nodes 
+→ It is commonly used to insert new elements into a hierarchy without reorgani
+  zing the entire tree
+*/
+ 
+TRUNCATE TABLE dbo.Example_Hierarchy;
+GO
+
+ -- 7.2.1 - Inserting the Root Node
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (hierarchyid::GetRoot(), 'CEO');
+GO
+
+-- 7.2.2 - Insert One Child at a Time (Using GetDescendant)
+DECLARE @Root HIERARCHYID;
+DECLARE @Child1 HIERARCHYID;
+DECLARE @Child2 HIERARCHYID;
+
+SELECT @Root = Node
+FROM dbo.Example_Hierarchy
+WHERE EmployeeName = 'CEO';
+
+SET @Child1 = @Root.GetDescendant(NULL, NULL);
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (@Child1, 'Sales Manager');
+
+SET @Child2 = @Root.GetDescendant(@Child1, NULL);
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (@Child2, 'IT Manager');
+ 
+-- 7.2.3 - Viewing the Hierarchy
+SELECT
+EmployeeName,
+Node.ToString() AS HierarchyPath
+FROM dbo.Example_Hierarchy
+ORDER BY Node;
+
+/*
+Result:
+EmployeeName	HierarchyPath
+CEO	            /
+Sales Manager	/1/
+IT Manager	    /2/
+*/
+
+-- 7.3 - Example Using the Hierarchy from This Study
+
+TRUNCATE TABLE dbo.Example_Hierarchy;
+GO
+
+TRUNCATE TABLE dbo.Example_Hierarchy;
+GO
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (hierarchyid::GetRoot(), '7 - HIERARCHYID');
+GO
+
+DECLARE @Root HIERARCHYID;
+DECLARE @N71 HIERARCHYID;
+DECLARE @N712 HIERARCHYID;
+DECLARE @N72 HIERARCHYID;
+DECLARE @N721 HIERARCHYID;
+DECLARE @N722 HIERARCHYID;
+DECLARE @N723 HIERARCHYID;
+
+SELECT @Root = Node
+FROM dbo.Example_Hierarchy
+WHERE EmployeeName = '7 - HIERARCHYID';
+
+-- 7.1
+SET @N71 = @Root.GetDescendant(NULL, NULL);
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (@N71, '7.1 - Simple Representation');
+
+-- 7.1.2
+SET @N712 = @N71.GetDescendant(NULL, NULL);
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (@N712, '7.1.2 - SR - Getting the Parent Node');
+
+-- 7.2
+SET @N72 = @Root.GetDescendant(@N71, NULL);
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (@N72, '7.2 - Example Using GetDescendant()');
+
+-- 7.2.1
+SET @N721 = @N72.GetDescendant(NULL, NULL);
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (@N721, '7.2.1 - GD - Inserting the Root Node');
+
+-- 7.2.2
+SET @N722 = @N72.GetDescendant(@N721, NULL);
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (@N722, '7.2.2 - GD - Inserting Children');
+
+-- 7.2.3
+SET @N723 = @N72.GetDescendant(@N722, NULL);
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (@N723, '7.2.3 - GD - Viewing the Hierarchy');
+
+SELECT
+EmployeeName,
+Node.ToString() AS HierarchyPath
+FROM dbo.Example_Hierarchy
+ORDER BY Node;
+
+/*
+Result:
+EmployeeName	                        HierarchyPath
+7 - HIERARCHYID	                        /
+7.1 - Simple Representation	            /1/
+7.1.2 - SR - Getting the Parent Node	/1/1/
+7.2 - Example Using GetDescendant()	    /2/
+7.2.1 - GD - Inserting the Root Node	/2/1/
+7.2.2 - GD - Inserting Children	        /2/2/
+7.2.3 - GD - Viewing the Hierarchy	    /2/3/
+*/
+
+--7.3 - Using the GetLevel() method to returns the depth level of a node in
+--      the hierarchy
+/* 
+→ Root node             = level 0
+→ First level children  = level 1
+→ Second level children = level 2
+*/
+
+SELECT
+EmployeeName,
+Node.ToString() AS HierarchyPath,
+Node.GetLevel() AS HierarchyLevel
+FROM dbo.Example_Hierarchy
+ORDER BY HierarchyPath;
+
+/*
+Result:
+EmployeeName	                    HierarchyPath	HierarchyLevel
+7 - HIERARCHYID	                        /	            0
+7.1 - Simple Representation	            /1/	            1
+7.1.2 - SR - Getting the Parent Node	/1/1/	        2
+7.2 - Example Using GetDescendant()	    /2/	            1
+7.2.1 - GD - Inserting the Root Node	/2/1/	        2
+7.2.2 - GD - Inserting Children	        /2/2/	        2
+7.2.3 - GD - Viewing the Hierarchy	    /2/3/	        2
+*/
+
+-------------------------------------------------------------------------------
+-- 8 - GEOMETRY 
+-------------------------------------------------------------------------------
+/*
+→ GEOMETRY represents spatial objects in a flat 2D plane 
+  Cartesian plane (maps, CAD, shapes)  
+→ POLYGON defines an area
+→ POINT defines coordinates
+→ STContains() checks if a point is inside a polygon
+*/
+
+CREATE TABLE dbo.Example_Geometry_Area
+(
+    Id INT IDENTITY(1,1),
+    Name VARCHAR(50),
+    Shape GEOMETRY
+);
+GO 
+
+-- 8.1 - Inserting a polygon (area)
+/*
+→ This polygon represents a simple rectangular area
+→ Visual representation of the polygon:
+
+(00,10) --------- (10,10)
+   |               |
+   |               |
+   |               |
+(00,00) --------- (10,00)
+
+*/
+
+INSERT INTO dbo.Example_Geometry_Area (Name, Shape)
+VALUES
+    (
+    'Test Area',
+    geometry::STGeomFromText(
+    'POLYGON((0 0, 0 10, 10 10, 10 0, 0 0))', 0
+    )
+);
+GO
+
+-- 8.1.1 - Creating two points and checking if the point is inside the area
+
+DECLARE @PointInside GEOMETRY;
+DECLARE @PointOutside GEOMETRY;
+
+SET @PointInside  = geometry::STGeomFromText('POINT(5 5)', 0);
+SET @PointOutside = geometry::STGeomFromText('POINT(20 20)', 0);
+
+SELECT
+Name,
+Shape.STContains(@PointInside)  AS PointInside,
+Shape.STContains(@PointOutside) AS PointOutside
+FROM dbo.Example_Geometry_Area;
+
+/*
+Result:
+Name	    PointInside	    PointOutside
+Test Area	    1	            0
+
+→ 1     =   point is inside the polygon
+→ 0     =   point is outside the polygon
+
+*/
+
+
+-------------------------------------------------------------------------------
+-- 9 - GEOGRAPHY 
+-------------------------------------------------------------------------------
+
+/*
+→ GEOGRAPHY stores spatial data using latitude and longitude
+  Earth coordinates (latitude and longitude) 
+→ SRID 4326 represents the WGS84 coordinate system used by GPS
+→ STDistance() returns the distance in meters
+*/
+
+CREATE TABLE dbo.Example_Geography
+(
+    Id INT IDENTITY(1,1),
+    CityName VARCHAR(50),
+    Location GEOGRAPHY
+);
+ 
+-- 9.1 - Example Using São Paulo and Curitiba
+
+-- 9.1.1 - Inserting real coordinates
+/*
+→ Approximate coordinates:
+    São Paulo → -23.5505, -46.6333
+    Curitiba → -25.4290, -49.2671
+→ In GEOGRAPHY the order is:
+    longitude latitude
+→ 4326 = SRID padrão para GPS (WGS84)
+*/
+
+INSERT INTO dbo.Example_Geography (CityName, Location)
+VALUES
+('Sao Paulo', geography::STGeomFromText('POINT(-46.6333 -23.5505)', 4326)),
+('Curitiba', geography::STGeomFromText('POINT(-49.2671 -25.4290)', 4326));
+GO
+
+-- 9.1.2 - Viewing stored locations
+SELECT
+CityName,
+Location.STAsText() AS Coordinates
+FROM dbo.Example_Geography;
+
+/*
+Result:
+CityName	Coordinates
+Sao Paulo	POINT (-46.6333 -23.5505)
+Curitiba	POINT (-49.2671 -25.429)
+*/
+
+SELECT
+A.CityName AS CityA,
+B.CityName AS CityB,
+A.Location.STDistance(B.Location) / 1000 AS DistanceKm
+FROM dbo.Example_Geography A
+CROSS JOIN dbo.Example_Geography B
+WHERE A.CityName = 'Sao Paulo'
+AND B.CityName = 'Curitiba';
+
+/*
+Result:
+CityA	    CityB	    DistanceKm
+Sao Paulo	Curitiba	338,459301659893
+*/
+
+-- 9.2 - GEOGRAPHY Example: Cities Within a 300 km Radius of São Paulo
+--Spatial Query Example Using STDistance() and STBuffer()
+
+/*
+Cities used in the example Within ~300 km of São Paulo
+City	                Latitude	Longitude
+Campinas	            -22.9056	-47.0608
+Santos	                -23.9608	-46.3336
+Sorocaba	            -23.5015	-47.4526
+São José dos Campos	    -23.2237	-45.9009
+Ribeirão Preto	        -21.1704	-47.8103
+
+More than 300 km from São Paulo
+City	                Latitude	Longitude
+Curitiba	            -25.4290	-49.2671
+Belo Horizonte	        -19.9167	-43.9345
+Rio de Janeiro	        -22.9068	-43.1729
+Brasília	            -15.7939	-47.8828
+Porto Alegre	        -30.0346	-51.2177
+*/
+
+TRUNCATE TABLE dbo.Example_Geography;
+GO
+
+-- 9.2.1 - Inserting cities
+INSERT INTO dbo.Example_Geography (CityName, Location)
+VALUES
+('Sao Paulo', geography::STGeomFromText('POINT(-46.6333 -23.5505)', 4326)),
+
+('Campinas', geography::STGeomFromText('POINT(-47.0608 -22.9056)', 4326)),
+('Santos', geography::STGeomFromText('POINT(-46.3336 -23.9608)', 4326)),
+('Sorocaba', geography::STGeomFromText('POINT(-47.4526 -23.5015)', 4326)),
+('Sao Jose dos Campos', geography::STGeomFromText('POINT(-45.9009 -23.2237)', 4326)),
+('Ribeirao Preto', geography::STGeomFromText('POINT(-47.8103 -21.1704)', 4326)),
+
+('Curitiba', geography::STGeomFromText('POINT(-49.2671 -25.4290)', 4326)),
+('Belo Horizonte', geography::STGeomFromText('POINT(-43.9345 -19.9167)', 4326)),
+('Rio de Janeiro', geography::STGeomFromText('POINT(-43.1729 -22.9068)', 4326)),
+('Brasilia', geography::STGeomFromText('POINT(-47.8828 -15.7939)', 4326)),
+('Porto Alegre', geography::STGeomFromText('POINT(-51.2177 -30.0346)', 4326));
+GO
+
+-- 9.2.2 - Distance from São Paulo
+SELECT
+B.CityName,
+CAST(A.Location.STDistance(B.Location)/1000 AS DECIMAL(10,2)) AS DistanceKm
+FROM dbo.Example_Geography A
+JOIN dbo.Example_Geography B
+ON A.CityName = 'Sao Paulo'
+AND B.CityName <> 'Sao Paulo'
+ORDER BY DistanceKm;
+
+/*
+Result:
+CityName	            Distance Km
+Santos	                54.76
+Sao Jose dos Campos	    83.16
+Campinas	            83.76
+Sorocaba	            83.84
+Ribeirao Preto	        290.10
+Curitiba	            338.46
+Rio de Janeiro	        361.26
+Belo Horizonte	        489.70
+Porto Alegre	        850.62
+Brasilia	            868.59
+*/
+
+-- 9.2.3 - Cities within 300 km
+SELECT
+B.CityName,
+CAST(A.Location.STDistance(B.Location)/1000 AS DECIMAL(10,2)) AS DistanceKm
+FROM dbo.Example_Geography A
+JOIN dbo.Example_Geography B
+ON A.CityName = 'Sao Paulo'
+WHERE A.Location.STBuffer(300000).STIntersects(B.Location) = 1
+AND B.CityName <> 'Sao Paulo'
+ORDER BY DistanceKm;
+
+/*
+Result:
+CityName	            DistanceKm
+Santos	                54.76
+Sao Jose dos Campos	    83.16
+Campinas	            83.76
+Sorocaba	            83.84
+Ribeirao Preto	        290.10
+*/
+
+-- 9.2.4 - Cities farther than 300 km
+
+SELECT
+B.CityName,
+CAST(A.Location.STDistance(B.Location)/1000 AS DECIMAL(10,2)) AS DistanceKm
+FROM dbo.Example_Geography A
+JOIN dbo.Example_Geography B
+ON A.CityName = 'Sao Paulo'
+WHERE  A.Location.STBuffer(300000).STIntersects(B.Location) = 0
+ORDER BY DistanceKm;
+
+/*
+Result:
+CityName	        DistanceKm
+Curitiba	        338.46
+Rio de Janeiro	    361.26
+Belo Horizonte	    489.70
+Porto Alegre	    850.62
+Brasilia	        868.59
+*/
+
