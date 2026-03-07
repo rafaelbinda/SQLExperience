@@ -11,11 +11,12 @@ Este documento apresenta os tipos de Dados no SQL Server
 
 ---
 
-## Hands-on
+## Hands-on  
 `scripts\Q0005-sql-string-data-types.sql`  
 `scripts\Q0006-sql-numeric-and-bit-data-types.sql`  
 `scripts\Q0007-sql-date-and-time-data-types.sql`  
-`scripts\Q0008-sql-special-data-types.sql` 
+`scripts\Q0008-sql-special-data-types.sql`  
+
 ---
 
 ## 1 - Tipos de Dados String
@@ -876,6 +877,7 @@ Permite navegar facilmente entre:
 | HIERARCHYID | Estruturas hierárquicas |
 | GEOMETRY | Dados espaciais em plano |
 | GEOGRAPHY | Dados espaciais globais |
+
 
 
 
