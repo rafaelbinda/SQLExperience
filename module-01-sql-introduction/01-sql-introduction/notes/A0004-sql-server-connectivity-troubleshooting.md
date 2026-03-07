@@ -17,12 +17,10 @@ Este documento descreve o passo a passo para diagnóstico de conectividade com o
 
 - Utiliza o executável disponível em:  
 `module-01-sql-introduction\01-sql-introduction\tools\A0003_X_PortQry.zip`  
-- Este documento contém informações complementares ao documento:  
-`notes\A0005-network-commands.md`  
-- Para informações sobre a versão do SQL Server, verificar:  
-`notes\A0006-sql-server-version.md`  
-- Para identificar a versão do SQL Server, usar a query disponível em:  
-`dba-scripts\SQL-instance-information\Q0003-sql-version.sql`  
+- Este documento contém informações complementares ao documento [Network Commnads](../notes/A0005-network-commands.md)  
+- Para informações sobre a versão do SQL Server, verificar o documento [SQL Server Version](../notes/A0006-sql-server-version.md)  
+- Para identificar a versão do SQL Server, usar o script disponível em:  
+`dba-scripts\SQL-instance-information\Q0003-sql-version.sql`   
 - Para identificar se há alguma conexão ativa através de Named Pipe, usar a query disponível em:  
 `dba-scripts\SQL-connections\Q0001-active-connections.sql`  
 
@@ -242,5 +240,6 @@ C:\TESTES\A0003_PortQry>PortQry.exe -n SRVSQLSERVER -p TCP -r 1400:1500
 → Sempre verifique se o hífen utilizado é o padrão do teclado.  
 
 ---
+
 
 
