@@ -12,8 +12,8 @@
 ---
 
 ## Hands-on  
-`scripts\Q0002-create-database.sql`  
-`scripts\Q0004-physical-storage-layout.sql`
+[SQL Server Create Database](../scripts/Q0002-create-database.sql)   
+[SQL Physical Storage Layout](../../../dba-scripts/SQL-instance-information/Q0004-physical-storage-layout.sql)  
 
 ## Conteúdo adicional
 - https://docs.microsoft.com/en-us/sql/relational
@@ -226,6 +226,7 @@ Se cada UPDATE fosse gravado imediatamente no disco:
 7. Checkpoint grava definitivamente nos Data Files
 
 ---
+
 
 
 
