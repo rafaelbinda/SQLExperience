@@ -21,7 +21,7 @@
 ---
 
 ## Hands-on  
-`scripts\Q0003-sql-fundamentals.sql`  
+[SQL Server Fundamentals](../scripts/Q0003-sql-fundamentals.sql)   
 
 ---
 
@@ -220,4 +220,5 @@ Precedência: Usar `(...)` para deixar explícito
 - Condicional: `IF ... ELSE`
 - Loop: `WHILE`
 - Lista/decisão: `CASE`
+
 
