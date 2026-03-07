@@ -24,10 +24,9 @@ Este ambiente é destinado exclusivamente para estudo e não deve ser utilizado 
 # Procedimento Completo
 ---
 
-## 1. Habilitar Hyper-V no Windows Home  
+## 1. Habilitar Hyper-V no Windows Home Edition  
 
-→ Executar a instalação do arquivo a seguir e em seguida reiniciar o computador:   
-`01-sql-introduction\tools\A0001_X_EnableHyperV_Windows_Home.bat` 
+→ Executar a instalação do arquivo [Enable Hyper-V on Windows Home Edition](../tools/A0001_X_EnableHyperV_Windows_Home.bat) e em seguida reiniciar o computador 
 
 ---
 
@@ -138,6 +137,7 @@ Requisitos do Hyper-V: Hipervisor detectado. Recursos necessários para o Hyper-
 → É possível renovar até 6x usando o comando: `slmgr.vbs /rearm`
 
 ---
+
 
 
 
