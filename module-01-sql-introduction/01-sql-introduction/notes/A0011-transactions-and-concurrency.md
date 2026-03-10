@@ -1,7 +1,7 @@
 ﻿# A0011 – Transações e Concorrência
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-07  
-> **Version:** 2.0 
+> **Version:** 3.0 
 
 ---
 
@@ -419,35 +419,72 @@ Sempre que uma transação executa operações de leitura ou escrita, o SQL Serv
 
 ### 4.1 - Principais tipos de lock
 
-Entre os diversos tipos de locks existentes, os dois mais importantes são:
+Os dois tipos mais importantes de locks são:
 - Lock de Leitura (Shared Lock – S)
 - Lock de Escrita (Exclusive Lock – X)
 
 ---
-  
-**Lock de Leitura (Shared Lock – S)**  
-O **Shared Lock** é utilizado durante operações de leitura  
 
-Características:  
+**Tipos de Locks**
+
+**Lock de Leitura (Shared Lock – S)**  
+- É utilizado durante operações de leitura `SELECT` 
 - Permite que múltiplas transações leiam o mesmo recurso simultaneamente
 - Impede que outras transações realizem modificações naquele recurso enquanto a leitura está ocorrendo
 
----
 **Lock de Escrita (Exclusive Lock – X)**  
-O **Exclusive Lock** é utilizado durante operações de modificação de dados  
-
-Características:  
-- Bloqueia outras leituras e escritas no recurso
+- É utilizado durante operações de modificação de dados
+- Bloqueia outras leituras e escritas no recurso `INSERT`, `UPDATE`, `DELETE`
 - Apenas uma transação pode possuir esse tipo de lock por vez
+- Bloqueia qualquer outro tipo de acesso ao recurso até o término da transação
+
+**IS (Intent Shared)**  
+- Indica que a transação pretende colocar **Shared Locks em níveis inferiores** da hierarquia (por exemplo, linhas dentro de uma página ou tabela)
+
+**U (Update)**
+- Usado quando uma leitura pode se transformar em atualização
+- Evita **deadlocks** comuns entre `SELECT` seguido de `UPDATE`
+
+**IX (Intent Exclusive)**  
+- Indica que a transação pretende colocar **Exclusive Locks em níveis inferiores** da hierarquia
+
+**SIX (Shared with Intent Exclusive)**  
+→ Combinação de:  
+- **Shared Lock** no recurso atual
+- **Intent Exclusive** nos níveis inferiores.
+ 
+---
+
+**Observação: O SQL Server utiliza lock hierarchy (hierarquia de locks)**  
+Database  
+└── Table  
+└── Page  
+└── Row  
 
 ---
 
-**Compatibilidade de Locks**  
+→ Os **Intent Locks (IS, IX, SIX)** existem para que o SQL Server saiba antecipadamente que locks serão colocados em níveis inferiores da hierarquia, evitando verificações custosas em cada linha ou página
+
+--- 
+
+### Matriz de Compatibilidade de Locks
 Alguns tipos de locks são **compatíveis entre si**, enquanto outros não  
 Por exemplo:  
 - Várias transações podem possuir **Shared Lock (S)** simultaneamente  
-- Um **Exclusive Lock (X)** não é compatível com nenhum outro lock  
-→ Isso significa que, se uma transação estiver modificando um registro, outras transações precisarão **aguardar** até que a operação seja concluída  
+- Um **Exclusive Lock (X)** não é compatível com nenhum outro lock, isso significa que, se uma transação estiver modificando um registro, outras transações precisarão **aguardar** até que a operação seja concluída  
+- A tabela abaixo mostra se um tipo de lock solicitado é compatível com um lock já existente no mesmo recurso
+
+| Lock solicitado \ Lock existente | IS | S | U | IX | SIX | X |
+|----------------------------------|----|----|----|----|-----|----|
+| **IS (Intent Shared)**           | ✔ | ✔ | ✔ | ✔ | ✔ | ✖ |
+| **S (Shared)**                   | ✔ | ✔ | ✔ | ✖ | ✖ | ✖ |
+| **U (Update)**                   | ✔ | ✔ | ✖ | ✖ | ✖ | ✖ |
+| **IX (Intent Exclusive)**        | ✔ | ✖ | ✖ | ✔ | ✖ | ✖ |
+| **SIX (Shared + Intent Exclusive)** | ✔ | ✖ | ✖ | ✖ | ✖ | ✖ |
+| **X (Exclusive)**                | ✖ | ✖ | ✖ | ✖ | ✖ | ✖ |
+
+✔ = Compatível  
+✖ = Incompatível
 
 ---
 
@@ -493,35 +530,7 @@ Sessão 75 → Blocked by 81
 
 ---
 
-### Consultas úteis para investigação
-
-Em versões mais antigas do SQL Server:
-
-```sql
-EXEC sp_who2
-```
-
-Essa procedure retorna diversas informações sobre as sessões ativas, incluindo a coluna **Blocked By**
-
----
-
-### Visualizar locks
-
-```sql
-EXEC sp_lock 75
-EXEC sp_lock 81
-```
-
----
-
-### Ver o comando executado pela sessão
-
-```sql
-DBCC INPUTBUFFER(75)
-DBCC INPUTBUFFER(81)
-```
-
-Esses comandos mostram qual instrução SQL está sendo executada pela sessão
+### Consultas úteis para investigação estão disponíveis no Hands-On
 
 ---
 
@@ -566,6 +575,7 @@ Na maioria dos casos, deadlocks são causados por **problemas na lógica da apli
 - Falta de índices adequados
 
 **O papel do DBA é investigar o problema e orientar os desenvolvedores na correção da aplicação**
+
 
 
 
