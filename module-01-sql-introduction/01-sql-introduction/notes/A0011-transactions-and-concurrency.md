@@ -1,7 +1,7 @@
 ﻿# A0011 – Transações e Concorrência
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-07  
-> **Version:** 1.0 
+> **Version:** 2.0 
 
 ---
 
@@ -193,6 +193,18 @@ Dentro do bloco `CATCH`, algumas funções podem ser utilizadas para obter infor
 | `ERROR_STATE()` | Retorna o estado do erro |
 | `ERROR_LINE()` | Retorna a linha onde o erro ocorreu |
 | `ERROR_MESSAGE()` | Retorna a mensagem completa do erro |
+
+**ERROR_SEVERITY() - Faixa de severidade (Error Severity Levels)**  
+Existem vários níveis de severity no SQL Server e eles seguem uma escala definida de 0 a 25. Nem todos são usados com frequência.  
+
+| Severity | Significado |
+|------|------|
+| 0–9  | Mensagens informativas (não são erros reais) |
+|10    | Mensagem informativa retornada ao cliente |
+|11–16 | Erros causados pelo usuário ou pela consulta|
+|17–19 | Problemas de recursos ou limitações do servidor|
+|20–25 |Erros graves que podem indicar falha do sistema|
+
 
 Exemplo:  
 ```sql
@@ -554,6 +566,7 @@ Na maioria dos casos, deadlocks são causados por **problemas na lógica da apli
 - Falta de índices adequados
 
 **O papel do DBA é investigar o problema e orientar os desenvolvedores na correção da aplicação**
+
 
 
 
