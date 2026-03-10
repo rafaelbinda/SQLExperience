@@ -188,8 +188,8 @@ Id	ProductName	    Price
 
 -- 3.2 - UPDATE with JOIN
 /*
-SQL Server allows UPDATE statements using JOINs to update data based on values 
-from another table
+→ SQL Server allows UPDATE statements using JOINs to update data based on  
+  values from another table
 */
 
 --Creating Customers table
@@ -389,5 +389,610 @@ ErrorNumber	ErrorSeverity	ErrorState	ErrorLine	ErrorMessage
 8134	    16	            1	        2	        Divide by zero error encountered.
 */
 
+
+-------------------------------------------------------------------------------
+-- 6 - Transactions
+-------------------------------------------------------------------------------
+
+-- 6.1 - Basic transaction
+
+CREATE TABLE dbo.Example_Transaction
+(
+    Id INT IDENTITY(1,1),
+    ProductName VARCHAR(100),
+    Price DECIMAL(10,2)
+);
+GO
+
+--Viewing current transaction count
+SELECT @@TRANCOUNT AS OpenTransactions;
+GO
+
+/*
+Result:
+OpenTransactions
+       0
+*/
+
+--Starting a transaction
+BEGIN TRAN;
+
+INSERT INTO dbo.Example_Transaction (ProductName, Price)
+VALUES ('Monitor', 900.00);
+
+--Checking open transactions
+SELECT @@TRANCOUNT AS OpenTransactions;
+GO
+
+/*
+Result:
+OpenTransactions
+       1
+*/
+
+--Committing the transaction
+COMMIT;
+GO
+
+--Checking transaction count again
+SELECT @@TRANCOUNT AS OpenTransactions;
+GO
+
+/*
+Result:
+OpenTransactions
+       0
+*/
+
+--Viewing inserted data
+SELECT *
+FROM dbo.Example_Transaction;
+GO
+
+/*
+Result:
+Id	ProductName	    Price
+1	Monitor	        900.00
+*/
+
+
+-- 6.2 - Implicit transaction 
+/*
+What this example demonstrates:
+→ The session enables implicit transactions using SET IMPLICIT_TRANSACTIONS ON
+→ A transaction is automatically started when a data modification statement is 
+  executed
+→ @@TRANCOUNT is used to verify that a transaction was opened automatically
+→ The transaction remains open until it is explicitly finalized
+→ The transaction is completed using COMMIT
+*/
+
+--Enabling implicit transactions
+SET IMPLICIT_TRANSACTIONS ON;
+GO
+
+--Checking current transaction count
+SELECT @@TRANCOUNT AS OpenTransactions;
+GO
+
+/*
+Result:
+OpenTransactions
+       0
+*/
+
+
+--Executing a statement that starts a transaction
+INSERT INTO dbo.Example_Transaction (ProductName, Price)
+VALUES ('Keyboard', 150.00);
+GO
+
+/*
+Result
+Commands completed successfully.
+Completion time: 2026-03-09T22:17:02.3364807-03:00
+*/
+
+--Checking transaction count again
+SELECT @@TRANCOUNT AS OpenTransactions;
+GO
+
+/*
+Result:
+OpenTransactions
+       1
+*/
+
+--Finalizing transaction
+COMMIT;
+GO
+
+--Disabling implicit transactions
+SET IMPLICIT_TRANSACTIONS OFF;
+GO
+
+--Checking transaction count again
+SELECT @@TRANCOUNT AS OpenTransactions;
+GO
+
+/*
+Result:
+OpenTransactions
+       1
+*/
+
+
+-- 6.3 - Explicit transaction
+/*
+What this example demonstrates:
+→ A transaction is started manually using BEGIN TRAN
+→ One or more operations are executed inside the transaction
+→ @@TRANCOUNT is used to verify the number of open transactions
+→ The transaction is finalized explicitly using COMMIT
+→ After the COMMIT, @@TRANCOUNT returns to 0, indicating that no transactions
+  remain open
+*/
+
+CREATE TABLE dbo.Example_ExplicitTransaction
+(
+    Id INT IDENTITY(1,1),
+    ProductName VARCHAR(100),
+    Price DECIMAL(10,2)
+);
+GO
+
+--Checking transaction count before starting
+SELECT @@TRANCOUNT AS OpenTransactions;
+GO
+
+/*
+Result:
+OpenTransactions
+       0
+*/
+
+
+--Starting explicit transaction
+BEGIN TRAN;
+
+INSERT INTO dbo.Example_ExplicitTransaction (ProductName, Price)
+VALUES ('Headset', 250.00);
+
+/*
+Result:
+Commands completed successfully.
+Completion time: 2026-03-09T22:19:51.8555532-03:00
+*/
+
+--Checking transaction count inside the transaction
+SELECT @@TRANCOUNT AS OpenTransactions;
+GO
+
+/*
+Result:
+OpenTransactions
+       1
+*/
+
+--Committing transaction
+COMMIT;
+GO
+
+
+--Checking transaction count after commit
+SELECT @@TRANCOUNT AS OpenTransactions;
+GO
+
+/*
+Result:
+OpenTransactions
+       0
+*/
+
+
+--Viewing inserted data
+SELECT *
+FROM dbo.Example_ExplicitTransaction;
+GO
+
+/*
+Result:
+Id	ProductName	    Price
+1	Headset	        250.00
+*/
+
+
+-- 6.4 - Transaction without error handling
+/*
+What this example demonstrates:
+→ Start of a transaction with BEGIN TRAN
+→ Execution of a valid operation
+→ An error occurs during the second operation
+→ Absence of error handling
+*/
+CREATE TABLE dbo.Example_Transaction_NoErrorHandling
+(
+    Id INT PRIMARY KEY,
+    ProductName VARCHAR(100),
+    Price DECIMAL(10,2)
+);
+GO
+
+INSERT INTO dbo.Example_Transaction_NoErrorHandling (Id, ProductName, Price)
+VALUES
+(1, 'Notebook', 3500.00),
+(2, 'Mouse', 80.00);
+GO
+
+--Viewing original data
+SELECT *
+FROM dbo.Example_Transaction_NoErrorHandling;
+GO
+
+/*
+Result:
+Id	ProductName	    Price
+1	Notebook	    3500.00
+2	Mouse	        80.00
+*/
+
+-- STEP 1 -  Execute the transaction statements below
+
+--Starting transaction
+BEGIN TRAN;
+
+--First operation (valid)
+UPDATE dbo.Example_Transaction_NoErrorHandling
+SET Price = 3600.00
+WHERE Id = 1;
+
+--Second operation (will generate error - duplicate primary key)
+INSERT INTO dbo.Example_Transaction_NoErrorHandling (Id, ProductName, Price)
+VALUES (1, 'Keyboard', 150.00);
+GO
+
+/*
+Result:
+Msg 2627, Level 14, State 1, Line 626
+Violation of PRIMARY KEY constraint 'PK__Example___3214EC07E9B383C7'.
+Cannot insert duplicate key in object 'dbo.Example_Transaction_NoErrorHandling'. 
+The duplicate key value is (1).
+The statement has been terminated.
+Completion time: 2026-03-09T22:32:37.8700010-03:00
+*/
+ 
+-- STEP 2 - Execute the queries below and observe the results
+
+--Check if the transaction is still open
+SELECT @@TRANCOUNT AS OpenTransactions;
+GO
+
+/*
+Result:
+OpenTransactions
+       1
+*/
+
+--Viewing table data
+SELECT *
+FROM dbo.Example_Transaction_NoErrorHandling;
+GO
+
+/*
+Result:
+Id	ProductName	    Price
+1	Notebook	    3600.00
+2	Mouse	        80.00
+*/
+
+-- STEP 3 - Rollback the transaction
+
+ROLLBACK;
+GO
+
+-- STEP 4 - Verify that the changes were reverted 
+
+SELECT @@TRANCOUNT AS OpenTransactions;
+
+/*
+Result:
+OpenTransactions
+       0
+*/
+
+--Viewing table data
+SELECT *
+FROM dbo.Example_Transaction_NoErrorHandling;
+GO
+
+/*
+Result:
+Id	ProductName	    Price
+1	Notebook	    3500.00
+2	Mouse	        80.00
+*/
+
+
+-- 6.5 - Transaction with error handling 
+/*
+What this example demonstrates:
+→ The error occurs during the second operation
+→ The CATCH block captures the error
+→ The ROLLBACK undoes the entire transaction
+→ @@TRANCOUNT returns to 0
+→ The valid UPDATE is also reverted
+*/
+
+CREATE TABLE dbo.Example_Transaction_WithErrorHandling
+(
+    Id INT PRIMARY KEY,
+    ProductName VARCHAR(100),
+    Price DECIMAL(10,2)
+);
+GO
+
+INSERT INTO dbo.Example_Transaction_WithErrorHandling (Id, ProductName, Price)
+VALUES
+(1, 'Notebook', 3500.00),
+(2, 'Mouse', 80.00);
+GO
+
+SELECT *
+FROM dbo.Example_Transaction_WithErrorHandling;
+GO
+
+/*
+Result:
+Id	ProductName	    Price
+1	Notebook	    3500.00
+2	Mouse	        80.00
+*/
+
+
+-- STEP 1 - Execute the block below 
+
+BEGIN TRY
+
+    BEGIN TRAN;
+
+    --First operation (valid)
+    UPDATE dbo.Example_Transaction_WithErrorHandling
+    SET Price = 3600.00
+    WHERE Id = 1;
+
+    --Second operation (will generate error - duplicate primary key)
+    INSERT INTO dbo.Example_Transaction_WithErrorHandling (Id, ProductName, Price)
+    VALUES (1, 'Keyboard', 150.00);
+
+    COMMIT;
+
+END TRY
+BEGIN CATCH
+
+    --Rollback transaction if it is still open
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+
+    --Return error information
+    SELECT
+        ERROR_NUMBER()   AS ErrorNumber,
+        ERROR_SEVERITY() AS ErrorSeverity,
+        ERROR_STATE()    AS ErrorState,
+        ERROR_LINE()     AS ErrorLine,
+        ERROR_MESSAGE()  AS ErrorMessage;
+
+END CATCH;
+GO
+
+/*
+Result:
+ErrorNumber     =   2627	
+ErrorSeverity   =   14
+ErrorState	    =   1
+ErrorLine	    =   12
+ErrorMessage    =   Violation of PRIMARY KEY constraint 'PK__Example___3214EC07278D3CB5'. 
+Cannot insert duplicate key in object 'dbo.Example_Transaction_WithErrorHandling'. 
+The duplicate key value is (1).
+*/
+
+
+-- STEP 2 - Check transaction count and table data 
+
+--Verify that no transaction remains open
+SELECT @@TRANCOUNT AS OpenTransactions;
+GO
+
+/*
+Result:
+OpenTransactions
+       0
+*/
+
+--Verify final table data
+SELECT *
+FROM dbo.Example_Transaction_WithErrorHandling;
+GO
+
+/*
+Result:
+Id	ProductName	    Price
+1	Notebook	    3500.00
+2	Mouse	        80.00
+*/
+
+
+-------------------------------------------------------------------------------
+-- 7 - Blocking Session
+-------------------------------------------------------------------------------
+
+CREATE TABLE dbo.Example_Blocking
+(
+    Id INT PRIMARY KEY,
+    ProductName VARCHAR(100),
+    Price DECIMAL(10,2)
+);
+GO
+
+INSERT INTO dbo.Example_Blocking (Id, ProductName, Price)
+VALUES
+(1, 'Notebook', 3500.00),
+(2, 'Mouse', 80.00);
+GO
+
+SELECT *
+FROM dbo.Example_Blocking;
+GO
+
+/*
+Result:
+Id	ProductName	    Price
+1	Notebook	    3500.00
+2	Mouse	        80.00
+*/
+
+--  7.1 - Shared Lock (S) example
+/*
+What this example demonstrates:
+→ A SELECT statement can acquire a Shared Lock (S) when reading data
+→ Shared Locks allow multiple sessions to read the same resource simultaneously
+→ An UPDATE operation requires an Exclusive Lock (X)
+→ Because Shared Locks and Exclusive Locks are incompatible, the UPDATE must wait
+→ The HOLDLOCK hint is used to retain the Shared Lock until the end of the 
+  transaction for demonstration purposes
+→ Under the default isolation level (READ COMMITTED), a SELECT normally releases 
+  the Shared Lock immediately after the statement completes
+*/
+
+ 
+CREATE TABLE dbo.Example_SharedLock
+(
+    Id INT PRIMARY KEY,
+    ProductName VARCHAR(100),
+    Price DECIMAL(10,2)
+);
+GO
+
+INSERT INTO dbo.Example_SharedLock (Id, ProductName, Price)
+VALUES
+(1, 'Notebook', 3500.00),
+(2, 'Mouse', 80.00);
+GO
+
+SELECT *
+FROM dbo.Example_SharedLock;
+GO
+
+/*
+Result:
+Id	ProductName	    Price
+1	Notebook	    3500.00
+2	Mouse	        80.00
+*/
+
+--Session A
+/*
+Do not commit the transaction yet
+This will keep the lock on the row
+*/
+
+BEGIN TRAN;
+
+SELECT *
+FROM dbo.Example_SharedLock WITH (HOLDLOCK)
+WHERE Id = 1;
+
+/*
+→ HOLDLOCK is used here only for demonstration purposes
+→ By default, SQL Server releases the Shared Lock immediately
+  after the SELECT statement finishes under READ COMMITTED
+→ Using HOLDLOCK keeps the Shared Lock until the transaction ends
+*/ 
+
+/*
+Result:
+Id	ProductName	    Price
+1	Notebook	    3500.00
+*/
+
+
+--Session B
+--Open a new query window and execute:
+
+UPDATE dbo.Example_SharedLock
+SET Price = 3600.00
+WHERE Id = 1;
+
+/*
+Expected behavior:
+→ The UPDATE in Session B will remain waiting
+→ This happens because Session A is holding a Shared Lock (S)
+→ An UPDATE requires an Exclusive Lock (X)
+→ Shared and Exclusive locks are incompatible
+*/
+ 
+---------------------------------------------------
+--?????????????????  CONTINUE  ?????????????????
+---------------------------------------------------
+
+
+/*====================================================
+  Releasing the lock
+====================================================*/
+
+--Return to SESSION A and execute:
+
+COMMIT;
+
+
+-- 7.2 - Exclusive Lock (X) example
+/*
+What this example demonstrates:
+→ A transaction acquires an Exclusive Lock (X) when modifying data
+→ Other sessions attempting to access the same resource must wait
+→ This waiting state is known as blocking
+→ The blocking is released when the transaction is committed or rolled back
+*/
+
+--Session A
+/*
+Do not commit the transaction yet
+This will keep the lock on the row
+*/
+
+BEGIN TRAN;
+
+UPDATE dbo.Example_Blocking
+SET Price = 3600.00
+WHERE Id = 1;
+
+/*
+Result:
+Commands completed successfully.
+Completion time: 2026-03-09T22:49:57.5335567-03:00
+*/
+
+--Session B
+--Open a new query window and execute:
+
+SELECT *
+FROM dbo.Example_Blocking
+WHERE Id = 1;
+
+/*
+Expected behavior:
+→ The query in Session B will remain waiting
+→ This happens because Session A holds an Exclusive Lock
+→ Session B must wait until the resource is released
+→ Releasing the lock
+*/
+
+--In Session A, execute:
+COMMIT;
+
+/*
+After that:
+→ The lock will be released
+→ The query in Session B will continue execution
+*/
 
 
