@@ -7,7 +7,7 @@ Task        : Q0009-transactions-and-concurrency.sql
 Databases   : ExamplesDB 
 Object      : Script
 Description : Examples demonstrating transactions and concurrency SQL Server
-Notes       : A0011-transactions-and-concurrency.md
+Notes       : notes/A0011-transactions-and-concurrency.md
 ===============================================================================
 */
 
@@ -167,8 +167,10 @@ Id	ProductName	    Price
 3	Mouse	        80.00
 */
 
-
+-------------------------------------------------------------------------------
 -- 3.1 - UPDATE WITHOUT WHERE
+-------------------------------------------------------------------------------
+
 UPDATE dbo.Example_Update
 SET Price = 333.33; 
 GO
@@ -186,7 +188,9 @@ Id	ProductName	    Price
 3	Mouse	        333.33
 */
 
+-------------------------------------------------------------------------------
 -- 3.2 - UPDATE with JOIN
+-------------------------------------------------------------------------------
 /*
 → SQL Server allows UPDATE statements using JOINs to update data based on  
   values from another table
@@ -322,7 +326,9 @@ Id	CustomerName	City
 3	Larissa	        Florianópolis
 */
 
+-------------------------------------------------------------------------------
 -- 4.1 - DELETE without WHERE 
+-------------------------------------------------------------------------------
 
 DELETE FROM dbo.Example_Delete;
 GO
@@ -394,7 +400,9 @@ ErrorNumber	ErrorSeverity	ErrorState	ErrorLine	ErrorMessage
 -- 6 - Transactions
 -------------------------------------------------------------------------------
 
+-------------------------------------------------------------------------------
 -- 6.1 - Basic transaction
+-------------------------------------------------------------------------------
 
 CREATE TABLE dbo.Example_Transaction
 (
@@ -455,8 +463,9 @@ Id	ProductName	    Price
 1	Monitor	        900.00
 */
 
-
+-------------------------------------------------------------------------------
 -- 6.2 - Implicit transaction 
+-------------------------------------------------------------------------------
 /*
 What this example demonstrates:
 → The session enables implicit transactions using SET IMPLICIT_TRANSACTIONS ON
@@ -521,8 +530,9 @@ OpenTransactions
        1
 */
 
-
+-------------------------------------------------------------------------------
 -- 6.3 - Explicit transaction
+-------------------------------------------------------------------------------
 /*
 What this example demonstrates:
 → A transaction is started manually using BEGIN TRAN
@@ -601,8 +611,9 @@ Id	ProductName	    Price
 1	Headset	        250.00
 */
 
-
+-------------------------------------------------------------------------------
 -- 6.4 - Transaction without error handling
+-------------------------------------------------------------------------------
 /*
 What this example demonstrates:
 → Start of a transaction with BEGIN TRAN
@@ -636,6 +647,7 @@ Id	ProductName	    Price
 2	Mouse	        80.00
 */
 
+-------------------------------------------------------------------------------
 -- STEP 1 -  Execute the transaction statements below
 
 --Starting transaction
@@ -661,6 +673,7 @@ The statement has been terminated.
 Completion time: 2026-03-09T22:32:37.8700010-03:00
 */
  
+-------------------------------------------------------------------------------
 -- STEP 2 - Execute the queries below and observe the results
 
 --Check if the transaction is still open
@@ -685,11 +698,13 @@ Id	ProductName	    Price
 2	Mouse	        80.00
 */
 
+-------------------------------------------------------------------------------
 -- STEP 3 - Rollback the transaction
 
 ROLLBACK;
 GO
 
+-------------------------------------------------------------------------------
 -- STEP 4 - Verify that the changes were reverted 
 
 SELECT @@TRANCOUNT AS OpenTransactions;
@@ -712,8 +727,9 @@ Id	ProductName	    Price
 2	Mouse	        80.00
 */
 
-
+-------------------------------------------------------------------------------
 -- 6.5 - Transaction with error handling 
+-------------------------------------------------------------------------------
 /*
 What this example demonstrates:
 → The error occurs during the second operation
@@ -748,7 +764,7 @@ Id	ProductName	    Price
 2	Mouse	        80.00
 */
 
-
+-------------------------------------------------------------------------------
 -- STEP 1 - Execute the block below 
 
 BEGIN TRY
@@ -795,7 +811,7 @@ Cannot insert duplicate key in object 'dbo.Example_Transaction_WithErrorHandling
 The duplicate key value is (1).
 */
 
-
+-------------------------------------------------------------------------------
 -- STEP 2 - Check transaction count and table data 
 
 --Verify that no transaction remains open
@@ -822,7 +838,7 @@ Id	ProductName	    Price
 
 
 -------------------------------------------------------------------------------
--- 7 - Blocking Session
+-- 7 - Locking and Blocking
 -------------------------------------------------------------------------------
 
 CREATE TABLE dbo.Example_Blocking
@@ -845,25 +861,27 @@ GO
 
 /*
 Result:
-Id	ProductName	    Price
-1	Notebook	    3500.00
-2	Mouse	        80.00
+Id  ProductName  Price
+1   Notebook     3500.00
+2   Mouse        80.00
 */
 
---  7.1 - Shared Lock (S) example
+-------------------------------------------------------------------------------
+-- 7.1 - Shared Lock (S), Exclusive Lock (X), and Blocking
+-------------------------------------------------------------------------------
 /*
 What this example demonstrates:
-→ A SELECT statement can acquire a Shared Lock (S) when reading data
-→ Shared Locks allow multiple sessions to read the same resource simultaneously
+→ A SELECT statement acquires a Shared Lock (S) when reading data
+→ The HOLDLOCK hint is used only for demonstration purposes to keep the
+  Shared Lock until the end of the transaction
+→ Under the default isolation level (READ COMMITTED), SQL Server normally
+  releases the Shared Lock as soon as the SELECT statement completes
 → An UPDATE operation requires an Exclusive Lock (X)
 → Because Shared Locks and Exclusive Locks are incompatible, the UPDATE must wait
-→ The HOLDLOCK hint is used to retain the Shared Lock until the end of the 
-  transaction for demonstration purposes
-→ Under the default isolation level (READ COMMITTED), a SELECT normally releases 
-  the Shared Lock immediately after the statement completes
+→ This waiting state is known as blocking
+→ The blocking is released when the transaction is committed or rolled back
 */
 
- 
 CREATE TABLE dbo.Example_SharedLock
 (
     Id INT PRIMARY KEY,
@@ -884,15 +902,26 @@ GO
 
 /*
 Result:
-Id	ProductName	    Price
-1	Notebook	    3500.00
-2	Mouse	        80.00
+Id  ProductName  Price
+1   Notebook     3500.00
+2   Mouse        80.00
 */
 
---Session A
+-------------------------------------------------------------------------------
+-- STEP 1 - Session A
+
 /*
-Do not commit the transaction yet
-This will keep the lock on the row
+Do not commit the transaction yet.
+This will keep the Shared Lock on the row.
+*/
+
+SELECT @@SPID AS SessionA_SPID;
+GO
+
+/*
+Result:
+SessionA_SPID
+    58
 */
 
 BEGIN TRAN;
@@ -902,21 +931,40 @@ FROM dbo.Example_SharedLock WITH (HOLDLOCK)
 WHERE Id = 1;
 
 /*
+Notes:
 → HOLDLOCK is used here only for demonstration purposes
-→ By default, SQL Server releases the Shared Lock immediately
-  after the SELECT statement finishes under READ COMMITTED
-→ Using HOLDLOCK keeps the Shared Lock until the transaction ends
-*/ 
+→ It keeps the Shared Lock until the transaction ends
+→ By default, under READ COMMITTED, SQL Server usually releases
+  the Shared Lock right after the SELECT statement completes
 
-/*
+Default isolation level example:
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED
+ 
 Result:
-Id	ProductName	    Price
-1	Notebook	    3500.00
+Id  ProductName  Price
+1   Notebook     3500.00
 */
 
 
---Session B
---Open a new query window and execute:
+-------------------------------------------------------------------------------
+-- STEP 2 - Session B
+
+/*
+Open a new query window and execute:
+*/
+
+SELECT @@SPID AS SessionB_SPID;
+GO
+
+/*
+Result:
+SessionA_SPID
+    60
+*/
+
+-------------------------------------------------------------------------------
+-- STEP 2.1 - Session B
+BEGIN TRAN;
 
 UPDATE dbo.Example_SharedLock
 SET Price = 3600.00
@@ -927,72 +975,257 @@ Expected behavior:
 → The UPDATE in Session B will remain waiting
 → This happens because Session A is holding a Shared Lock (S)
 → An UPDATE requires an Exclusive Lock (X)
-→ Shared and Exclusive locks are incompatible
+→ Shared and Exclusive Locks are incompatible
 */
- 
----------------------------------------------------
---?????????????????  CONTINUE  ?????????????????
----------------------------------------------------
 
+-------------------------------------------------------------------------------
+-- STEP 3 - Session C (Check the lock)
 
-/*====================================================
-  Releasing the lock
-====================================================*/
+/*
+Open a third query window and execute.
+Replace <SessionA_SPID> and <SessionB_SPID> with the values returned by @@SPID.
+*/
 
---Return to SESSION A and execute:
+SELECT
+tl.request_session_id              AS SessionID,
+tl.resource_type                   AS ResourceType,
+tl.request_mode                    AS LockMode,
+tl.request_status                  AS LockStatus,
+tl.resource_associated_entity_id   AS AssociatedEntityID
+FROM sys.dm_tran_locks AS tl
+WHERE tl.request_session_id IN ('<SessionA_SPID>', '<SessionB_SPID>')
+ORDER BY tl.request_session_id, tl.resource_type, tl.request_mode;
+
+/*
+What to look for:
+→ Session A should show a Shared Lock (S) with status GRANT
+→ Session B may show a waiting request related to the UPDATE
+→ ResourceType may appear as KEY, PAGE, OBJECT, or RID
+  depending on the execution plan and storage structure
+
+Result:
+
+SessionID	    ResourceType	LockMode	LockStatus	AssociatedEntityID
+58	            DATABASE	    S	        GRANT	    0                  
+58	            KEY	            S	        GRANT	    72057594049265664
+58	            OBJECT	        IS	        GRANT	    370100359        
+58	            PAGE	        IS	        GRANT	    72057594049265664     
+60	            DATABASE	    S	        GRANT	    0
+60	            KEY	            X	        WAIT	    72057594049265664
+60	            OBJECT	        IX	        GRANT	    370100359
+60	            PAGE	        IX	        GRANT	    72057594049265664
+
+------------------------------------------------------------------------------- 
+Lock analysis:
+
+→ Observe that the blocking occurs at the KEY level (row lock)
+
+-----------------------
+Session 58 (Session A)
+  
+1 - ResourceType  LockMode    LockStatus
+    DATABASE        S          GRANT
+→   The session has a Shared Lock at the database level
+
+2 - ResourceType  LockMode    LockStatus
+    OBJECT          IS         GRANT
+→   Intent Shared lock on the table
+→   This indicates that Shared Locks will be placed at lower levels
+
+3 - ResourceType  LockMode    LockStatus
+    PAGE            IS          GRANT
+→   Intent Shared lock at the page level
+
+4 - ResourceType  LockMode    LockStatus
+    KEY             S           GRANT
+→   The actual Shared Lock on the row (Id = 1).
+→   This lock is being held because the SELECT was executed with HOLDLOCK
+
+In summary:
+→ 1 - Holds a Shared Lock (S) on the row (KEY) due to the SELECT with HOLDLOCK
+→ 2 - Intent Shared (IS) locks appear at OBJECT and PAGE levels as part of SQL 
+      Server lock hierarchy
+
+-----------------------
+Session 60 (Session B)
+
+1 - ResourceType  LockMode    LockStatus
+    DATABASE        S           GRANT
+→   Normal shared access to the database
+
+2 - ResourceType  LockMode    LockStatus
+    OBJECT          IX          GRANT
+→   Intent Exclusive lock indicating that the session intends to modify data
+
+3 - ResourceType  LockMode    LockStatus
+    PAGE            IX          GRANT
+→   Intent Exclusive lock at the page level
+
+4 - ResourceType  LockMode    LockStatus
+    KEY             X           WAIT
+→   The session is requesting an Exclusive Lock to perform the UPDATE, however, 
+    it must wait because Session 58 is holding a Shared Lock (S) on the same row
+
+In summary:
+→ 1 - Requests an Exclusive Lock (X) on the row (KEY) to perform the UPDATE
+→ 2 - Intent Exclusive (IX) locks appear at OBJECT and PAGE levels, indicating
+      the intention to modify data
+
+-----------------------
+→ Blocking reason:
+Session 58 : KEY  S  GRANT
+Session 60 : KEY  X  WAIT
+
+-----------------------
+→ Request_status meaning:
+GRANT   = lock successfully granted to the session
+WAIT    = the session is waiting for the lock
+CONVERT = SQL Server is converting an existing lock to another type
+
+→ Shared (S) and Exclusive (X) locks are not compatible
+
+→ Therefore, Session 60 must wait until Session 58 releases the lock
+  (by executing COMMIT or ROLLBACK)
+
+*/
+
+-------------------------------------------------------------------------------
+-- STEP 4 - Releasing the lock
+-------------------------------------------------------------------------------
+-- 4.1 - Return to Session A and execute:
+COMMIT;
+
+-- 4.2 - Return to Session B and execute:
 
 COMMIT;
 
-
--- 7.2 - Exclusive Lock (X) example
+ 
+-------------------------------------------------------------------------------
+-- 8 - Deadlock
+-------------------------------------------------------------------------------
 /*
 What this example demonstrates:
-→ A transaction acquires an Exclusive Lock (X) when modifying data
-→ Other sessions attempting to access the same resource must wait
-→ This waiting state is known as blocking
-→ The blocking is released when the transaction is committed or rolled back
+→ A deadlock occurs when two sessions hold locks on different resources
+  and each session tries to acquire a lock held by the other
+→ Neither session can proceed, creating a circular blocking dependency
+→ SQL Server automatically detects the deadlock and selects one session
+  as the deadlock victim
+→ The victim transaction is rolled back so the other transaction can continue
 */
 
---Session A
+CREATE TABLE dbo.Example_Deadlock
+(
+    Id INT PRIMARY KEY,
+    ProductName VARCHAR(100),
+    Price DECIMAL(10,2)
+);
+GO
+
+INSERT INTO dbo.Example_Deadlock (Id, ProductName, Price)
+VALUES
+(1, 'Notebook', 3500.00),
+(2, 'Mouse', 80.00);
+GO
+
+SELECT *
+FROM dbo.Example_Deadlock;
+GO
+
 /*
-Do not commit the transaction yet
-This will keep the lock on the row
+Result:
+Id  ProductName  Price
+1   Notebook     3500.00
+2   Mouse        80.00
+*/
+
+-------------------------------------------------------------------------------
+-- STEP 1 - Session A
+
+/*
+→ Open a new query window (Session A) and execute
+→ Do not commit the transaction
 */
 
 BEGIN TRAN;
 
-UPDATE dbo.Example_Blocking
+UPDATE dbo.Example_Deadlock
+SET Price = 3550.00
+WHERE Id = 1;
+
+/*
+→ Session A now holds an Exclusive Lock (X) on row Id = 1
+*/
+
+WAITFOR DELAY '00:00:10';
+
+UPDATE dbo.Example_Deadlock
+SET Price = 90.00
+WHERE Id = 2;
+
+WAITFOR DELAY '00:00:10';
+
+COMMIT;
+
+-------------------------------------------------------------------------------
+-- STEP 2 - Session B
+ 
+/*
+→ Open another query window (Session B) and execute at the same time
+→ Do not commit the transaction until the deadlock occurs
+*/
+
+BEGIN TRAN;
+
+UPDATE dbo.Example_Deadlock
+SET Price = 85.00
+WHERE Id = 2;
+
+/*
+→ Session B now holds an Exclusive Lock (X) on row Id = 2
+*/
+
+WAITFOR DELAY '00:00:10';
+
+UPDATE dbo.Example_Deadlock
 SET Price = 3600.00
 WHERE Id = 1;
 
-/*
-Result:
-Commands completed successfully.
-Completion time: 2026-03-09T22:49:57.5335567-03:00
-*/
+WAITFOR DELAY '00:00:10';
 
---Session B
---Open a new query window and execute:
-
-SELECT *
-FROM dbo.Example_Blocking
-WHERE Id = 1;
-
-/*
-Expected behavior:
-→ The query in Session B will remain waiting
-→ This happens because Session A holds an Exclusive Lock
-→ Session B must wait until the resource is released
-→ Releasing the lock
-*/
-
---In Session A, execute:
 COMMIT;
 
 /*
-After that:
-→ The lock will be released
-→ The query in Session B will continue execution
+1 - Expected behavior:
+→ Session A locks row Id = 1
+→ Session B locks row Id = 2
+
+2 - Then:
+→ Session A tries to update Id = 2 (locked by Session B)
+→ Session B tries to update Id = 1 (locked by Session A)
+
+3 - This creates a circular dependency:
+→ Session A → waiting for Session B
+→ Session B → waiting for Session A
+
+4 - SQL Server detects the deadlock and automatically chooses one session as the
+    deadlock victim
+
+5 - The victim receives the error:
+Msg 1205, Level 13, State 51, Line 13
+Transaction (Process ID 65) was deadlocked on lock resources with another process
+and has been chosen as the deadlock victim. Rerun the transaction.
+Completion time: 2026-03-10T23:14:43.7955378-03:00
+
+→ The other session continues execution
 */
 
+SELECT *
+FROM dbo.Example_Deadlock;
+GO
 
+/*
+Result:
+Id	ProductName	Price
+1	Notebook	3550.00
+2	Mouse	    90.00
+*/
