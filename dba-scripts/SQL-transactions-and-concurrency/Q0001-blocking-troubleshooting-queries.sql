@@ -6,7 +6,7 @@ Version     : 1.0
 Task        : Q0001 - Blocking troubleshooting queries
 Object      : Script
 Description : Queries to detect and analyze SQL Server blocking situations
-Notes       : notes/A0011-transactions-and-concurrency.md
+Notes       : notes/A0011-sql-transactions-and-concurrency.md
 Examples    : scripts/Q0009-sql-transactions-and-concurrency.sql
 Tools       : sp_WhoIsActive v11.32
 Location    : tools/Q0001-sp_whoisactive-v11.32.sql
@@ -220,5 +220,6 @@ EXEC sp_WhoIsActive
 GO
 
  
+
 
 
