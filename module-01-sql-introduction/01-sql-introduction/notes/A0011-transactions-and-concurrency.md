@@ -12,6 +12,12 @@ Este documento apresenta informações a respeito de transações e concorrênci
 
 ## Hands-on  
 [Transactions and Concurrency ](../scripts/Q0009-transactions-and-concurrency.sql)  
+[Q0001-blocking-troubleshooting-queries](../../../dba-scripts/SQL-transactions-and-concurrency/Q0001-blocking-troubleshooting-queries.sql)
+
+---
+
+## Observações
+- Neste capítulo é utilizada a stored procedure sp_WhoIsActive que está disponível para download em [Q0001-sp_whoisactive-v11.32.sql](../tools/Q0001-sp_whoisactive-v11.32.sql)  
 
 ---
 
@@ -530,7 +536,96 @@ Sessão 75 → Blocked by 81
 
 ---
 
-### Consultas úteis para investigação estão disponíveis no Hands-On
+### 5.1 - Uso do `sp_WhoIsActive` para análise de blocking
+
+→ O `sp_WhoIsActive` é uma stored procedure de diagnóstico muito utilizada no SQL Server, criada por **Adam Machanic**  
+→ Ela fornece informações em tempo real sobre sessões ativas, queries em execução, waits, locks e situações de **blocking**  
+→ No material deste projeto, o `sp_WhoIsActive` é utilizado para identificar sessões bloqueadas e investigar quais queries estão causando o bloqueio  
+
+---
+
+**5.1.1 - Uso básico**  
+```sql
+EXEC sp_WhoIsActive;
+ou somente
+sp_WhoIsActive;
+```
+→ Resultado: Esse comando retorna um snapshot das sessões atualmente ativas no SQL Server  
+→ Algumas colunas importantes relacionadas a **blocking** no resultado incluem:
+
+| Coluna | Descrição |
+|------|------|
+| `session_id` | Identificador da sessão |
+| `blocking_session_id` | Identificador da sessão que está causando o bloqueio |
+| `blocked_session_count` | Número de sessões que estão sendo bloqueadas por esta sessão |
+| `wait_info` | Tipo de espera atual da sessão |
+| `status` | Estado atual da sessão (`running`, `sleeping`, `suspended`) |
+| `sql_text` | Query que está sendo executada |
+| `database_name` | Banco de dados onde a operação está ocorrendo |
+
+---
+
+**Principais `wait_info` relacionados a blocking**  
+→ Quando ocorre bloqueio no SQL Server, a coluna `wait_info` normalmente apresenta valores iniciados por **`LCK_M_`**, indicando que a sessão está aguardando um lock  
+→ Em geral, waits iniciados por `LCK_M_` indicam que **uma sessão está aguardando outra sessão liberar um lock sobre o mesmo recurso  
+
+| Wait Type | Descrição |
+|------|------|
+| `LCK_M_S` | A sessão está aguardando um **Shared Lock (S)** |
+| `LCK_M_X` | A sessão está aguardando um **Exclusive Lock (X)** |
+| `LCK_M_U` | A sessão está aguardando um **Update Lock (U)** |
+| `LCK_M_IS` | A sessão está aguardando um **Intent Shared Lock (IS)** |
+| `LCK_M_IX` | A sessão está aguardando um **Intent Exclusive Lock (IX)** |
+| `LCK_M_SCH_S` | A sessão está aguardando um **Schema Stability Lock** |
+| `LCK_M_SCH_M` | A sessão está aguardando um **Schema Modification Lock** |
+
+---
+
+**5.1.2 - Detectar locks e blocking**  
+```sql
+EXEC sp_WhoIsActive  
+    @get_locks = 1,  
+    @get_plans = 1;
+```
+→ Resultado: Este comando adiciona informações adicionais de diagnóstico:  
+- `@get_locks = 1` → retorna os locks associados a cada sessão em formato XML  
+- `@get_plans = 1` → retorna o plano de execução da query em execução  
+
+→ Isso ajuda a identificar:  
+- quais recursos estão bloqueados
+- quais tipos de lock estão sendo utilizados
+- quais queries estão causando blocking
+
+---
+
+**5.1.3 - Identificar sessões que estão bloqueando outras**
+
+```sql
+EXEC sp_WhoIsActive  
+    @find_block_leaders = 1;
+```
+→ Essa opção destaca o **root blocker**, ou seja, a sessão que está causando bloqueio em outras sessões  
+→ Normalmente o root blocker possui:  
+- `blocking_session_id = NULL`
+- `blocked_session_count > 0`
+
+---
+
+**5.1.4 - Análise aprofundada de blocking**
+```sql
+EXEC sp_WhoIsActive  
+    @get_locks = 1,  
+    @get_plans = 1,  
+    @find_block_leaders = 1;
+```
+→ Essa abordagem combina:  
+- informações de locks
+- planos de execução
+- identificação do root blocker
+
+---
+
+### Outras consultas úteis para investigação estão disponíveis no Hands-On
 
 ---
 
@@ -575,6 +670,7 @@ Na maioria dos casos, deadlocks são causados por **problemas na lógica da apli
 - Falta de índices adequados
 
 **O papel do DBA é investigar o problema e orientar os desenvolvedores na correção da aplicação**
+
 
 
 
