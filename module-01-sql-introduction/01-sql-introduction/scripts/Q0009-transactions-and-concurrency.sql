@@ -1091,7 +1091,7 @@ CONVERT = SQL Server is converting an existing lock to another type
 
 -------------------------------------------------------------------------------
 -- STEP 4 - Releasing the lock
--------------------------------------------------------------------------------
+
 -- 4.1 - Return to Session A and execute:
 COMMIT;
 
