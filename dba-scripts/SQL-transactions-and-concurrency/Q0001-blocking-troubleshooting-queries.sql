@@ -9,7 +9,7 @@ Description : Queries to detect and analyze SQL Server blocking situations
 Notes       : notes/A0011-transactions-and-concurrency.md
 Examples    : scripts/Q0009-transactions-and-concurrency.sql
 Tools       : sp_WhoIsActive v11.32
-Location    : scripts/Q0002-sp_whoisactive-v11.32.sql
+Location    : tools/Q0001-sp_whoisactive-v11.32.sql
 ===============================================================================
 INDEX
 1 - Check current session ID
@@ -220,3 +220,4 @@ EXEC sp_WhoIsActive
 GO
 
  
+
