@@ -12,7 +12,9 @@ Informações a respeito da versão do SQL SERVER
 ---
 
 ## Hands-on
-[SQL Version and Compatibility](../../../dba-scripts/SQL-instance-information/Q0003-version-and-compatibility.sql)  
+[Server and Instance Name](../../../dba-scripts/SQL-instance-information/INST-Q0002-server-and-service-name.sql)  
+[SQL Version and Compatibility](../../../dba-scripts/SQL-instance-information/INST-Q0003-version-and-compatibility.sql)
+
 
 ---
 
