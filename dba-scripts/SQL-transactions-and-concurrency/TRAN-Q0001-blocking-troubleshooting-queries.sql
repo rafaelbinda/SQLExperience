@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-03-10
 Version     : 1.0
-Task        : Q0001 - Blocking troubleshooting queries
+Task        : TRAN-Q0001 - Blocking Troubleshooting Queries
 Object      : Script
 Description : Queries to detect and analyze SQL Server blocking situations
 Notes       : notes/A0011-sql-transactions-and-concurrency.md
