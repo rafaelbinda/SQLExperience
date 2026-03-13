@@ -16,7 +16,7 @@ Each topic includes:
 | # | Topic | Note | Hands-on | DBA |
 |---|-------|------|--------|-----|
 | 1 | Study Environment Setup | [A0001](notes/A0001-study-environment-setup.md) | — | — |
-| 2 | Collation | [A0002](notes/A0002-collation.md) | [Q0001](scripts/Q0001-collation.sql) | [INST-Q0002](../../../dba-scripts/SQL-instance-information/INST-Q0002-collation.sql) |
+| 2 | Collation | [A0002](notes/A0002-collation.md) | [Q0001](scripts/Q0001-collation.sql) |               [INST-Q0001](../../../dba-scripts/SQL-instance-information/INST-Q0001-collation.sql) |
 | 3 | SQL Server Installation | [A0003](notes/A0003-sql_server-installation.md) | — | — |
 | 4 | Connectivity Troubleshooting | [A0004](notes/A0004-sql-server-connectivity-troubleshooting.md) | — | [CONN-Q0001](../../../dba-scripts/SQL-connections/CONN-Q0001-active-connections.sql) |
 | 5 | Network Commands | [A0005](notes/A0005-network-commands.md) | — | — |
