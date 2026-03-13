@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-02-15
 Version     : 2.0
-Task        : Q0001 - Server and Service Name
+Task        : INST-Q0002 - Server and Service Name
 Object      : Script
 Description : Queries to identify server and instance information 
 ===============================================================================
