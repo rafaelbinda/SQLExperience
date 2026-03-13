@@ -13,7 +13,7 @@
 
 ## Hands-on  
 [SQL Server Create Database](../scripts/Q0002-create-database.sql)   
-[SQL Physical Storage Layout](../../../dba-scripts/SQL-instance-information/Q0004-physical-storage-layout.sql)  
+[SQL Physical Storage Layout](../../../dba-scripts/SQL-instance-information/INST-Q0004-physical-storage-layout.sql)  
 
 ## Conteúdo adicional
 - https://docs.microsoft.com/en-us/sql/relational
