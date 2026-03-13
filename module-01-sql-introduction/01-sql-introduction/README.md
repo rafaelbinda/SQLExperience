@@ -20,7 +20,7 @@ Each topic includes:
 | 3 | SQL Server Installation | [A0003](notes/A0003-sql_server-installation.md) | — | — |
 | 4 | Connectivity Troubleshooting | [A0004](notes/A0004-sql-server-connectivity-troubleshooting.md) | — | [CONN-Q0001](../../dba-scripts/SQL-connections/CONN-Q0001-active-connections.sql) |
 | 5 | Network Commands | [A0005](notes/A0005-network-commands.md) | — | — |
-| 6 | Version | [A0006](notes/A0006-sql-server-version.md) | — | [INST-Q0002](../../../dba-scripts/SQL-instance-information/INST-Q0002-server-and-service-name.sql)<br>[INST-Q0003](../../dba-scripts/SQL-instance-information/INST-Q0003-version-and-compatibility.sql) |
+| 6 | Version | [A0006](notes/A0006-sql-server-version.md) | — | [INST-Q0002](../../dba-scripts/SQL-instance-information/INST-Q0002-server-and-service-name.sql)<br>[INST-Q0003](../../dba-scripts/SQL-instance-information/INST-Q0003-version-and-compatibility.sql) |
 | 7 | Architecture | [A0007](notes/A0007-sql-server-architecture.md) | [Q0002](scripts/Q0002-create-database.sql) | [INST-Q0004](../../dba-scripts/SQL-instance-information/INST-Q0004-physical-storage-layout.sql) |
 | 8 | Fundamentals | [A0008](notes/A0008-sql-fundamentals.md) | [Q0003](scripts/Q0003-sql-fundamentals.sql) | — |
 | 9 | Data Querying | [A0009](notes/A0009-sql-data-querying.md) | [Q0004](scripts/Q0004-sql-data-querying.sql) | — |
