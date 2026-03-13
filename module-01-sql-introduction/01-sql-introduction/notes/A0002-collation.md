@@ -9,7 +9,7 @@ Documento técnico resumido sobre Code Page, Unicode e Collation no SQL Server, 
 
 ## Hands-on
 [Q0001 - SQL Collation Hands-on](../scripts/Q0001-collation.sql)  
-[Q0001 - SQL Collation DBA Scripts](../../../dba-scripts/SQL-instance-information/Q0001-collation.sql)  
+[INST-Q0001 - SQL Collation DBA Scripts](../../../dba-scripts/SQL-instance-information/INST-Q0001-collation.sql)  
 
 ---
 
