@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-02-11
 Version     : 3.0
-Task        : Q0001 - Collation
+Task        : INST-Q0001 - Collation
 Object      : Script
 Description : Queries to identify collation
 Notes       : notes\A0002-collation.md
