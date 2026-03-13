@@ -1,5 +1,5 @@
 
-# 01 — SQL Introduction
+# 01 - SQL Introduction
 
 This section covers the fundamental concepts required to start working with SQL Server
 
@@ -28,12 +28,11 @@ Each topic includes:
 |11 | Transactions & Concurrency | [A0011](notes/A0011-sql-transactions-and-concurrency.md) | [Q0009](scripts/Q0009-sql-transactions-and-concurrency.sql) | [Blocking Troubleshooting Queries](../../dba-scripts/SQL-transactions-and-concurrency/TRAN-Q0001-blocking-troubleshooting-queries.sql) |
 |12 | Programming Objects | [A0012](notes/A0012-sql-server-programming-objects.md) | [Q0010](scripts/Q0010-sql-server-programming-objects.sql) | — |
 
-
 ---
 
 # Tools
 
-Utilities used during environment setup and troubleshooting.
+Utilities used during environment setup and troubleshooting
 
 | Tool | Description |
 |-----|-----|
