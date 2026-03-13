@@ -8,9 +8,8 @@
 Documento técnico resumido sobre Code Page, Unicode e Collation no SQL Server, incluindo impactos de desempenho e boas práticas de padronização
 
 ## Hands-on
-[Q0001 - SQL Collation](../scripts/Q0001-collation.sql)  
-ou  
-[Q0001 - SQL Collation](../../dba-scripts/SQL-instance-information/Q0001-collation.sql)  
+[Q0001 - SQL Collation Hands-on](../scripts/Q0001-collation.sql)  
+[Q0001 - SQL Collation DBA Scripts](../../../dba-scripts/SQL-instance-information/Q0001-collation.sql)  
 
 ---
 
