@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-02-11
 Version     : 2.0
-Task        : Q0003 - Version and compatibility
+Task        : INST-Q0003 - Version and compatibility
 Object      : Script
 Description : Queries to identify database version and compatibility
 Notes       : notes\A0006-sql-server-version.md
