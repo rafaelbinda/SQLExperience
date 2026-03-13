@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-02-16
 Version     : 2.0
-Task        : Q0001 - Active Connections
+Task        : CONN-Q0001 - Active Connections
 Object      : Script
 Description : Query to identify active SQL Server connections
               Includes detection of connections using Named Pipes.
