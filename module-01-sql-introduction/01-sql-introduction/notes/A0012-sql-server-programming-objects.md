@@ -1,25 +1,30 @@
 ﻿# A0012 – Objetos de programação do SQL Server
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-11  
-> **Version:** 1.0 
+> **Version:** 2.0 
 
 ---
 
-## Descrição
+## Descrição  
+
+Este documento apresenta os principais objetos de programação do SQL Server:
+- Views
+- Stored Procedures
+- Functions
+- Triggers
  
 ---
 
 ## Hands-on  
- 
----
 
-## Observações
- 
+[SQL Server Programing Objects](../scripts/Q0010-sql-server-programming-objects.sql)  
+
 ---
 
 ## 1 - VIEWS
 
 **O que é uma View?**
+
 - Uma **View** é uma **consulta armazenada no SQL Server**  
 - Para o usuário, a view **aparece como se fosse uma tabela**, porém na realidade ela é apenas um **SELECT armazenado**  
 - Quando uma consulta é executada sobre uma view, o SQL Server executa a consulta definida na view  
@@ -27,9 +32,10 @@
 ---
 
 ### 1.1 - Benefícios de usar Views
-→ Simplificação da administração de permissões  
-→ Views ajudam a simplificar a segurança do banco de dados 
-→ Facilita desenvolvimento de relatórios e exportações de dados e integrações porque a lógica de consulta pode ficar **centralizada no banco**    
+
+Simplificação da administração de permissões  
+Views ajudam a simplificar a segurança do banco de dados 
+Facilita desenvolvimento de relatórios e exportações de dados e integrações porque a lógica de consulta pode ficar **centralizada no banco**    
 
 Exemplo:
 1. Um relatório precisa exibir informações que exigem **5 JOINs entre tabelas**  
@@ -42,8 +48,7 @@ Exemplo:
 
 ### 1.2 - Camada de abstração
 
-Views criam uma **camada de abstração entre a aplicação e a estrutura das tabelas**  
-Isso permite:
+Views criam uma **camada de abstração entre a aplicação e a estrutura das tabelas**, isso permite:  
 - Alterar tabelas internas sem impactar diretamente a aplicação
 - Centralizar regras de consulta
 - Padronizar acesso aos dados
@@ -91,15 +96,10 @@ FROM Sales.vw_CustomersOrders
 
 **1.4.3 - Resolução dinâmica da view**
 
-Quando executamos uma consulta na view, o SQL Server **não executa a view separadamente**  
-
-Ele faz o seguinte:
-
+Quando executamos uma consulta na view, o SQL Server **não executa a view separadamente**, ele faz o seguinte:  
 1. Pega o `SELECT` que foi enviado pelo usuário  
 2. Junta com a definição da view  
-3. Gera **uma única consulta final**  
-
-Ou seja, o SQL Server executa algo equivalente a:  
+3. Gera **uma única consulta final**, ou seja, o SQL Server executa algo equivalente a:  
 
 ```sql
 SELECT *
@@ -117,9 +117,7 @@ FROM (
 ### 1.5 - Desempenho
 
 Uma view **não melhora nem piora o desempenho por si só**  
-
-O desempenho dependerá:
-
+O desempenho dependerá de:  
 - Da consulta
 - Dos índices
 - Das tabelas envolvidas
@@ -131,24 +129,23 @@ O desempenho dependerá:
 
 ### 1.6 - Estudo usando plano de execução
 
-Para visualizar como o SQL Server executa uma consulta com view:
-
+Habilite o plano de execução no SSMS conforme informado a seguir:
 ```
 Query → Include Actual Execution Plan
+ou
 CTRL + M
 ```
 
-→ Depois execute a consulta  
-
-**1.6.1 - Leitura do plano de execução**
+→ Esse processo representa o fluxo de execução que o SQL Server utiliza para retornar os dados  
 
 O plano de execução deve ser interpretado:
+- **Da direita para a esquerda**
+- **De cima para baixo**
 
-- **da direita para a esquerda**
-- **de cima para baixo**
+**Para efeito de comparação**  
+**1.6.1 - Faça a leitura do plano de execução ao executar uma consulta COM view**  
+**1.6.2 - Faça a leitura do plano de execução ao executar a mesma consulta SEM view**  
 
-→ Isso representa o fluxo de execução que o SQL Server utiliza para retornar os dados
- 
 ---
 
 ## 2 - STORED PROCEDURE
@@ -644,6 +641,225 @@ dbo.ufn_GetOrdersByCustomer
  
 ---
 
-## TRIGGERS
+## 4 - TRIGGERS
+
+### 4.1 - O que é uma Trigger?
+
+Uma **Trigger** é um objeto de banco de dados que executa automaticamente um conjunto de comandos SQL quando ocorre um determinado evento  
+Triggers **não podem ser executadas diretamente pelo usuário**, pois são acionadas automaticamente quando o evento associado ocorre  
+Esse evento pode ser:
+- Uma operação de
+- **INSERT**
+- **UPDATE**
+- **DELETE**
+- Ou eventos administrativos no banco ou instância
+
+---
+
+**Características das Triggers**
+
+- Executam automaticamente após um evento
+- Não podem ser chamadas diretamente pelo usuário
+- São utilizadas principalmente para **auditoria, validação ou automação de processos**
+- Podem gerar **impacto de desempenho** se utilizadas de forma excessiva
+- Podem aumentar a carga de trabalho na **tempdb**, dependendo da operação executada  
+
+---
+
+### 4.2 - Tabelas Virtuais INSERTED e DELETED
+
+Durante a execução de uma Trigger, o SQL Server disponibiliza duas tabelas especiais que existem **somente durante a execução da trigger**:
+- `INSERTED`
+- `DELETED`
+
+→ Fora do contexto da Trigger essas tabelas **não podem ser acessadas** 
+
+---
+
+**4.2.1 - Operação INSERT**
+
+Quando ocorre um **INSERT**, o SQL Server cria uma tabela chamada `INSERTED`  
+Essa tabela possui:  
+- A mesma estrutura da tabela original
+- Os registros recém inseridos
+
+Exemplo conceitual:
+```sql
+SELECT *
+FROM INSERTED;
+```
+
+→ Isso permite identificar **quais dados o usuário inseriu no banco de dados**
+
+---
+
+**4.2.2 - Operação DELETE**
+
+Quando ocorre um **DELETE**, o SQL Server cria uma tabela chamada `DELETED`  
+Essa tabela contém:  
+- A mesma estrutura da tabela original
+- Os registros que foram removidos
+
+Exemplo conceitual:
+```sql
+SELECT *
+FROM DELETED;
+```
+
+Assim é possível verificar **quais dados foram excluídos**  
+
+---
+
+**4.2.3 - Operação UPDATE**
+
+Em operações de **UPDATE**, ambas as tabelas ficam disponíveis  
+Isso permite comparar os valores antes e depois da modificação  
+
+| Tabela | Conteúdo |
+|------|------|
+| `DELETED` | valores **antes da alteração** |
+| `INSERTED` | valores **após a alteração** |
+
+---
+
+**Exemplo conceitural das operações**
+
+```sql
+IF EXISTS (SELECT 1 FROM INSERTED) 
+AND NOT EXISTS (SELECT 1 FROM DELETED)
+BEGIN
+    -- operação de INSERT
+END
+
+IF EXISTS (SELECT 1 FROM INSERTED) 
+AND EXISTS (SELECT 1 FROM DELETED)
+BEGIN
+    -- operação de UPDATE
+END
+
+IF EXISTS (SELECT 1 FROM DELETED) 
+AND NOT EXISTS (SELECT 1 FROM INSERTED)
+BEGIN
+    -- operação de DELETE
+END
+```
+
+---
+
+### 4.3 - Tipos de Trigger
+
+**4.3.1 - Trigger DML**
+
+Esse é o tipo **mais utilizado no dia a dia**  
+Triggers **DML (Data Manipulation Language)** são vinculadas a uma **tabela ou view**  
+Elas são executadas quando ocorre:  
+- `INSERT`
+- `UPDATE`
+- `DELETE`
+
+**Exemplo de uso:** Registrar alterações em uma tabela de auditoria  
+
+**Exemplo de cenário:**    
+
+→ Tabela principal: `Customers`  
+→ Tabela de auditoria: `Audit_Customers`  
+
+**Resultado esperado:**  
+Quando ocorrer algum `INSERT` ou `UPDATE`, as informações a seguir serão armazendos na tabela de auditoria:  
+→ ID  
+→ Operation Type  
+→ User  
+→ Host  
+→ CustomerID  
+→ Name  
+→ FirstName  
+→ MiddleName  
+→ LastName  
+→ Deleted (flag lógica 0 ou 1)  
+
+---
+
+**4.3.2 - Trigger DDL**
+
+Triggers **DDL (Data Definition Language)** são disparadas quando ocorrem eventos estruturais no banco de dados  
+Exemplos:  
+- `CREATE TABLE`
+- `ALTER TABLE`
+- `DROP TABLE`
+- `CREATE PROCEDURE`
+
+→ São utilizadas principalmente para **auditoria administrativa**  
+→ O exemplo a seguir apresenta um cenário em que quando ocorrer qualquer CREATE TABLE será disparada a trigger e ela vai gravar informações para **auditoria** em uma tabela denominada dbo.SchemaChangesLog:  
+```sql
+CREATE OR ALTER TRIGGER trg_LogCreateTable
+ON DATABASE
+FOR CREATE_TABLE 
+AS
+BEGIN
+
+    INSERT INTO dbo.SchemaChangesLog
+    --Prossegue com a regra 
+
+END 
+```
+
+---
+
+**4.3.3 - Trigger de Login**
+
+Triggers de login são executadas **no momento em que um usuário tenta se conectar ao SQL Server**  
+Usos comuns:  
+- Auditoria de acesso  
+- Bloqueio de conexões indevidas  
+- Restrição de acesso a determinadas ferramentas  
+
+Exemplo conceitual:  
+→ Se uma conexão for detectada a partir de uma ferramenta não autorizada (como Excel), a trigger pode executar um **ROLLBACK**, impedindo o acesso  
+
+```sql
+CREATE OR ALTER TRIGGER trg_BlockExcelLogin
+ON ALL SERVER --Perceba que avalia em todo o servidor independente de banco de dados
+FOR LOGON
+AS
+BEGIN
+
+    DECLARE @ProgramName NVARCHAR(128);
+
+    SELECT @ProgramName = program_name
+    FROM sys.dm_exec_sessions
+    WHERE session_id = @@SPID;
+
+    -- Checa se a conexão está vindo do Excel
+    IF @ProgramName LIKE '%Excel%'
+    BEGIN
+
+        ROLLBACK;
+
+    END
+
+END;
+```
+---
+
+**Boas Práticas**
+
+Triggers devem ser utilizadas com cuidado
+Boas práticas incluem:  
+- Evitar lógica complexa dentro de triggers
+- Evitar operações demoradas
+- Utilizar triggers principalmente para **auditoria ou validação**
+- Sempre considerar o impacto no desempenho
  
 
+---
+
+**Resumo**
+
+| Tipo de Trigger | Scopo | Evento |
+|---|---|---|
+| DML Trigger | Tabela / View | INSERT, UPDATE, DELETE |
+| DDL Trigger (Database) | Database | CREATE TABLE, ALTER TABLE, DROP PROCEDURE |
+| DDL Trigger (Server) | Instância | CREATE LOGIN, ALTER LOGIN, etc |
+| Login Trigger | Instância | LOGIN |
+
+---
