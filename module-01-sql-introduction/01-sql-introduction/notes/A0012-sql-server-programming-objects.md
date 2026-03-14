@@ -17,7 +17,7 @@
  
 ---
 
-## 1 - Views no SQL Server
+## 1 - VIEWS
 
 **O que é uma View?**
 - Uma **View** é uma **consulta armazenada no SQL Server**  
@@ -150,6 +150,142 @@ O plano de execução deve ser interpretado:
 → Isso representa o fluxo de execução que o SQL Server utiliza para retornar os dados
  
 ---
+
+## 2 - STORED PROCEDURE
+
+### 2.1 - O que é uma Stored Procedure?
+
+Uma **Stored Procedure** é um conjunto de comandos escritos em **Transact-SQL (T-SQL)** que são armazenados e executados diretamente no **SQL Server**  
+Ela permite encapsular lógica de banco de dados que pode ser executada sempre que necessário  
+As stored procedures podem:  
+- Executar múltiplas instruções SQL
+- Receber **parâmetros**
+- Retornar **resultados**
+- Executar **operações administrativas ou de manipulação de dados**
+
+Algumas vantagens de usar stored procedure são:  
+- Reutilização de código
+- Melhor organização da lógica do banco
+- Maior controle de permissões
+- Redução do tráfego entre aplicação e banco
+- Execução diretamente no servidor
+
+---
+
+### 2.2 - Tipos de Stored Procedures
+
+**2.2.1 - Stored Procedures de Sistema**
+
+São procedures internas do SQL Server usadas para executar **tarefas administrativas**  
+Características:  
+- Criadas automaticamente pelo SQL Server
+- Possuem prefixo **`sp_`**
+
+Exemplo:
+
+```sql
+EXEC sp_helpdb;
+```
+
+---
+
+**2.2.2 - Stored Procedures Estendidas**
+
+São procedures desenvolvidas utilizando **linguagem C ou C++** e carregadas no SQL Server como bibliotecas externas  
+Características:  
+- Possuem prefixo **`xp_`**
+- Executam operações externas ao SQL Server
+- Mantidas apenas por **compatibilidade**
+- **Não é recomendado utilizar**
+- Muitas estão **descontinuadas ou desabilitadas por padrão**
+
+Exemplo:
+
+```sql
+EXEC xp_cmdshell 'dir';
+```
+
+---
+
+**2.2.3 - Stored Procedures Locais**
+
+São procedures **criadas pelo próprio desenvolvedor ou DBA**
+Características:
+- Criadas dentro de um banco de dados  
+- Podem manipular objetos de **outros bancos de dados**  
+- Utilizadas para encapsular regras de negócio ou automações  
+
+Exemplo:
+
+```sql
+CREATE PROCEDURE dbo.usp_GetCustomers
+AS
+BEGIN
+    SELECT *
+    FROM Sales.Customers;
+END;
+```
+
+Execução:
+
+```sql
+EXEC dbo.usp_GetCustomers;
+```
+
+---
+
+**2.2.4 - Stored Procedures com Parâmetros**
+
+Uma stored procedure pode receber parâmetros para tornar sua execução dinâmica
+
+Exemplo:
+
+```sql
+CREATE PROCEDURE dbo.usp_GetCustomerById
+    @CustomerID INT
+AS
+BEGIN
+    SELECT *
+    FROM Sales.Customers
+    WHERE CustomerID = @CustomerID;
+END;
+```
+
+Execução:
+
+```sql
+EXEC dbo.usp_GetCustomerById @CustomerID = 10;
+```
+
+---
+
+### Resumo
+
+| Tipo | Prefixo | Uso |
+|---|---|---|
+| Sistema | `sp_` | tarefas administrativas internas |
+| Estendida | `xp_` | integração externa (não recomendado) |
+| Local | definido pelo usuário | lógica de negócio e automação |
+
+---
+
+# Observação
+
+Boas práticas recomendam:
+
+- utilizar prefixos próprios como **`usp_`** (user stored procedure)
+- evitar utilizar **`sp_`** em procedures criadas pelo usuário
+
+Exemplo recomendado:
+
+```sql
+CREATE PROCEDURE dbo.usp_UpdateCustomerStatus
+AS
+BEGIN
+    -- lógica da procedure
+END;
+```
+
 
 ## FUNCTIONS 
  
