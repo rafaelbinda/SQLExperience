@@ -1,7 +1,7 @@
 ﻿# A0012 – Objetos de programação do SQL Server
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-11  
-> **Version:** 2.0 
+> **Version:** 3.0 
 
 ---
 
@@ -83,6 +83,121 @@ FROM ...
 JOIN ...
 LEFT JOIN ...
 ```
+---
+
+**1.4.1.1 - CREATE VIEW WITH SCHEMABINDING**  
+→ WITH SCHEMABINDING é uma opção usada quando você cria uma view para vincular (bind) a view à estrutura das tabelas que ela utiliza  
+→ Impede que a estrutura das tabelas usadas pela view seja alterada de uma forma que quebraria a view  
+
+**Sem SCHEMABINDING (comportamento padrão)**
+
+Imagine a view:  
+
+```sql
+CREATE VIEW Sales.vw_Test
+AS
+SELECT CustomerID, AccountNumber
+FROM Sales.Customer;
+```
+
+Agora alguém executa:
+```sql
+ALTER TABLE Sales.Customer
+DROP COLUMN AccountNumber;
+```
+
+→ O SQL Server permite isso  
+→ Resultado: **A view continua existindo, mas fica quebrada**  
+→ Quando alguém tentar usar a view:
+
+```sql
+SELECT * FROM Sales.vw_Test;
+```
+Erro:
+```sql
+Invalid column name 'AccountNumber'
+```
+
+**Com SCHEMABINDING**
+
+Agora criando a view assim:  
+```sql
+CREATE VIEW Sales.vw_Test
+WITH SCHEMABINDING
+AS
+SELECT CustomerID, AccountNumber
+FROM Sales.Customer;
+```
+
+Se alguém tentar:  
+```sql
+ALTER TABLE Sales.Customer
+DROP COLUMN AccountNumber;
+```
+
+→ Resultado: o SQL Server bloqueia a operação:  
+```sql
+Cannot ALTER TABLE because the object 'vw_Test' is schema bound
+--Ou seja:
+--A estrutura da tabela não pode ser alterada enquanto a view depender dela
+```
+
+Quando é usado WITH SCHEMABINDING, algumas regras passam a valer:
+
+- Deve usar schema nos objetos
+  
+→ Errado:  
+
+```sql
+FROM Customer
+```
+
+→ Correto:  
+```sql
+FROM Sales.Customer
+```
+
+- Não pode usar `SELECT *`
+  
+→ Errado: 
+```sql
+SELECT *
+FROM Sales.Customer
+```
+
+→ Correto:  
+```sql
+SELECT CustomerID, AccountNumber
+FROM Sales.Customer
+```
+
+- Objetos devem estar no mesmo banco
+  
+Não é possível referenciar outro banco de dados:
+```sql
+OtherDatabase.dbo.Table
+```
+
+- Quando DBAs usam SCHEMABINDING
+  
+Principalmente em Indexed Views
+```sql
+CREATE UNIQUE CLUSTERED INDEX IX_vw_SalesSummary_CustomerID
+ON Sales.vw_SalesSummary (CustomerID);
+GO
+```
+
+- Sem SCHEMABINDING não é possível criar índice na view
+
+**Resumo simples**  
+| Característica	| Sem SCHEMABINDING |	Com SCHEMABINDING |  
+| ---------------| ------------------| ------------------|
+| Alterar tabela	| permitido	| bloqueado |
+| View pode quebrar	|sim |	não |
+| Pode usar SELECT *	|sim	| não |
+| Indexed view	| não	| sim |
+
+
 ---
 
 **1.4.2 - Consulta na view**
