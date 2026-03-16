@@ -3,11 +3,24 @@
 Author      : Rafael Binda
 Created     : 2026-03-15
 Version     : 1.0
-Task        : Q0010 - Sql Server Programming Objects
-Databases   : AventureWorkds, ExamplesDB 
+Task        : Q0010 - Sql Server Programming Objects - VIEWS
+Databases   : AventureWorks 
 Object      : Script
-Description : Examples demonstrating Sql Server Programming Objects
+Description : Examples demonstrating views
 Notes       : notes/A0012-sql-server-programming-objects.md
+=============================================================================== 
+INDEX
+1  - Simple view
+2  - View with JOIN
+3  - View with JOIN and calculated column
+4  - View with aggregation
+5  - View used as an abstraction layer
+6  - Aggregating data from a view
+7  - Filtering data from a view
+8  - View metadata
+9  - Creating an Indexed View
+10 - Execution Plan Example — View Expansion
+11 - Drop View
 ===============================================================================
 */
 
@@ -18,11 +31,11 @@ USE AdventureWorks;
 GO
 
 -------------------------------------------------------------------------------
--- 1 - VIEWS 
+-- VIEWS 
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
--- 1.1 - Simple view
+-- 1 - Simple view
 -------------------------------------------------------------------------------
 -- Returns basic customer information from Person.Person
 
@@ -57,7 +70,7 @@ BusinessEntityID	FirstName	MiddleName	LastName
 */
 
 -------------------------------------------------------------------------------
--- 1.2 - View with JOIN
+-- 2 - View with JOIN
 -------------------------------------------------------------------------------
 -- Combines customer and person data
 
@@ -96,7 +109,7 @@ CustomerID	BusinessEntityID	FirstName	MiddleName	LastName
 */
 
 -------------------------------------------------------------------------------
--- 1.3 - View with JOIN and calculated column
+-- 3 - View with JOIN and calculated column
 -------------------------------------------------------------------------------
 -- Shows sales order header data with customer info
 
@@ -141,7 +154,7 @@ SalesOrderID	OrderDate	                CustomerID	SubTotal	TaxAmt	    Freight	  
 
 
 -------------------------------------------------------------------------------
--- 1.4 - View with aggregation
+-- 4 - View with aggregation
 -------------------------------------------------------------------------------
 -- Returns total orders and total sales by customer
 
@@ -177,19 +190,19 @@ CustomerID	TotalOrders	TotalSales
 
 
 -------------------------------------------------------------------------------
--- 1.5 - View used as an abstraction layer
+-- 5 - View used as an abstraction layer
 -------------------------------------------------------------------------------
--- The application can query the view instead of writing
--- the complete JOIN every time
+--The application can query the view instead of writing the complete JOIN every
+--time
+
 SELECT TOP (10)
-    CustomerID,
-    FullName,
-    TotalDue
+CustomerID,
+FullName,
+TotalDue
 FROM Sales.vw_SalesOrderSummary
 ORDER BY TotalDue DESC;
 GO
 
--------------------------------------------------------------------------------
 /*
 Result:
 → The reason we saw two rows for the same customer in CustomerID 29641 is
@@ -209,7 +222,7 @@ CustomerID	FullName	    TotalDue
 */
 
 -------------------------------------------------------------------------------
--- 1.6 - Aggregating data from a view
+-- 6 - Aggregating data from a view
 -------------------------------------------------------------------------------
 
 SELECT TOP (10)
@@ -238,7 +251,7 @@ CustomerID	FullName	TotalSales
 */
 
 -------------------------------------------------------------------------------
--- 1.7 - Filtering data from a view
+-- 7 - Filtering data from a view
 -------------------------------------------------------------------------------
 -- SQL Server expands the view definition internally
 
@@ -269,7 +282,7 @@ SalesOrderID	OrderDate	                FullName	    TotalDue
 
 
 -------------------------------------------------------------------------------
--- 1.8 - View metadata
+-- 8 - View metadata
 -------------------------------------------------------------------------------
 -- Shows the stored definition of the view
 
@@ -299,18 +312,67 @@ Row     Text
 */
 
 -------------------------------------------------------------------------------
--- 1.9 - Drop examples (optional)
+-- 09 - Creating an Indexed View
 -------------------------------------------------------------------------------
--- Uncomment only if you want to remove the objects
 
--- DROP VIEW Person.vw_BasicPersonInfo;
--- DROP VIEW Sales.vw_CustomerPersonInfo;
--- DROP VIEW Sales.vw_SalesOrderSummary;
--- DROP VIEW Sales.vw_CustomerSalesTotals;
--- GO
+--STEP 1 - Create the view with SCHEMABINDING
+
+CREATE OR ALTER VIEW Sales.vw_SalesSummary
+WITH SCHEMABINDING
+AS
+SELECT
+SOH.CustomerID,
+COUNT_BIG(*) AS OrderCount,
+SUM(SOH.TotalDue) AS TotalSales
+FROM Sales.SalesOrderHeader AS SOH
+GROUP BY SOH.CustomerID;
+GO
+
+--STEP 2 - Create a UNIQUE CLUSTERED INDEX on the view
+CREATE UNIQUE CLUSTERED INDEX IX_vw_SalesSummary_CustomerID
+ON Sales.vw_SalesSummary (CustomerID);
+GO
+
+--STEP 3 - Verify indexes on the view
+SELECT
+v.name AS ViewName,
+i.name AS IndexName,
+i.type_desc
+FROM sys.views AS v
+INNER JOIN sys.indexes AS i
+    ON v.object_id = i.object_id
+WHERE v.name = 'vw_SalesSummary'
+  AND i.index_id > 0;
+GO
+
+/*
+Result:
+ViewName	    IndexName	                    type_desc
+vw_SalesSummary	IX_vw_SalesSummary_CustomerID	CLUSTERED
+*/
+
+--STEP 4 - Query the indexed view 
+SELECT
+CustomerID,
+OrderCount,
+TotalSales
+FROM Sales.vw_SalesSummary
+WHERE CustomerID = 29957;
+GO
+
+/*
+Result:
+CustomerID	OrderCount	TotalSales
+29957	    8	        718258,8109
+
+In the execution plan, the Object property shows that SQL Server is 
+performing a Clustered Index Seek on the indexed view:
+[AdventureWorks].[Sales].[vw_SalesSummary].[IX_vw_SalesSummary_CustomerID]
+*/
+
 
 -------------------------------------------------------------------------------
--- 1.10 - Execution Plan Example — View Expansion
+-- 10 - Execution Plan Example — View Expansion
 -------------------------------------------------------------------------------
 
 /*
@@ -346,7 +408,7 @@ WHERE C.PersonID IS NOT NULL
 AND P.LastName LIKE 'A%';
 GO
  
- -------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 --Step 3 — Compare Showplan 
 /*
 Main Comparison
@@ -358,11 +420,22 @@ Join                    Hash Match            Hash Match
 Table Access            Index Seek            Index Seek 
 Table Access            Clustered Index Scan  Clustered Index Scan 
 
-→ In the execution plan it is possible to observe that SQL Server does not access 
-  the view object directly 
-→ Instead, the optimizer expands the view definition and accesses the base tables
-  involved in the query
+→ In the execution plan it is possible to observe that SQL Server does not 
+  access the view object directly 
+→ Instead, the optimizer expands the view definition and accesses the base
+  tables involved in the query
 → Because of this behavior, a view by itself does not improve performance
 → It mainly serves as an abstraction layer to simplify queries and manage 
   permissions
 */ 
+
+-------------------------------------------------------------------------------
+-- 11 - Drop View
+-------------------------------------------------------------------------------
+-- Uncomment only if you want to remove the objects
+
+-- DROP VIEW Person.vw_BasicPersonInfo;
+-- DROP VIEW Sales.vw_CustomerPersonInfo;
+-- DROP VIEW Sales.vw_SalesOrderSummary;
+-- DROP VIEW Sales.vw_CustomerSalesTotals;
+-- GO
