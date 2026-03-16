@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-03-15
 Version     : 1.0
-Task        : VIEW-Q0001 - View Metadata Objetcts
+Task        : VIEW-Q0001 - View Metadata Objects
 Object      : Script
 Description : The queries below are useful for quick investigation of views in 
               a SQL Server database.  
