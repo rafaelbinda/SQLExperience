@@ -9,7 +9,7 @@ Description : The queries below are useful for quick investigation of views in
               a SQL Server database.  
               They help inspect metadata, dependencies, and configuration details
 Notes       : notes/A0012-sql-server-programming-objects.md
-Examples    : scripts/Q0010-sql-server-programming-objects.sql
+Examples    : scripts/Q0010-sql-views.sql
 Tools       : -
 Location    : -
 ===============================================================================
