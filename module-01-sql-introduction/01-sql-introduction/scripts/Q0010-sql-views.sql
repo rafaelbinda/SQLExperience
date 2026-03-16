@@ -6,8 +6,8 @@ Version     : 1.0
 Task        : Q0010 - Sql Server Programming Objects - VIEWS
 Databases   : AventureWorks 
 Object      : Script
-Description : Examples demonstrating views
-Notes       : notes/A0012-sql-server-programming-objects.md
+Description : Examples of SQL Server views
+Notes       : notes/A0012-sql-views.md
 =============================================================================== 
 INDEX
 1  - Simple view
