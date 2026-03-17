@@ -6,8 +6,8 @@
 ---
 
 ## Descrição  
-
-Este documento apresenta uma visão geral sobre Triggers no SQL Server, incluindo conceitos, uso prático e exemplos
+ 
+Este documento apresenta uma visão geral sobre Triggers no SQL Server, incluindo conceitos, funcionamento, uso das tabelas virtuais INSERTED e DELETED e os principais tipos de triggers
  
 ---
 
