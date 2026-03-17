@@ -7,7 +7,7 @@
 
 ## Descrição  
 
-Este documento apresenta uma visão geral sobre Stored Procedures no SQL Server, incluindo conceitos, uso prático e exemplos
+Este documento apresenta uma visão geral sobre Stored Procedures no SQL Server, incluindo conceitos, estrutura, parâmetros, controle de fluxo, tratamento de erros, uso de transações e cursores, além de cenários práticos de utilização
  
 ---
 
