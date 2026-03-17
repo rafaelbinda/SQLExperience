@@ -7,7 +7,7 @@
 
 ## Descrição
 
-Este documento apresenta uma visão geral sobre Views no SQL Server, incluindo conceitos e uso prático.
+Este documento apresenta uma visão geral sobre Views no SQL Server, incluindo conceitos, uso prático, funcionamento interno e considerações de desempenho
  
 ---
 
