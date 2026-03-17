@@ -7,7 +7,7 @@
 
 ## Descrição  
 
-Este documento apresenta uma visão geral sobre Functions no SQL Server, incluindo conceitos e uso prático 
+Este documento apresenta uma visão geral sobre Functions no SQL Server, incluindo conceitos, tipos de funções e exemplos de uso.
  
 ---
 
