@@ -28,7 +28,7 @@ Este documento apresenta uma visão geral sobre Views no SQL Server, incluindo c
 
 ---
 
-###1 - Benefícios de usar Views
+### 1 - Benefícios de usar Views
 
 Simplificação da administração de permissões  
 Views ajudam a simplificar a segurança do banco de dados 
@@ -43,7 +43,7 @@ Exemplo:
 
 ---
 
-###2 - Camada de abstração
+### 2 - Camada de abstração
 
 Views criam uma **camada de abstração entre a aplicação e a estrutura das tabelas**, isso permite:  
 - Alterar tabelas internas sem impactar diretamente a aplicação
@@ -52,7 +52,7 @@ Views criam uma **camada de abstração entre a aplicação e a estrutura das ta
 
 ---
 
-###3 - Características importantes das Views
+### 3 - Características importantes das Views
 
 - Uma view retorna **apenas um conjunto de resultados**
 - Pode conter:
@@ -66,7 +66,7 @@ Views criam uma **camada de abstração entre a aplicação e a estrutura das ta
 
 ---
 
-###4 - Como o SQL Server executa uma View
+### 4 - Como o SQL Server executa uma View
 
 **4.1 - Criação da view**
 
@@ -197,7 +197,7 @@ GO
 
 ---
 
-**5 - Consulta na view**
+### 5 - Consulta na view 
 
 ```sql
 SELECT *
@@ -206,7 +206,7 @@ FROM Sales.vw_CustomersOrders
 
 ---
 
-**6 - Resolução dinâmica da view**
+### 6 - Resolução dinâmica da view 
 
 Quando executamos uma consulta na view, o SQL Server **não executa a view separadamente**, ele faz o seguinte:  
 1. Pega o `SELECT` que foi enviado pelo usuário  
@@ -226,7 +226,7 @@ FROM (
 
 ---
 
-###7 - Desempenho
+### 7 - Desempenho
 
 Uma view **não melhora nem piora o desempenho por si só**  
 O desempenho dependerá de:  
