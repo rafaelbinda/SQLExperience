@@ -2,20 +2,26 @@
 ===============================================================================
 Author      : Rafael Binda
 Created     : 2026-03-16
-Version     : 1.0
-Task        : Q0011 - Sql Server Programming Objects - STORED PROCEDURES
+Version     : 2.0
+Task        : Q0011 - Sql Server Programming Objects
 Databases   : AventureWorks 
 Object      : Script
-Description : Examples of SQL Server stored procedures
-Notes       : notes/A0012-sql-server-programming-objects.md
+Description : Examples of SQL Server Stored Procedures
+Notes       : notes/A0013-programming-objects-stored-procedures.md
 =============================================================================== 
 INDEX
-1 - Simple Stored Procedure
-2 - Stored Procedure with Parameters
-3 - Stored Procedure with Multiple Parameters
-4 - Stored Procedure with Output Parameter
-5 - Stored Procedure with Conditional Logic
-6 - Stored Procedure with Error Handling
+1  - Simple Stored Procedure
+2  - Stored Procedure with Parameters
+3  - Stored Procedure with Multiple Parameters
+4  - Stored Procedure with Output Parameter
+5  - Stored Procedure with Conditional Logic
+6  - Stored Procedure with Error Handling
+7  - Stored Procedure with Transaction
+8  - Stored Procedure with Transaction and Error Handling (Using THROW)
+9  - Stored Procedure with Transaction and Error Handling (Using RAISERROR)
+10 - Stored Procedure with WHILE Loop
+11 - Stored Procedure using Cursor
+12 - Output Parameter vs SELECT
 =============================================================================== 
 */
 
@@ -243,5 +249,458 @@ ErrorNumber	    ErrorMessage
 */
 
 -------------------------------------------------------------------------------
--- 7 - Stored Procedure with Error Handling
+-- 7 - Stored Procedure with Transaction
 -------------------------------------------------------------------------------
+ 
+USE ExamplesDB;
+GO
+
+IF OBJECT_ID('dbo.Example_StoredProcedureProducts', 'U') IS NOT NULL
+    DROP TABLE dbo.Example_StoredProcedureProducts;
+GO
+
+CREATE TABLE dbo.Example_StoredProcedureProducts
+(
+    ProductID   INT IDENTITY(1,1) PRIMARY KEY,
+    ProductName VARCHAR(100),
+    Price       DECIMAL(10,2)
+);
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_Example_InsertProductWithTransaction
+    @ProductName VARCHAR(100),
+    @Price       DECIMAL(10,2)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRANSACTION;
+
+    INSERT INTO dbo.Example_StoredProcedureProducts (ProductName, Price)
+    VALUES (@ProductName, @Price);
+
+    COMMIT TRANSACTION;
+END;
+GO
+
+-- Execution
+EXEC dbo.usp_Example_InsertProductWithTransaction 
+    @ProductName = 'Notebook',
+    @Price = 3500.00;
+GO
+
+EXEC dbo.usp_Example_InsertProductWithTransaction 
+    @ProductName = 'Mouse',
+    @Price = 50.00;
+GO
+
+EXEC dbo.usp_Example_InsertProductWithTransaction 
+    @ProductName = 'Monitor',
+    @Price = 799.00;
+GO
+
+SELECT * FROM dbo.Example_StoredProcedureProducts;
+GO
+
+/*Result:
+ProductID	ProductName	    Price
+1	        Notebook	    3500.00
+2	        Mouse	        50.00
+3	        Monitor	        799.00
+*/
+
+-------------------------------------------------------------------------------
+-- 8 - Stored Procedure with Transaction and Error Handling (Using THROW)
+-------------------------------------------------------------------------------
+
+-- THROW is the modern alternative and provides better error handling
+
+USE ExamplesDB;
+GO
+
+IF OBJECT_ID('dbo.Example_StoredProcedureProducts', 'U') IS NOT NULL
+    DROP TABLE dbo.Example_StoredProcedureProducts;
+GO
+
+CREATE TABLE dbo.Example_StoredProcedureProducts
+(
+    ProductID   INT IDENTITY(1,1) PRIMARY KEY,
+    ProductName VARCHAR(100),
+    Price       DECIMAL(10,2)
+);
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_Example_InsertProduct_ErrorHandling_with_THROW 
+    @ProductName VARCHAR(100),
+    @Price       DECIMAL(10,2)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF @Price <= 0
+        BEGIN
+            
+            /*
+            → ";" is required before THROW.
+            → Otherwise, SQL Server may return the following error:
+              Incorrect syntax near 'THROW'.
+              Expecting CONVERSATION, DIALOG, DISTRIBUTED or TRANSACTION.
+            */
+
+            ;THROW 50001, 'Price must be greater than zero.', 1;
+        
+        END;
+
+        INSERT INTO dbo.Example_StoredProcedureProducts (ProductName, Price)
+        VALUES (@ProductName, @Price);
+
+        COMMIT TRANSACTION;
+    END TRY
+     
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        THROW;
+    END CATCH
+END;
+GO
+
+-- Valid execution
+EXEC dbo.usp_Example_InsertProduct_ErrorHandling_with_THROW
+    @ProductName = 'Notebook',
+    @Price = 3500.00;
+GO
+
+EXEC dbo.usp_Example_InsertProduct_ErrorHandling_with_THROW 
+    @ProductName = 'Mouse',
+    @Price = 50.00;
+GO
+
+EXEC dbo.usp_Example_InsertProduct_ErrorHandling_with_THROW 
+    @ProductName = 'Monitor',
+    @Price = 799.00;
+GO
+
+SELECT *
+FROM dbo.Example_StoredProcedureProducts;
+GO
+
+/*Result:
+ProductID	ProductName	    Price
+1	        Notebook	    3500.00
+2	        Mouse	        50.00
+3	        Monitor	        799.00
+*/
+
+-- Invalid execution
+EXEC dbo.usp_Example_InsertProduct_ErrorHandling_with_THROW
+    @ProductName = 'Mouse',
+    @Price = -50.00;
+GO
+
+/*
+Result:
+Msg 50001, Level 16, State 1, Procedure dbo.usp_Example_InsertProduct_ErrorHandling_with_THROW, 
+Line 22 [Batch Start Line 384]
+Price must be greater than zero.
+
+Completion time: 2026-03-18T20:26:15.2491664-03:00
+*/
+
+
+-------------------------------------------------------------------------------
+-- 9 - Stored Procedure with Transaction and Error Handling (Using RAISERROR)
+-------------------------------------------------------------------------------
+
+-- RAISERROR is a legacy feature and is kept for backward compatibility
+
+USE ExamplesDB;
+GO
+
+IF OBJECT_ID('dbo.Example_StoredProcedureProducts', 'U') IS NOT NULL
+    DROP TABLE dbo.Example_StoredProcedureProducts;
+GO
+
+CREATE TABLE dbo.Example_StoredProcedureProducts
+(
+    ProductID   INT IDENTITY(1,1) PRIMARY KEY,
+    ProductName VARCHAR(100),
+    Price       DECIMAL(10,2)
+);
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_Example_InsertProductWith_Raiserror
+    @ProductName VARCHAR(100),
+    @Price       DECIMAL(10,2)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        IF @Price <= 0
+        BEGIN
+            RAISERROR ('Price must be greater than zero.', 16, 1);
+            RETURN;
+        END;
+
+        INSERT INTO dbo.Example_StoredProcedureProducts (ProductName, Price)
+        VALUES (@ProductName, @Price);
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        -- Re-throw the error
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        DECLARE @ErrorSeverity INT = ERROR_SEVERITY();
+        DECLARE @ErrorState INT = ERROR_STATE();
+
+        RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState);
+    END CATCH
+END;
+GO
+
+-- Valid execution
+EXEC dbo.usp_Example_InsertProductWith_Raiserror
+    @ProductName = 'Notebook',
+    @Price = 3500.00;
+GO
+
+EXEC dbo.usp_Example_InsertProductWith_Raiserror 
+    @ProductName = 'Mouse',
+    @Price = 50.00;
+GO
+
+EXEC dbo.usp_Example_InsertProductWith_Raiserror 
+    @ProductName = 'Monitor',
+    @Price = 799.00;
+GO
+
+SELECT *
+FROM dbo.Example_StoredProcedureProducts;
+GO
+
+/*
+Result:
+ProductID	ProductName	    Price
+1	        Notebook	    3500.00
+2	        Mouse	        50.00
+3	        Monitor	        799.00
+*/
+
+-- Invalid execution
+EXEC dbo.usp_Example_InsertProductWith_Raiserror
+    @ProductName = 'Mouse',
+    @Price = -50.00;
+GO
+
+/*
+Result:
+Msg 50000, Level 16, State 1, Procedure dbo.usp_Example_InsertProductWith_Raiserror, 
+Line 32 [Batch Start Line 495]
+Price must be greater than zero.
+
+Completion time: 2026-03-18T20:32:30.1286570-03:00
+*/
+
+-------------------------------------------------------------------------------
+-- 10 - Stored Procedure with WHILE Loop
+-------------------------------------------------------------------------------
+
+-- WHILE loop executes repeatedly while the condition is TRUE
+
+USE ExamplesDB;
+GO
+
+IF OBJECT_ID('dbo.Example_StoredProcedureCounter', 'U') IS NOT NULL
+    DROP TABLE dbo.Example_StoredProcedureCounter;
+GO
+
+CREATE TABLE dbo.Example_StoredProcedureCounter
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    CounterValue INT
+);
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_Example_InsertCounterValues
+    @MaxValue INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @Counter INT = 1;
+
+    WHILE @Counter <= @MaxValue
+    BEGIN
+        INSERT INTO dbo.Example_StoredProcedureCounter (CounterValue)
+        VALUES (@Counter);
+
+        SET @Counter = @Counter + 1 * 15;
+    END;
+END;
+GO
+
+-- Execution
+EXEC dbo.usp_Example_InsertCounterValues 
+    @MaxValue = 50;
+GO
+
+SELECT *
+FROM dbo.Example_StoredProcedureCounter;
+
+/*
+Result:
+Id	CounterValue
+1	    1
+2	    16
+3	    31
+4	    46
+*/
+
+-------------------------------------------------------------------------------
+-- 11 - Stored Procedure using Cursor
+-------------------------------------------------------------------------------
+ 
+USE ExamplesDB;
+GO
+
+/*
+→ Cursors process data row by row (RBAR - Row By Agonizing Row)
+→ Use only when set-based operations are not possible
+*/
+
+IF OBJECT_ID('dbo.Example_StoredProcedureCursor', 'U') IS NOT NULL
+    DROP TABLE dbo.Example_StoredProcedureCursor;
+GO
+
+CREATE TABLE dbo.Example_StoredProcedureCursor
+(
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ProductName VARCHAR(100),
+    Price DECIMAL(10,2)
+);
+GO
+
+-- Populate sample data
+INSERT INTO dbo.Example_StoredProcedureCursor (ProductName, Price)
+VALUES 
+('Notebook', 3500.00),
+('Mouse', 50.00),
+('Monitor', 799.00);
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_Example_ProcessProductsWithCursor
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @ProductName VARCHAR(100);
+    DECLARE @Price DECIMAL(10,2);
+
+    DECLARE ProductCursor CURSOR FOR
+        SELECT ProductName, Price
+        FROM dbo.Example_StoredProcedureCursor;
+
+    OPEN ProductCursor;
+
+    FETCH NEXT FROM ProductCursor INTO @ProductName, @Price;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        -- Example logic: increase price by 10%
+        SET @Price = @Price * 1.10;
+
+        UPDATE dbo.Example_StoredProcedureCursor
+        SET Price = @Price
+        WHERE ProductName = @ProductName;
+
+        FETCH NEXT FROM ProductCursor INTO @ProductName, @Price;
+    END;
+
+    CLOSE ProductCursor;
+    DEALLOCATE ProductCursor;
+END;
+GO
+
+SELECT *
+FROM dbo.Example_StoredProcedureCursor;
+GO
+/*
+Result:
+Id	ProductName	    Price
+1	Notebook	    3500.00
+2	Mouse	        50.00
+3	Monitor	        799.00
+*/
+
+-- Execution
+EXEC dbo.usp_Example_ProcessProductsWithCursor;
+GO
+
+SELECT *
+FROM dbo.Example_StoredProcedureCursor;
+GO
+
+/*
+Result:
+Id	ProductName	    Price
+1	Notebook	    3850.00
+2	Mouse	        55.00
+3	Monitor	        878.90
+*/
+
+-------------------------------------------------------------------------------
+-- 12 - Output Parameter vs SELECT
+-------------------------------------------------------------------------------
+ 
+USE ExamplesDB;
+GO
+
+CREATE OR ALTER PROCEDURE dbo.usp_Example_OutputVsSelect
+    @Number1 INT,
+    @Number2 INT,
+    @SumOutput INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- OUTPUT parameter
+    SET @SumOutput = @Number1 + @Number2;
+
+    -- SELECT result
+    SELECT 
+        @Number1 AS Number1,
+        @Number2 AS Number2,
+        (@Number1 + @Number2) AS SumResult;
+END;
+GO
+
+-- Execution
+DECLARE @Result INT;
+
+EXEC dbo.usp_Example_OutputVsSelect
+    @Number1 = 10,
+    @Number2 = 20,
+    @SumOutput = @Result OUTPUT;
+
+-- OUTPUT value
+SELECT @Result AS OutputValue;
+
+/*
+Result 1: SELECT returns a result set to the client 
+    Number1	    Number2	    SumResult
+      10	      20	       30
+
+Result 2: OUTPUT returns a value to a variable
+  OutputValue
+      30
+*/
