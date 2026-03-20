@@ -1,7 +1,7 @@
 ﻿/*
 ===============================================================================
 Author      : Rafael Binda
-Created     : 2026-03-18
+Created     : 2026-03-19
 Version     : 1.0
 Task        : PROC-Q0001 - Stored Procedure Metadata Objects
 Object      : Script
@@ -23,13 +23,6 @@ INDEX
 6  - Procedure parameters using INFORMATION_SCHEMA
 7  - Count parameters per procedure
 8  - Objects referenced by the stored procedure
-9  - Objects that depend on the stored procedure
-10 - Check procedure properties
-11 - Check if the procedure is encrypted
-12 - Check startup procedures
-13 - Creation and last modification date
-14 - Search stored procedures by name
-15 - Search text inside procedure definitions
 ===============================================================================
 */
 
