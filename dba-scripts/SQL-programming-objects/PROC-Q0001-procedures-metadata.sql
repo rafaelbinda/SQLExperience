@@ -23,6 +23,13 @@ INDEX
 6  - Procedure parameters using INFORMATION_SCHEMA
 7  - Count parameters per procedure
 8  - Objects referenced by the stored procedure
+9  - Objects that depend on the stored procedure
+10 - Check procedure properties
+11 - Check if the procedure is encrypted
+12 - Check startup procedures
+13 - Creation and last modification date
+14 - Search stored procedures by name
+15 - Search text inside procedure definitions
 ===============================================================================
 */
 
@@ -179,11 +186,6 @@ GO
 /*
 → Returns objects used by the stored procedure (tables, views, functions, etc.)
 → Useful for dependency analysis and impact assessment
-
-→ Note:
-  sys.dm_sql_referenced_entities is a table-valued function (DMF), not a regular
-  table
-→ The object name is passed as a parameter, so no WHERE clause is required
 */
 
 SELECT
@@ -192,4 +194,140 @@ referenced_entity_name AS ReferencedObject,
 referenced_minor_name AS ReferencedColumn,
 referenced_class_desc AS ReferencedClass
 FROM sys.dm_sql_referenced_entities ('dbo.uspGetEmployeeManagers', 'OBJECT');
+GO
+
+-------------------------------------------------------------------------------
+-- 9 - Objects that depend on the stored procedure
+-------------------------------------------------------------------------------
+
+/*
+→ Returns objects that reference the stored procedure
+→ Useful to understand what may be affected if the procedure is changed or removed
+*/
+
+SELECT
+referencing_schema_name AS ReferencingSchema,
+referencing_entity_name AS ReferencingObject,
+referencing_class_desc AS ReferencingClass
+FROM sys.dm_sql_referencing_entities  ('dbo.uspGetEmployeeManagers', 'OBJECT');
+GO
+
+-------------------------------------------------------------------------------
+-- 10 - Check procedure properties
+-------------------------------------------------------------------------------
+
+/*
+→ Returns selected object properties such as:
+  whether the object is a procedure
+  whether it is encrypted
+  whether it is marked as a startup procedure
+*/
+
+SELECT
+SCHEMA_NAME(p.schema_id) AS SchemaName,
+p.name AS ProcedureName,
+OBJECTPROPERTY(p.object_id, 'IsProcedure') AS IsProcedure,
+OBJECTPROPERTY(p.object_id, 'IsEncrypted') AS IsEncrypted,
+OBJECTPROPERTY(p.object_id, 'ExecIsStartup') AS IsStartupProcedure
+FROM sys.procedures AS p
+WHERE p.name = 'uspGetEmployeeManagers';
+GO
+
+-------------------------------------------------------------------------------
+-- 11 - Check if the procedure is encrypted
+-------------------------------------------------------------------------------
+
+/*
+→ Verifies whether the procedure definition is hidden
+→ If the procedure is encrypted, the definition in sys.sql_modules may be NULL
+*/
+
+SELECT
+SCHEMA_NAME(p.schema_id) AS SchemaName,
+p.name AS ProcedureName,
+CASE
+    WHEN m.definition IS NULL 
+    THEN 'Yes'
+    ELSE 'No'
+END AS IsEncrypted
+FROM sys.procedures AS p
+LEFT JOIN sys.sql_modules AS m
+    ON p.object_id = m.object_id
+WHERE p.name = 'uspGetEmployeeManagers';
+GO
+
+-------------------------------------------------------------------------------
+-- 12 - Check startup procedures
+-------------------------------------------------------------------------------
+
+/*
+→ Returns procedures configured to run automatically when SQL Server starts
+→ These are rare in normal application databases, but can exist in administrative 
+  or maintenance scenarios
+*/
+
+SELECT
+SCHEMA_NAME(p.schema_id) AS SchemaName,
+p.name AS ProcedureName,
+OBJECTPROPERTY(p.object_id, 'ExecIsStartup') AS IsStartupProcedure
+FROM sys.procedures AS p
+WHERE OBJECTPROPERTY(p.object_id, 'ExecIsStartup') = 1
+ORDER BY SchemaName, ProcedureName;
+GO
+
+-------------------------------------------------------------------------------
+--13 - Creation and last modification date
+-------------------------------------------------------------------------------
+
+/*
+→ Returns the creation date and last modification date of the procedure
+→ Useful to track recent changes
+*/
+
+SELECT
+SCHEMA_NAME(p.schema_id) AS SchemaName,
+p.name AS ProcedureName,
+p.create_date AS CreateDate,
+p.modify_date AS ModifyDate
+FROM sys.procedures AS p
+WHERE p.name = 'uspGetEmployeeManagers';
+GO
+
+-------------------------------------------------------------------------------
+-- 14 - Search stored procedures by name
+-------------------------------------------------------------------------------
+
+/*
+→ Searches stored procedures by partial name
+→ Useful when the exact procedure name is not known
+*/
+
+SELECT
+SCHEMA_NAME(p.schema_id) AS SchemaName,
+p.name AS ProcedureName,
+p.create_date AS CreateDate,
+p.modify_date AS ModifyDate
+FROM sys.procedures AS p
+WHERE p.name LIKE '%Employee%'
+ORDER BY SchemaName, ProcedureName;
+GO
+
+-------------------------------------------------------------------------------
+-- 15 - Search text inside procedure definitions
+-------------------------------------------------------------------------------
+
+/*
+→ Searches for text inside procedure definitions
+→ Useful to find procedures containing a table name, column name, keyword, 
+  or business rule
+*/
+
+SELECT
+SCHEMA_NAME(p.schema_id) AS SchemaName,
+p.name AS ProcedureName
+FROM sys.procedures AS p
+INNER JOIN sys.sql_modules AS m
+    ON p.object_id = m.object_id
+WHERE m.definition LIKE '%Employee%'
+ORDER BY SchemaName, ProcedureName;
 GO
