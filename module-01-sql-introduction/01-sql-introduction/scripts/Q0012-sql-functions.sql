@@ -2,7 +2,7 @@
 ===============================================================================
 Author      : Rafael Binda
 Created     : 2026-03-21
-Version     : .0
+Version     : 1.0
 Task        : Q0012 - Sql Server Programming Objects
 Databases   : ExamplesDB 
 Object      : Script
