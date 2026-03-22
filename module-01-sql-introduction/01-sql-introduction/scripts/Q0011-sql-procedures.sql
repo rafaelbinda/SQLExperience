@@ -712,6 +712,8 @@ Result 2: OUTPUT returns a value to a variable
 --Demonstrates how to remove stored procedures from the database
 --Dropping a procedure permanently removes it
 
+-- Always verify dependencies before dropping procedures
+
 DROP PROCEDURE IF EXISTS dbo.usp_Example_SimpleProcedure;
 GO
 
