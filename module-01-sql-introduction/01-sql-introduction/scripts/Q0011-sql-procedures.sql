@@ -22,6 +22,7 @@ INDEX
 10 - Stored Procedure with WHILE Loop
 11 - Stored Procedure using Cursor
 12 - Output Parameter vs SELECT
+13 - Managing Stored Procedures (DROP)
 =============================================================================== 
 */
 
@@ -704,3 +705,45 @@ Result 2: OUTPUT returns a value to a variable
   OutputValue
       30
 */
+
+-------------------------------------------------------------------------------
+-- 13 - Managing Stored Procedures (DROP)
+-------------------------------------------------------------------------------
+--Demonstrates how to remove stored procedures from the database
+--Dropping a procedure permanently removes it
+
+DROP PROCEDURE IF EXISTS dbo.usp_Example_SimpleProcedure;
+GO
+
+DROP PROCEDURE IF EXISTS dbo.usp_Example_WithParameters;
+GO
+
+DROP PROCEDURE IF EXISTS dbo.usp_Example_WithMultipleParameters;
+GO
+
+DROP PROCEDURE IF EXISTS dbo.usp_Example_WithOutputParameter;
+GO
+
+DROP PROCEDURE IF EXISTS dbo.usp_Example_WithConditionalLogic;
+GO
+
+DROP PROCEDURE IF EXISTS dbo.usp_Example_WithErrorHandling;
+GO
+
+DROP PROCEDURE IF EXISTS dbo.usp_Example_InsertProductWithTransaction;
+GO
+
+DROP PROCEDURE IF EXISTS dbo.usp_Example_InsertProductWithTransactionAndErrorHandling;
+GO
+
+DROP PROCEDURE IF EXISTS dbo.usp_Example_InsertProductWithTransactionAndErrorHandling_Raiserror;
+GO
+
+DROP PROCEDURE IF EXISTS dbo.usp_Example_InsertCounterValues;
+GO
+
+DROP PROCEDURE IF EXISTS dbo.usp_Example_ProcessProductsWithCursor;
+GO
+
+DROP PROCEDURE IF EXISTS dbo.usp_Example_OutputVsSelect;
+GO
