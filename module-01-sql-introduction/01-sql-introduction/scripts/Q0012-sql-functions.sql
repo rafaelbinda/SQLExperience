@@ -17,6 +17,7 @@ INDEX
 4 - Multi-Statement Table-Valued Function  
 5 - Using Function in SELECT  
 6 - Using CROSS APPLY with Table-Valued Function
+7 - Managing Functions (DROP)
 =============================================================================== 
 */
 
@@ -251,3 +252,26 @@ ProductID	ProductName	    Price	    PriceWithTax
 3	        Keyboard	    150.00	    165.0000
 4	        Monitor	        1200.00	    1320.0000
 */
+
+-------------------------------------------------------------------------------
+-- 7 - Managing Functions (DROP)
+-------------------------------------------------------------------------------
+--Demonstrates how to remove functions from the database
+--Dropping a function permanently removes it
+
+-- Always verify dependencies before dropping functions
+
+DROP FUNCTION IF EXISTS dbo.ufn_Example_AddNumbers;
+GO
+
+DROP FUNCTION IF EXISTS dbo.ufn_Example_GetDiscount;
+GO
+
+DROP FUNCTION IF EXISTS dbo.ufn_Example_GetProductsAbovePrice;
+GO
+
+DROP FUNCTION IF EXISTS dbo.ufn_Example_GetProductsWithTax;
+GO
+
+DROP FUNCTION IF EXISTS dbo.ufn_Example_GetProductWithTax;
+GO
