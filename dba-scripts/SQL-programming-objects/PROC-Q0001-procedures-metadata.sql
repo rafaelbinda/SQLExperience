@@ -30,6 +30,7 @@ INDEX
 13 - Creation and last modification date
 14 - Search stored procedures by name
 15 - Search text inside procedure definitions
+16 - Managing Stored Procedures (DROP)
 ===============================================================================
 */
 
@@ -331,3 +332,16 @@ INNER JOIN sys.sql_modules AS m
 WHERE m.definition LIKE '%Employee%'
 ORDER BY SchemaName, ProcedureName;
 GO
+
+-------------------------------------------------------------------------------
+-- 16 - Managing Stored Procedures (DROP)
+-------------------------------------------------------------------------------
+--Demonstrates how to remove stored procedures from the database
+--Dropping a procedure permanently removes it
+
+-- Stored procedures may be referenced by other objects (views, functions, jobs)
+-- Always check dependencies before dropping
+
+DROP PROCEDURE IF EXISTS schema_name.procedure_name;
+GO
+
