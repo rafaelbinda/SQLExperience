@@ -21,6 +21,7 @@ INDEX
 5 - Check if the view is schema-bound 
 6 - Check if the view has indexes
 7 - View columns
+8 - Managing Views (DROP)
 ===============================================================================
 */
 
@@ -191,5 +192,15 @@ WHERE v.name = @ViewName
 ORDER BY c.column_id;
 GO
  
+-------------------------------------------------------------------------------
+-- 8 - Managing Views (DROP)
+-------------------------------------------------------------------------------
+--Demonstrates how to remove views from the database
+--Dropping a view permanently removes it
+
+-- Use dependency queries before dropping views to avoid breaking other objects
+
+DROP VIEW IF EXISTS dbo.Example_View;
+GO
 
 
