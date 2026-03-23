@@ -45,6 +45,8 @@ dba-scripts/
 ├── SQL-connections/
 ├── SQL-examples/
 ├── SQL-instance-information/
+├── SQL-programming-objects/
+├── SQL-transactions-and-concurrency
 │
 ├── module-01-sql-on-premises/
 │   ├── 01-sql-introduction/
@@ -110,6 +112,7 @@ Author      : Rafael Binda
 Created     : yyyy-mm-dd
 Version     : 1.0
 Task        : -
+Databases   : Databases Name
 Object      : Script | Procedure | Function | View | Notes
 Description : -
 Notes       : -
