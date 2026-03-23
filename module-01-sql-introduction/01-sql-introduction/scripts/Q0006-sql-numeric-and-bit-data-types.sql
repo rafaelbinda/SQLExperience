@@ -9,6 +9,21 @@ Object      : Script
 Description : Examples demonstrating numeric and bit data types in SQL Server
 Notes       : A0010-sql-data-types.md
 ===============================================================================
+INDEX
+1 - Integer Types
+2 - DECIMAL and NUMERIC
+3 - Approximate Types (FLOAT and REAL)
+3.1 - Demonstrating imprecision with FLOAT
+3.2 - Demonstrating imprecision with REAL
+4 - Monetary Data Types
+4.1 - Inserting values at the maximum value
+4.2 - Inserting values at the minimum value
+4.3 - Viewing the stored values
+4.4 - Demonstrating overflow
+4.5 - Scenario: dividing R$ 100.00 into 3 equal parts 
+4.6 - Same logic using DECIMAL with higher precision (more reliable calculation)
+5 - BIT Data Type
+===============================================================================
 */
 
 SET NOCOUNT ON;
