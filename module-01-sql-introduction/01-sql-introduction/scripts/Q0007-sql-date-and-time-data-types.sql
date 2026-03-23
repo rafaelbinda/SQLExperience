@@ -9,6 +9,14 @@ Object      : Script
 Description : Examples demonstrating date and time data types in SQL Server
 Notes       : A0010-sql-data-types.md
 ===============================================================================
+INDEX
+1 - DATETIME
+2 - SMALLDATETIME
+3 - DATE
+4 - TIME
+5 - DATETIME2
+6 - DATETIMEOFFSET
+7 - Comparing current date/time functions
 */
 
 SET NOCOUNT ON;
