@@ -7,11 +7,14 @@
 
 ## Descrição  
 
-Este documento apresenta uma visão geral sobre Functions no SQL Server, incluindo conceitos, tipos de funções e exemplos de uso.
+Este documento apresenta uma visão geral sobre Functions no SQL Server, incluindo conceitos, tipos de funções e exemplos de uso
  
 ---
 
 ## Hands-on  
+
+[Functions](../scripts/Q0012-sql-functions.sql)  
+[Function Metadata Objects](../../../dba-scripts/SQL-programming-objects/FUNC-Q0001-function-metadata.sql) 
 
 ---
 
