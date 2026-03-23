@@ -3,10 +3,11 @@
 Author      : Rafael Binda
 Created     : 2026-03-15
 Version     : 1.0
-Task        : Q0010 - Sql Server Programming Objects - VIEWS
+Task        : Q0010 - Sql Server Programming Objects
 Databases   : AventureWorks 
 Object      : Script
-Description : Examples of SQL Server views
+Description : Examples demonstrating SQL Server Views, including simple views,
+              joins, filtering, and practical query abstraction scenarios
 Notes       : notes/A0012-programming-objects-views.md
 =============================================================================== 
 INDEX
