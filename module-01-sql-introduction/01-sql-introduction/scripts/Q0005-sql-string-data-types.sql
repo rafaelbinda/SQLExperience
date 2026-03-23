@@ -9,6 +9,20 @@ Object      : Script
 Description : Examples demonstrating string data types in SQL Server
 Notes       : A0010-sql-data-types.md
 ===============================================================================
+INDEX
+1 - Example with CHAR (fixed length)
+2 - Example with VARCHAR (variable length)
+3 - Example with NCHAR (fixed Unicode)
+4 - Example with NVARCHAR (variable Unicode)
+5 - Example with VARCHAR(MAX)
+6 - Compare LEN() X DATALENGTH()
+7 - Removing spaces
+8 - Searching with LIKE
+9 - String concatenation
+10 - Converting values to strings
+11 - Comparison between CHAR and VARCHAR
+12 - Demonstrating padding
+===============================================================================
 */
 
 SET NOCOUNT ON;
