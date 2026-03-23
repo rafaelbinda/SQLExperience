@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-03-21
 Version     : 1.0
-Task        : TRG-Q0001 - Trigger Metadata Objects
+Task        : TRIG-Q0001 - Trigger Metadata Objects
 Object      : Script
 Description : The queries below are useful for quick investigation of triggers
               in a SQL Server database
