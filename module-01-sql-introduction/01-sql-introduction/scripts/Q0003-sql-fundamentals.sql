@@ -10,6 +10,16 @@ Description : Examples for command types, batches, errors, naming, variables,
               operators, dynamic SQL and flow control 
 Notes       : A0008-sql-fundamentals.md
 ===============================================================================
+INDEX
+1 - Batch + Syntax error
+2 - Execution error (syntax OK, runtime fails)
+3 - Naming rules + schema + object qualification + Dynamic SQL
+4 - Variables + SET vs SELECT + @@ERROR (simple demos)
+5 - Operators + precedence
+6 - Dynamic SQL (EXEC + safer option with sp_executesql)
+7 - Flow control (IF/ELSE, WHILE, CASE)
+===============================================================================
+
 */
 
 SET NOCOUNT ON;
