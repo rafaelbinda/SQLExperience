@@ -12,7 +12,9 @@ Este documento apresenta uma visão geral sobre Triggers no SQL Server, incluind
 ---
 
 ## Hands-on  
- 
+
+[Triggers](../scripts/Q0013-sql-triggers.sql)  
+[Trigger Metadata Objects](../../../dba-scripts/SQL-programming-objects/TRIG-Q0001-trigger-metadata.sql) 
 
 ---
 
