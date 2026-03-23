@@ -9,6 +9,18 @@ Object      : Script
 Description : Examples demonstrating special data types in SQL Server
 Notes       : A0010-sql-data-types.md
 ===============================================================================
+INDEX
+1 - UNIQUEIDENTIFIER
+2 - ROWVERSION / TIMESTAMP
+3 - BINARY 
+4 - VARBINARY 
+5 - XML 
+6 - SQL_VARIANT 
+7 - TABLE
+8 - HIERARCHYID 
+9 - GEOMETRY 
+10 - GEOGRAPHY 
+===============================================================================
 */
 
 SET NOCOUNT ON;
@@ -544,10 +556,10 @@ Keyboard	                            varchar
 */
 
 -------------------------------------------------------------------------------
--- 6 - TABLE 
+-- 7 - TABLE 
 -------------------------------------------------------------------------------
 
--- 6.1 - TABLE Variable
+-- 7.1 - TABLE Variable
 /*
 → TABLE variables exist only during the batch execution or procedure
 → They are often used for temporary data storage inside scripts or procedures
@@ -583,7 +595,7 @@ Id	ProductName	    Price
 3	Monitor	        800.00
 */
 
--- 6.2 - Local Temporary Table
+-- 7.2 - Local Temporary Table
 /*
 → A local temporary table exists only for the current session (connection)
 → Automatically dropped when the session ends
@@ -617,7 +629,7 @@ Msg 208, Level 16, State 0, Line 1
 Invalid object name '#Products'.
 */
 
--- 6.3 - Global Temporary Table
+-- 7.3 - Global Temporary Table
 /*
 Accessible by all sessions
 Exists until the last session referencing it closes
@@ -647,7 +659,7 @@ Id	ProductName 	Price
 3	Monitor	        800.00
 */
 
-/* 6.4 - Comparison
+/* 7.4 - Comparison
 Feature	        TABLE Variable	            #Temp Table	        ##Temp Table
 Scope	        Current batch/procedure	    Current session	    All sessions
 Name Prefix     @	                        #	                ##
@@ -658,7 +670,7 @@ Lifetime	    Batch execution	Session     lifetime	        Until last
 
 
 -------------------------------------------------------------------------------
--- 7 - HIERARCHYID 
+-- 8 - HIERARCHYID 
 -------------------------------------------------------------------------------
 /*
 → HIERARCHYID represents hierarchical relationships
@@ -677,7 +689,7 @@ CREATE TABLE dbo.Example_Hierarchy
 );
 GO
 
--- 7.1 - Simple representation
+-- 8.1 - Simple representation
 INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
 VALUES
 (hierarchyid::GetRoot(), 'CEO'),
@@ -687,7 +699,7 @@ VALUES
 (hierarchyid::Parse('/2/1/'), 'System Administrator');
 GO
 
--- 7.1.1 - Viewing the Hierarchy
+-- 8.1.1 - Viewing the Hierarchy
 SELECT 
 EmployeeName,
 Node.ToString() AS HierarchyPath
@@ -704,7 +716,7 @@ IT Manager	            /2/
 System Administrator	/2/1/
 */
 
--- 7.1.2 - Getting the Parent Node
+-- 8.1.2 - Getting the Parent Node
 SELECT 
 EmployeeName,
 Node.GetAncestor(1).ToString() AS ParentNode
@@ -720,7 +732,7 @@ Sales Representative	/1/
 System Administrator	/2/
 */
 
--- 7.2 - Example Using GetDescendant()
+-- 8.2 - Example Using GetDescendant()
 /*
 → The `GetDescendant()` method generates a new child node between two existing 
   nodes 
@@ -731,13 +743,13 @@ System Administrator	/2/
 TRUNCATE TABLE dbo.Example_Hierarchy;
 GO
 
- -- 7.2.1 - Inserting the Root Node
+ -- 8.2.1 - Inserting the Root Node
 
 INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
 VALUES (hierarchyid::GetRoot(), 'CEO');
 GO
 
--- 7.2.2 - Insert One Child at a Time (Using GetDescendant)
+-- 8.2.2 - Insert One Child at a Time (Using GetDescendant)
 DECLARE @Root HIERARCHYID;
 DECLARE @Child1 HIERARCHYID;
 DECLARE @Child2 HIERARCHYID;
@@ -756,7 +768,7 @@ SET @Child2 = @Root.GetDescendant(@Child1, NULL);
 INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
 VALUES (@Child2, 'IT Manager');
  
--- 7.2.3 - Viewing the Hierarchy
+-- 8.2.3 - Viewing the Hierarchy
 SELECT
 EmployeeName,
 Node.ToString() AS HierarchyPath
@@ -771,7 +783,7 @@ Sales Manager	/1/
 IT Manager	    /2/
 */
 
--- 7.3 - Example Using the Hierarchy from This Study
+-- 8.3 - Example Using the Hierarchy from This Study
 
 TRUNCATE TABLE dbo.Example_Hierarchy;
 GO
@@ -793,43 +805,43 @@ DECLARE @N723 HIERARCHYID;
 
 SELECT @Root = Node
 FROM dbo.Example_Hierarchy
-WHERE EmployeeName = '7 - HIERARCHYID';
+WHERE EmployeeName = '8 - HIERARCHYID';
 
--- 7.1
-SET @N71 = @Root.GetDescendant(NULL, NULL);
-
-INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
-VALUES (@N71, '7.1 - Simple Representation');
-
--- 7.1.2
-SET @N712 = @N71.GetDescendant(NULL, NULL);
+-- 8.1
+SET @N81 = @Root.GetDescendant(NULL, NULL);
 
 INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
-VALUES (@N712, '7.1.2 - SR - Getting the Parent Node');
+VALUES (@N81, '8.1 - Simple Representation');
 
--- 7.2
-SET @N72 = @Root.GetDescendant(@N71, NULL);
-
-INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
-VALUES (@N72, '7.2 - Example Using GetDescendant()');
-
--- 7.2.1
-SET @N721 = @N72.GetDescendant(NULL, NULL);
+-- 8.1.2
+SET @N812 = @N81.GetDescendant(NULL, NULL);
 
 INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
-VALUES (@N721, '7.2.1 - GD - Inserting the Root Node');
+VALUES (@N812, '8.1.2 - SR - Getting the Parent Node');
 
--- 7.2.2
-SET @N722 = @N72.GetDescendant(@N721, NULL);
-
-INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
-VALUES (@N722, '7.2.2 - GD - Inserting Children');
-
--- 7.2.3
-SET @N723 = @N72.GetDescendant(@N722, NULL);
+-- 8.2
+SET @N82 = @Root.GetDescendant(@N71, NULL);
 
 INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
-VALUES (@N723, '7.2.3 - GD - Viewing the Hierarchy');
+VALUES (@N82, '8.2 - Example Using GetDescendant()');
+
+-- 8.2.1
+SET @N821 = @N82.GetDescendant(NULL, NULL);
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (@N821, '8.2.1 - GD - Inserting the Root Node');
+
+-- 8.2.2
+SET @N822 = @N82.GetDescendant(@N721, NULL);
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (@N822, '8.2.2 - GD - Inserting Children');
+
+-- 8.2.3
+SET @N823 = @N82.GetDescendant(@N722, NULL);
+
+INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
+VALUES (@N823, '8.2.3 - GD - Viewing the Hierarchy');
 
 SELECT
 EmployeeName,
@@ -840,16 +852,16 @@ ORDER BY Node;
 /*
 Result:
 EmployeeName	                        HierarchyPath
-7 - HIERARCHYID	                        /
-7.1 - Simple Representation	            /1/
-7.1.2 - SR - Getting the Parent Node	/1/1/
-7.2 - Example Using GetDescendant()	    /2/
-7.2.1 - GD - Inserting the Root Node	/2/1/
-7.2.2 - GD - Inserting Children	        /2/2/
-7.2.3 - GD - Viewing the Hierarchy	    /2/3/
+8 - HIERARCHYID	                        /
+8.1 - Simple Representation	            /1/
+8.1.2 - SR - Getting the Parent Node	   /1/1/
+8.2 - Example Using GetDescendant()	    /2/
+8.2.1 - GD - Inserting the Root Node	   /2/1/
+8.2.2 - GD - Inserting Children	        /2/2/
+8.2.3 - GD - Viewing the Hierarchy	     /2/3/
 */
 
---7.3 - Using the GetLevel() method to returns the depth level of a node in
+--8.3 - Using the GetLevel() method to returns the depth level of a node in
 --      the hierarchy
 /* 
 → Root node             = level 0
@@ -867,17 +879,17 @@ ORDER BY HierarchyPath;
 /*
 Result:
 EmployeeName	                    HierarchyPath	HierarchyLevel
-7 - HIERARCHYID	                        /	            0
-7.1 - Simple Representation	            /1/	            1
-7.1.2 - SR - Getting the Parent Node	/1/1/	        2
-7.2 - Example Using GetDescendant()	    /2/	            1
-7.2.1 - GD - Inserting the Root Node	/2/1/	        2
-7.2.2 - GD - Inserting Children	        /2/2/	        2
-7.2.3 - GD - Viewing the Hierarchy	    /2/3/	        2
+8 - HIERARCHYID	                        /	            0
+8.1 - Simple Representation	            /1/	          1
+8.1.2 - SR - Getting the Parent Node	   /1/1/	        2
+8.2 - Example Using GetDescendant()	    /2/	          1
+8.2.1 - GD - Inserting the Root Node	   /2/1/	        2
+8.2.2 - GD - Inserting Children	        /2/2/	        2
+8.2.3 - GD - Viewing the Hierarchy	     /2/3/	        2
 */
 
 -------------------------------------------------------------------------------
--- 8 - GEOMETRY 
+-- 9 - GEOMETRY 
 -------------------------------------------------------------------------------
 /*
 → GEOMETRY represents spatial objects in a flat 2D plane 
@@ -895,7 +907,7 @@ CREATE TABLE dbo.Example_Geometry_Area
 );
 GO 
 
--- 8.1 - Inserting a polygon (area)
+-- 9.1 - Inserting a polygon (area)
 /*
 → This polygon represents a simple rectangular area
 → Visual representation of the polygon:
@@ -918,7 +930,7 @@ VALUES
 );
 GO
 
--- 8.1.1 - Creating two points and checking if the point is inside the area
+-- 9.1.1 - Creating two points and checking if the point is inside the area
 
 DECLARE @PointInside GEOMETRY;
 DECLARE @PointOutside GEOMETRY;
@@ -944,7 +956,7 @@ Test Area	    1	            0
 
 
 -------------------------------------------------------------------------------
--- 9 - GEOGRAPHY 
+-- 10 - GEOGRAPHY 
 -------------------------------------------------------------------------------
 
 /*
@@ -961,9 +973,9 @@ CREATE TABLE dbo.Example_Geography
     Location GEOGRAPHY
 );
  
--- 9.1 - Example Using São Paulo and Curitiba
+-- 10.1 - Example Using São Paulo and Curitiba
 
--- 9.1.1 - Inserting real coordinates
+-- 10.1.1 - Inserting real coordinates
 /*
 → Approximate coordinates:
     São Paulo → -23.5505, -46.6333
@@ -979,7 +991,7 @@ VALUES
 ('Curitiba', geography::STGeomFromText('POINT(-49.2671 -25.4290)', 4326));
 GO
 
--- 9.1.2 - Viewing stored locations
+-- 10.1.2 - Viewing stored locations
 SELECT
 CityName,
 Location.STAsText() AS Coordinates
@@ -1007,7 +1019,7 @@ CityA	    CityB	    DistanceKm
 Sao Paulo	Curitiba	338,459301659893
 */
 
--- 9.2 - GEOGRAPHY Example: Cities Within a 300 km Radius of São Paulo
+-- 10.2 - GEOGRAPHY Example: Cities Within a 300 km Radius of São Paulo
 --Spatial Query Example Using STDistance() and STBuffer()
 
 /*
@@ -1031,7 +1043,7 @@ Porto Alegre	        -30.0346	-51.2177
 TRUNCATE TABLE dbo.Example_Geography;
 GO
 
--- 9.2.1 - Inserting cities
+-- 10.2.1 - Inserting cities
 INSERT INTO dbo.Example_Geography (CityName, Location)
 VALUES
 ('Sao Paulo', geography::STGeomFromText('POINT(-46.6333 -23.5505)', 4326)),
@@ -1049,7 +1061,7 @@ VALUES
 ('Porto Alegre', geography::STGeomFromText('POINT(-51.2177 -30.0346)', 4326));
 GO
 
--- 9.2.2 - Distance from São Paulo
+-- 10.2.2 - Distance from São Paulo
 SELECT
 B.CityName,
 CAST(A.Location.STDistance(B.Location)/1000 AS DECIMAL(10,2)) AS DistanceKm
@@ -1074,7 +1086,7 @@ Porto Alegre	        850.62
 Brasilia	            868.59
 */
 
--- 9.2.3 - Cities within 300 km
+-- 10.2.3 - Cities within 300 km
 SELECT
 B.CityName,
 CAST(A.Location.STDistance(B.Location)/1000 AS DECIMAL(10,2)) AS DistanceKm
@@ -1095,7 +1107,7 @@ Sorocaba	            83.84
 Ribeirao Preto	        290.10
 */
 
--- 9.2.4 - Cities farther than 300 km
+-- 10.2.4 - Cities farther than 300 km
 
 SELECT
 B.CityName,
