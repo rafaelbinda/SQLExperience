@@ -9,6 +9,16 @@ Object      : Script
 Description : Examples demonstrating transactions and concurrency SQL Server
 Notes       : notes/A0011-sql-transactions-and-concurrency.md
 ===============================================================================
+INDEX
+1 - INSERT
+2 - SELECT INTO 
+3 - UPDATE
+4 - DELETE
+5 - Error handling in older versions of SQL Server (legacy approach)
+6 - Transactions
+7 - Locking and Blocking
+8 - Deadlock 
+===============================================================================
 */
 
 SET NOCOUNT ON;
