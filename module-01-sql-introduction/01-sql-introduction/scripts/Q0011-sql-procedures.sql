@@ -6,7 +6,9 @@ Version     : 2.0
 Task        : Q0011 - Sql Server Programming Objects
 Databases   : AventureWorks 
 Object      : Script
-Description : Examples of SQL Server Stored Procedures
+Description : Examples demonstrating SQL Server Stored Procedures, including
+              parameter usage, output parameters, conditional logic,
+              error handling, and execution scenarios
 Notes       : notes/A0013-programming-objects-stored-procedures.md
 =============================================================================== 
 INDEX
