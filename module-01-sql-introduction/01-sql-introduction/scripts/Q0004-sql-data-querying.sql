@@ -10,6 +10,56 @@ Description : Examples demonstrating data retrieval using SELECT, filtering,
               grouping, and joins in SQL Server. 
 Notes       : A0009-sql-data-querying.md
 ===============================================================================
+INDEX
+
+1 - SELECT
+1.1 - Simple SELECT
+1.2 - SELECT with vertical filter (column list)			
+1.3 - SELECT with column alias							
+1.4 - SELECT with horizontal filter (WHERE clause)		
+1.5 - SELECT with comparison operator					
+1.6 - SELECT with DISTINCT								
+1.7 - SELECT with ORDER BY								
+1.8 - SELECT with TOP									
+1.9 - LIKE (starts with)									
+1.10 - LIKE (contains)										
+1.11 - AND (multiple conditions)							
+1.12 - OR (either condition)								
+1.13 - Greater than (>)
+1.14 - Less than (<)
+1.15 - IN (multiple values)
+1.16 - BETWEEN (inclusive range)
+1.17 - IS NULL (returns only NULL values)
+1.18 - IS NOT NULL
+1.19 - DISTINCT
+
+2 - GROUP BY 
+2.1 - GROUP BY with COUNT
+2.2 - GROUP BY with SUM
+2.3 - GROUP BY with multiple columns
+2.4 - WHERE before GROUP BY
+2.5 - HAVING after GROUP BY
+2.6 - GROUP BY with AVG
+2.7 - Common GROUP BY Mistakes
+	Mistake 1: Column in SELECT not included in GROUP BY
+	Mistake 2: Using aggregate function in WHERE
+	Mistake 3: Filtering aggregated column in WHERE
+	Mistake 4: GROUP BY changes granularity unexpectedly
+
+3 - INNER JOIN (only matching rows)
+4 - LEFT JOIN (all rows from left table)
+4.1 - LEFT JOIN that naturally produces NULLs (SalesPersonID can be NULL)
+5 - RIGHT JOIN producing NULLs on the left side
+6 - Controlled example: create unmatched rows using VALUES
+7 - FULL OUTER JOIN
+8 - CROSS JOIN (Cartesian Product)
+9 - Common JOIN Mistakes
+	Mistake 1: Missing JOIN condition (Cartesian product)
+	Mistake 2: Filtering RIGHT table in WHERE after LEFT JOIN
+	Mistake 3: Using wrong join column
+	Mistake 4: Forgetting table aliases in multi-table queries
+
+===============================================================================
 */
 
 SET NOCOUNT ON;
@@ -19,7 +69,10 @@ USE AdventureWorks;
 GO
 
 -------------------------------------------------------------------------------
--- 1 - Simple SELECT
+-- 1 - SELECT
+-------------------------------------------------------------------------------  
+-------------------------------------------------------------------------------
+-- 1.1  - Basic SELECT
 -------------------------------------------------------------------------------
 
 SELECT *
@@ -32,7 +85,7 @@ Result:
 
 
 -------------------------------------------------------------------------------
--- 1.2 - SELECT with vertical filter (column list)
+-- 1.2  - Column selection (vertical filter)
 -------------------------------------------------------------------------------
 
 SELECT FirstName, LastName
