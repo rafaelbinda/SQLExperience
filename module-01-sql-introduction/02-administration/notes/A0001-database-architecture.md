@@ -52,8 +52,6 @@ O transaction log é essencial para garantir:
 - Contém metadata do banco  
 - Armazena a localização dos demais arquivos  
 
----
-
 ### Arquivo secundário (.NDF)
 
 - Arquivo adicional de dados  
@@ -62,18 +60,12 @@ O transaction log é essencial para garantir:
   - distribuição de carga (I/O)  
   - organização por filegroups  
 
----
-
 ### Quando usar múltiplos arquivos de dados  
-
----
 
 #### 1º Cenário: Desempenho (paralelismo de I/O)
 
 - O SQL Server pode executar operações de leitura e escrita em paralelo entre arquivos diferentes  
 - Quando distribuídos em discos distintos, há melhor aproveitamento de I/O  
-
----
 
 #### 2º Cenário: Aumentar a capacidade de armazenamento  
 
@@ -97,8 +89,6 @@ Comportamento:
 
 O LSN representa a sequência lógica das operações e é fundamental para recuperação
 
----
-
 ### Funcionamento básico
 
 O SQL Server utiliza o modelo **Write-Ahead Logging (WAL)**:
@@ -106,8 +96,6 @@ O SQL Server utiliza o modelo **Write-Ahead Logging (WAL)**:
 1. A alteração é registrada no log  
 2. A alteração ocorre em memória  
 3. Posteriormente é gravada no arquivo de dados  
-
----
 
 ### Escrita sequencial
 
@@ -120,8 +108,6 @@ Consequências:
 - Alta dependência de disco rápido  
 - Sensibilidade à latência  
 
----
-
 ### Informações registradas
 
 - Operações DML  
@@ -129,14 +115,10 @@ Consequências:
 - Controle de transações  
 - Dados necessários para REDO e UNDO  
 
----
-
 ### Múltiplos arquivos de log
 
 - Não existe paralelismo de escrita  
 - Apenas um arquivo é utilizado por vez  
-
----
 
 ### Impacto prático
 
@@ -168,8 +150,6 @@ Essas métricas são fundamentais para entender comportamento de leitura e escri
 - Número de operações por segundo  
 - Importante para acesso aleatório (dados)  
 
----
-
 ### Impacto no SQL Server
 
 - Arquivo de log:
@@ -188,26 +168,28 @@ Essas métricas são fundamentais para entender comportamento de leitura e escri
 
 ### Pages (8 KB)
 
-A menor unidade de armazenamento no SQL Server é a página, com tamanho fixo de **8 KB (8192 bytes)**
+A menor unidade de armazenamento no SQL Server é a página, com tamanho fixo de **8 KB (8192 bytes)**.
+
+As páginas são a base de toda a estrutura de armazenamento: tabelas, índices e demais objetos são organizados internamente como conjuntos de páginas.
 
 Cada página é composta por:
 
-- Header (cabeçalho)  
-- Área de dados  
-- Slot array  
+- Page Header (cabeçalho)  
+  Contém metadados essenciais para o gerenciamento da página, como:
 
----
+  - Identificação da página (Page ID)  
+  - Tipo da página (data, index, etc.)  
+  - Informações de alocação  
+  - LSN da última modificação  
+  
+  O LSN armazenado no header permite ao SQL Server:
+  - Identificar se a página está atualizada em relação ao transaction log  
+  - Determinar se é necessário aplicar REDO durante o recovery  
+  Esse mecanismo é fundamental para garantir consistência após falhas
 
-### Page Header
+- Área de dados
 
-Contém metadados importantes, como:
-
-- Identificação da página  
-- Tipo da página  
-- Informações de alocação  
-- LSN da última modificação  
-
-Esse LSN é utilizado no processo de recovery
+- Slot array (estrutura de controle que mantém os ponteiros para as linhas dentro da página)  
 
 ---
 
@@ -239,8 +221,6 @@ Esse LSN é utilizado no processo de recovery
 - Total de 64 KB  
 - Unidade de alocação do SQL Server  
 
----
-
 ### Tipos de extent
 
 #### Misto
@@ -256,8 +236,6 @@ Esse LSN é utilizado no processo de recovery
 ## 3.0 - CHECKPOINT  
 
 Processo responsável por persistir dados da memória no disco
-
----
 
 ### Fluxo em ordem cronológica
 
@@ -286,7 +264,6 @@ Processo responsável por persistir dados da memória no disco
 6. Persistência no disco (CHECKPOINT)  
    - O processo de CHECKPOINT grava as dirty pages no arquivo de dados (.MDF/.NDF)  
    - A página deixa de ser considerada dirty e passa a refletir o estado persistido no disco  
----
 
 ### Importante
 
@@ -311,8 +288,6 @@ Seu objetivo é garantir que o banco de dados volte a um estado consistente, uti
   - ponto inicial necessário para recuperação (MINLSN)  
 - Reconstrói o estado interno das transações  
 
----
-
 #### 2 - REDO (Roll Forward)
 - Reaplica todas as operações que já foram confirmadas (COMMIT)  
 - Garante que alterações registradas no log sejam refletidas no arquivo de dados  
@@ -321,8 +296,6 @@ Seu objetivo é garantir que o banco de dados volte a um estado consistente, uti
 Objetivo:
 - Garantir que nenhuma alteração confirmada seja perdida  
 
----
-
 #### 3 - UNDO (Rollback)
 - Desfaz todas as transações que não foram confirmadas (sem COMMIT)  
 - Utiliza as informações do log para reverter as alterações  
@@ -330,8 +303,6 @@ Objetivo:
 
 Objetivo:
 - Garantir consistência lógica do banco  
-
----
 
 ### 4 - Resultado
 
@@ -344,17 +315,63 @@ Objetivo:
 
 ## 4.0 - Transaction Log Internals  
 
----
-
-### VLF
-
-- Divisões internas do log  
+O transaction log não é um arquivo contínuo único do ponto de vista interno  
+Ele é dividido em partes menores chamadas **VLF (Virtual Log Files)**, que são utilizadas pelo SQL Server para gerenciar gravação, reutilização e recuperação dos dados
 
 ---
 
-### Problemas
+### VLF (Virtual Log Files)
 
-- Muitos VLF → recovery lento  
+- São subdivisões internas do arquivo de log (.LDF)  
+- Cada VLF possui um intervalo de LSNs  
+- O SQL Server grava os dados sequencialmente atravessando os VLFs  
+
+Funcionamento:
+
+- O log começa a gravar no primeiro VLF disponível  
+- À medida que enche, passa para o próximo  
+- Quando chega ao final, pode voltar ao início (comportamento circular), desde que a porção esteja inativa  
+
+Importante:
+
+- O tamanho e a quantidade de VLFs são definidos automaticamente pelo SQL Server  
+- Isso depende do tamanho inicial do log e da configuração de crescimento (autogrowth)  
+
+### Problemas com muitos VLF
+
+Ter muitos VLFs pode causar impacto direto no desempenho do banco.
+
+Principais problemas:
+
+- Tempo maior de inicialização do banco  
+- Recovery mais lento após falhas  
+- Restore mais demorado  
+- Maior tempo para análise do transaction log  
+
+Motivo:
+
+- O SQL Server precisa percorrer diversos VLFs durante o processo de recovery  
+- Quanto maior a quantidade, maior o trabalho necessário  
+
+### Causa comum
+
+- Crescimento do log em pequenos incrementos (autogrowth baixo)  
+- Expansão frequente do arquivo de log  
+
+### Boas práticas
+
+- Definir um tamanho inicial adequado para o log  
+- Evitar crescimento automático em valores muito pequenos  
+- Manter uma quantidade controlada de VLFs  
+
+### Conceito importante
+
+O log funciona de forma **circular**:
+
+- VLFs com dados já processados (porção inativa) podem ser reutilizados  
+- Caso não seja possível reutilizar, o log cresce  
+
+Esse comportamento está diretamente relacionado ao recovery model e à realização de backup de log
 
 ---
 
@@ -388,22 +405,16 @@ Ele impacta diretamente:
 
 No modelo SIMPLE, o SQL Server gerencia automaticamente o transaction log
 
----
-
 #### Características
 
 - O log é truncado automaticamente após o CHECKPOINT  
 - Não permite backup do transaction log  
 - O arquivo de log tende a se manter menor  
 
----
-
 #### Funcionamento
 
 - Após o CHECKPOINT, a porção inativa do log é liberada automaticamente  
 - O espaço é reutilizado sem necessidade de intervenção manual  
-
----
 
 #### Vantagens
 
@@ -411,14 +422,10 @@ No modelo SIMPLE, o SQL Server gerencia automaticamente o transaction log
 - Menor crescimento do log  
 - Simplicidade de configuração  
 
----
-
 #### Limitações
 
 - Não permite recuperação ponto no tempo  
 - Em caso de falha, só é possível restaurar até o último backup FULL ou DIFFERENTIAL  
-
----
 
 #### Uso recomendado
 
@@ -432,15 +439,11 @@ No modelo SIMPLE, o SQL Server gerencia automaticamente o transaction log
 
 No modelo FULL, todas as operações são totalmente registradas no transaction log
 
----
-
 #### Características
 
 - Registro completo de todas as operações  
 - Permite backup do transaction log  
 - Permite recuperação ponto no tempo  
-
----
 
 #### Funcionamento
 
@@ -448,23 +451,17 @@ No modelo FULL, todas as operações são totalmente registradas no transaction 
 - A porção inativa só é liberada após backup do log  
 - Todas as transações são preservadas até serem copiadas em backup  
 
----
-
 #### Vantagens
 
 - Máximo controle sobre recuperação  
 - Possibilidade de restaurar o banco em qualquer ponto específico no tempo  
 - Suporte a cenários avançados (alta disponibilidade, replicação, etc.)  
 
----
-
 #### Limitações
 
 - Requer estratégia de backup bem definida  
 - Se não houver backup de log, o arquivo cresce indefinidamente  
 - Maior volume de dados no log  
-
----
 
 #### Uso recomendado
 
@@ -478,14 +475,10 @@ No modelo FULL, todas as operações são totalmente registradas no transaction 
 
 O modelo BULK LOGGED é uma variação do FULL, focada em melhorar desempenho em operações de grande volume.
 
----
-
 #### Características
 
 - Similar ao FULL  
 - Algumas operações utilizam registro mínimo (minimal logging)  
-
----
 
 #### Operações afetadas
 
@@ -494,29 +487,21 @@ O modelo BULK LOGGED é uma variação do FULL, focada em melhorar desempenho em
 - Importações de dados  
 - Rebuild de índices  
 
----
-
 #### Funcionamento
 
 - Reduz a quantidade de dados registrados no log durante operações em massa  
 - Mantém comportamento semelhante ao FULL para as demais operações  
-
----
 
 #### Vantagens
 
 - Melhor desempenho em cargas grandes  
 - Redução do volume de log gerado  
 
----
-
 #### Limitações
 
 - Pode impedir recuperação ponto no tempo durante operações bulk  
 - Backup do log pode ficar maior  
 - Não é recomendado como modelo padrão permanente  
-
----
 
 #### Uso recomendado
 
