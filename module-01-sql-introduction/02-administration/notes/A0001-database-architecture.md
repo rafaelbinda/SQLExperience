@@ -1,13 +1,13 @@
 # A0001 – Arquitetura dos bancos de dados  
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-23  
-> **Version:** 1.0 
+> **Version:** 2.0  
 
 ---
 
 ## Descrição  
 
-Este material apresenta os conceitos fundamentais da arquitetura de bancos de dados no SQL Server, abordando estrutura de arquivos, organização interna, métricas de I/O, funcionamento do transaction log, checkpoint, recovery process e recovery models  
+Este material apresenta os conceitos fundamentais da arquitetura de bancos de dados no SQL Server, abordando estrutura de arquivos, organização interna, métricas de I/O, funcionamento do transaction log, checkpoint, recovery process e recovery models
 
 ---
 
@@ -89,7 +89,69 @@ Comportamento:
 
 ---
 
+## Arquivo de log (.LDF)
+
+- Escrita sequencial  
+- Operações registradas em ordem  
+- Cada operação recebe um LSN (Log Sequence Number)
+
+O LSN representa a sequência lógica das operações e é fundamental para recuperação
+
+---
+
+### Funcionamento básico
+
+O SQL Server utiliza o modelo **Write-Ahead Logging (WAL)**:
+
+1. A alteração é registrada no log  
+2. A alteração ocorre em memória  
+3. Posteriormente é gravada no arquivo de dados  
+
+---
+
+### Escrita sequencial
+
+- O SQL Server grava sempre no final do log  
+- Não existe escrita aleatória  
+
+Consequências:
+
+- Escrita eficiente  
+- Alta dependência de disco rápido  
+- Sensibilidade à latência  
+
+---
+
+### Informações registradas
+
+- Operações DML  
+- Operações DDL  
+- Controle de transações  
+- Dados necessários para REDO e UNDO  
+
+---
+
+### Múltiplos arquivos de log
+
+- Não existe paralelismo de escrita  
+- Apenas um arquivo é utilizado por vez  
+
+---
+
+### Impacto prático
+
+Problemas no log afetam diretamente:
+
+- Tempo de COMMIT  
+- Performance de escrita  
+- Consistência do banco  
+
+---
+
 ## Métricas de I/O (Disco)
+
+O desempenho do SQL Server depende diretamente da capacidade de I/O do disco  
+Essas métricas são fundamentais para entender comportamento de leitura e escrita
 
 ---
 
@@ -116,18 +178,13 @@ Comportamento:
 
 ### Impacto no SQL Server
 
-- Log → throughput + latência  
-- Dados → IOPS + latência (acesso aleatório)
+- Arquivo de log:
+  - dependente de throughput e latência  
+  - escrita sequencial  
 
----
-
-## Arquivo de log (.LDF)
-
-- Escrita sequencial  
-- Operações registradas em ordem  
-- Cada operação recebe um LSN (Log Sequence Number)
-
-O LSN representa a sequência lógica das operações e é fundamental para recuperação.
+- Arquivo de dados:
+  - dependente de IOPS e latência  
+  - acesso mais aleatório (as operações acessam páginas distribuídas ao longo do arquivo, devido a índices, filtros e joins, sem seguir ordem sequencial)
 
 ---
 
@@ -141,20 +198,22 @@ A menor unidade de armazenamento no SQL Server é a página, com tamanho fixo de
 
 Cada página é composta por:
 
-- **Header (cabeçalho)**  
-- **Área de dados**  
-- **Slot array (controle de linhas)**  
+- Header (cabeçalho)  
+- Área de dados  
+- Slot array  
 
-#### Page Header (informações importantes)
+---
 
-O header contém metadados da página, como:
+### Page Header
 
-- Page ID  
-- Tipo da página (data, index, etc.)  
+Contém metadados importantes, como:
+
+- Identificação da página  
+- Tipo da página  
 - Informações de alocação  
-- **LSN da última modificação da página**  
+- LSN da última modificação  
 
-Esse LSN é essencial para o processo de recovery, pois permite ao SQL Server identificar se uma página precisa ser atualizada (REDO) ou revertida (UNDO)
+Esse LSN é utilizado no processo de recovery
 
 ---
 
@@ -182,28 +241,21 @@ Esse LSN é essencial para o processo de recovery, pois permite ao SQL Server id
 
 ### Extent (64 KB)
 
-Um extent é composto por **8 páginas de 8 KB**, totalizando **64 KB**
-
-- É a unidade de alocação de espaço no SQL Server  
-- O crescimento de arquivos ocorre em múltiplos de extent  
+- Conjunto de 8 páginas  
+- Total de 64 KB  
+- Unidade de alocação do SQL Server  
 
 ---
 
 ### Tipos de extent
 
-#### Extent Misto
-
-- As 8 páginas podem pertencer a objetos diferentes  
+#### Misto
+- Páginas podem pertencer a objetos diferentes  
 - Utilizado para objetos pequenos  
-- Evita desperdício de espaço  
 
----
-
-#### Extent Uniforme
-
+#### Uniforme
 - Todas as páginas pertencem ao mesmo objeto  
-- Utilizado quando o objeto cresce  
-- Melhora desempenho e organização  
+- Utilizado conforme crescimento do objeto  
 
 ---
 
@@ -213,48 +265,44 @@ Processo responsável por persistir dados da memória no disco
 
 ---
 
-### Fluxo de funcionamento
+### Fluxo
 
-1. Execução de comando  
-2. Alteração em memória (Buffer Cache)  
-3. Página marcada como dirty page  
+1. Execução  
+2. Alteração em memória  
+3. Dirty page  
 4. Registro no log  
-5. Confirmação da transação  
-6. CHECKPOINT grava no disco  
+5. Confirmação  
+6. Persistência no disco  
 
 ---
 
 ### Importante
 
-- Dados podem estar atualizados no log, mas não no MDF  
-- O log é sempre a fonte mais confiável  
+- Log é a fonte confiável  
+- Dados podem não estar no MDF ainda  
 
 ---
 
 ## Recovery Process  
 
-Quando ocorre falha:
-
 ---
 
 ### Etapas
 
-#### 1) Analysis
-- Identifica transações ativas no momento da falha  
+#### Analysis
+- Identifica transações ativas  
 
-#### 2) REDO (roll forward)
-- Reaplica operações já confirmadas  
-- Garante que alterações persistam no banco  
+#### REDO
+- Reaplica transações confirmadas  
 
-#### 3) UNDO (rollback)
+#### UNDO
 - Desfaz transações não confirmadas  
-- Garante consistência dos dados  
 
 ---
 
 ### Resultado
 
-- Banco retorna a um estado consistente  
+- Banco consistente  
 
 ---
 
@@ -262,31 +310,29 @@ Quando ocorre falha:
 
 ---
 
-### VLF (Virtual Log Files)
+### VLF
 
 - Divisões internas do log  
 
 ---
 
-### Problemas com muitos VLF
+### Problemas
 
-- Recovery lento  
-- Restore lento  
-- Startup lento  
+- Muitos VLF → recovery lento  
 
 ---
 
 ## LSN e MINLSN  
 
 - LSN identifica operações  
-- MINLSN define o ponto mínimo necessário para recovery  
+- MINLSN define ponto mínimo necessário  
 
 ---
 
-### Porções do log
+### Porções
 
-- Inativa → pode ser reutilizada  
-- Ativa → necessária para recuperação  
+- Inativa → reutilizável  
+- Ativa → necessária  
 
 ---
 
@@ -296,53 +342,29 @@ Quando ocorre falha:
 
 ### SIMPLE
 
-- Truncamento automático do log  
-- Não permite backup de log  
-
-Uso recomendado:
-
-- ambientes de desenvolvimento  
-- testes  
-- bancos não críticos  
+- Truncamento automático  
+- Uso: desenvolvimento  
 
 ---
 
 ### FULL
 
-- Exige backup de log  
+- Backup obrigatório  
+- Recomendado para produção  
 - Permite recuperação ponto no tempo  
-
-Características:
-
-- Maior controle sobre dados  
-- Maior segurança  
-
-Recomendação:
-
-- ambientes de produção  
-- sistemas críticos  
 
 ---
 
 ### BULK LOGGED
 
-- Semelhante ao FULL  
 - Otimiza operações em massa  
-
-Exemplos:
-
-- BULK INSERT  
-- SELECT INTO  
-
-Limitação:
-
-- Pode comprometer recuperação detalhada  
+- Pode limitar recuperação  
 
 ---
 
 ## Observações finais  
 
-- Transaction log é o componente mais crítico do SQL Server  
+- Transaction log é crítico  
 - CHECKPOINT não substitui backup  
-- Arquitetura de I/O impacta diretamente desempenho  
-- Dimensionamento correto é essencial em produção  
+- I/O impacta diretamente desempenho  
+- Dimensionamento correto é essencial  
