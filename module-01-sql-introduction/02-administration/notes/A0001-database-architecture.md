@@ -153,21 +153,15 @@ Problemas no log afetam diretamente:
 O desempenho do SQL Server depende diretamente da capacidade de I/O do disco  
 Essas métricas são fundamentais para entender comportamento de leitura e escrita
 
----
-
 ### Throughput
 
 - Quantidade de dados transferidos por segundo (MB/s)  
 - Importante para operações sequenciais (log)  
 
----
-
 ### Latência
 
 - Tempo de resposta do disco (ms)  
 - Impacta diretamente o tempo de COMMIT  
-
----
 
 ### IOPS
 
@@ -265,15 +259,33 @@ Processo responsável por persistir dados da memória no disco
 
 ---
 
-### Fluxo
+### Fluxo em ordem cronológica
 
-1. Execução  
-2. Alteração em memória  
-3. Dirty page  
-4. Registro no log  
-5. Confirmação  
-6. Persistência no disco  
+1. Execução do comando  
+   - Uma operação é iniciada (ex: INSERT, UPDATE, DELETE)  
+   - O SQL Server inicia o processamento da transação  
 
+2. Alteração em memória (Buffer Cache)  
+   - A página de dados é carregada para a memória (se ainda não estiver)  
+   - A modificação é realizada diretamente na memória, não no disco  
+
+3. Dirty Page  
+   - A página modificada é marcada como *dirty page*  
+   - Isso indica que o conteúdo da página em memória está diferente do que está no disco  
+
+4. Registro no transaction log  
+   - Antes de qualquer gravação no arquivo de dados, a alteração é registrada no log (.LDF)  
+   - O log armazena informações suficientes para refazer (REDO) ou desfazer (UNDO) a operação  
+   - Cada operação recebe um identificador (LSN), garantindo a ordem das transações  
+
+5. Confirmação da transação (COMMIT)  
+   - O SQL Server confirma a operação após garantir que o log foi gravado no disco  
+   - Nesse momento, a aplicação já considera a transação concluída  
+   - A alteração ainda pode não estar persistida no arquivo de dados  
+
+6. Persistência no disco (CHECKPOINT)  
+   - O processo de CHECKPOINT grava as dirty pages no arquivo de dados (.MDF/.NDF)  
+   - A página deixa de ser considerada dirty e passa a refletir o estado persistido no disco  
 ---
 
 ### Importante
@@ -285,24 +297,48 @@ Processo responsável por persistir dados da memória no disco
 
 ## Recovery Process  
 
+O recovery process ocorre quando o SQL Server é reiniciado após uma falha inesperada (queda de energia, crash, etc.)  
+Seu objetivo é garantir que o banco de dados volte a um estado consistente, utilizando as informações registradas no transaction log  
+
 ---
 
 ### Etapas
 
-#### Analysis
-- Identifica transações ativas  
-
-#### REDO
-- Reaplica transações confirmadas  
-
-#### UNDO
-- Desfaz transações não confirmadas  
+#### 1 - Analysis
+- O SQL Server analisa o transaction log a partir do último CHECKPOINT  
+- Identifica:
+  - transações que estavam ativas no momento da falha  
+  - ponto inicial necessário para recuperação (MINLSN)  
+- Reconstrói o estado interno das transações  
 
 ---
 
-### Resultado
+#### 2 - REDO (Roll Forward)
+- Reaplica todas as operações que já foram confirmadas (COMMIT)  
+- Garante que alterações registradas no log sejam refletidas no arquivo de dados  
+- Mesmo que a página já esteja atualizada, o SQL valida via LSN se precisa reaplicar  
 
-- Banco consistente  
+Objetivo:
+- Garantir que nenhuma alteração confirmada seja perdida  
+
+---
+
+#### 3 - UNDO (Rollback)
+- Desfaz todas as transações que não foram confirmadas (sem COMMIT)  
+- Utiliza as informações do log para reverter as alterações  
+- Executa rollback até o ponto inicial da transação  
+
+Objetivo:
+- Garantir consistência lógica do banco  
+
+---
+
+### 4 - Resultado
+
+- O banco de dados retorna a um estado consistente  
+- Todas as transações confirmadas são mantidas  
+- Todas as transações não confirmadas são desfeitas  
+- O banco é liberado para uso normalmente  
 
 ---
 
@@ -338,28 +374,173 @@ Processo responsável por persistir dados da memória no disco
 
 ## 5.0 - Recovery Model  
 
+O recovery model define como o SQL Server gerencia o transaction log e quais tipos de recuperação são possíveis em caso de falha
+
+Ele impacta diretamente:
+
+- comportamento do transaction log  
+- necessidade de backup  
+- capacidade de recuperação dos dados  
+
 ---
 
 ### SIMPLE
 
-- Truncamento automático  
-- Uso: desenvolvimento  
+No modelo SIMPLE, o SQL Server gerencia automaticamente o transaction log
+
+---
+
+#### Características
+
+- O log é truncado automaticamente após o CHECKPOINT  
+- Não permite backup do transaction log  
+- O arquivo de log tende a se manter menor  
+
+---
+
+#### Funcionamento
+
+- Após o CHECKPOINT, a porção inativa do log é liberada automaticamente  
+- O espaço é reutilizado sem necessidade de intervenção manual  
+
+---
+
+#### Vantagens
+
+- Baixa necessidade de administração  
+- Menor crescimento do log  
+- Simplicidade de configuração  
+
+---
+
+#### Limitações
+
+- Não permite recuperação ponto no tempo  
+- Em caso de falha, só é possível restaurar até o último backup FULL ou DIFFERENTIAL  
+
+---
+
+#### Uso recomendado
+
+- Ambientes de desenvolvimento  
+- Testes  
+- Bancos não críticos  
 
 ---
 
 ### FULL
 
-- Backup obrigatório  
-- Recomendado para produção  
+No modelo FULL, todas as operações são totalmente registradas no transaction log
+
+---
+
+#### Características
+
+- Registro completo de todas as operações  
+- Permite backup do transaction log  
 - Permite recuperação ponto no tempo  
+
+---
+
+#### Funcionamento
+
+- O log não é truncado automaticamente  
+- A porção inativa só é liberada após backup do log  
+- Todas as transações são preservadas até serem copiadas em backup  
+
+---
+
+#### Vantagens
+
+- Máximo controle sobre recuperação  
+- Possibilidade de restaurar o banco em qualquer ponto específico no tempo  
+- Suporte a cenários avançados (alta disponibilidade, replicação, etc.)  
+
+---
+
+#### Limitações
+
+- Requer estratégia de backup bem definida  
+- Se não houver backup de log, o arquivo cresce indefinidamente  
+- Maior volume de dados no log  
+
+---
+
+#### Uso recomendado
+
+- Ambientes de produção  
+- Sistemas críticos  
+- Bancos que exigem recuperação precisa  
 
 ---
 
 ### BULK LOGGED
 
-- Otimiza operações em massa  
-- Pode limitar recuperação  
+O modelo BULK LOGGED é uma variação do FULL, focada em melhorar desempenho em operações de grande volume.
 
+---
+
+#### Características
+
+- Similar ao FULL  
+- Algumas operações utilizam registro mínimo (minimal logging)  
+
+---
+
+#### Operações afetadas
+
+- BULK INSERT  
+- SELECT INTO  
+- Importações de dados  
+- Rebuild de índices  
+
+---
+
+#### Funcionamento
+
+- Reduz a quantidade de dados registrados no log durante operações em massa  
+- Mantém comportamento semelhante ao FULL para as demais operações  
+
+---
+
+#### Vantagens
+
+- Melhor desempenho em cargas grandes  
+- Redução do volume de log gerado  
+
+---
+
+#### Limitações
+
+- Pode impedir recuperação ponto no tempo durante operações bulk  
+- Backup do log pode ficar maior  
+- Não é recomendado como modelo padrão permanente  
+
+---
+
+#### Uso recomendado
+
+- Processos de ETL  
+- Cargas massivas de dados  
+- Uso temporário em operações específicas  
+
+---
+
+### Comparação resumida
+
+| Modelo       | Backup de Log | Truncamento | Point-in-time | Uso recomendado |
+|--------------|--------------|------------|--------------|----------------|
+| SIMPLE       | Não          | Automático | Não          | Dev/Teste      |
+| FULL         | Sim          | Manual     | Sim          | Produção       |
+| BULK LOGGED  | Sim          | Manual     | Parcial      | Cargas massivas|
+
+---
+
+### Observação importante
+
+- O modelo FULL é o padrão recomendado para ambientes de produção  
+- O modelo SIMPLE simplifica a gestão, mas limita a recuperação  
+- O modelo BULK LOGGED deve ser utilizado com cuidado e, preferencialmente, de forma temporária  
 ---
 
 ## Observações finais  
