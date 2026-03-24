@@ -9,6 +9,8 @@
 
 Este material apresenta os conceitos fundamentais da arquitetura de bancos de dados no SQL Server, abordando estrutura de arquivos, organização interna, métricas de I/O, funcionamento do transaction log, checkpoint, recovery process e recovery models
 
+Esses conceitos formam a base para os módulos seguintes, especialmente nas áreas de administração, desempenho, backup e recuperação de dados
+
 ---
 
 ## Hands-on  
