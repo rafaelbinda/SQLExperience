@@ -112,11 +112,10 @@ A propriedade AUTO_CLOSE controla o fechamento automático do banco de dados qua
 
 ### Impacto no Desempenho
 
-- Pode causar degradação de performance  
-- Reabertura frequente do banco  
-- Recarregamento de dados em memória  
-- Maior tempo de resposta nas primeiras consultas  
-
+- Pode causar degradação de performance
+- Reabertura frequente do banco
+- Recarregamento de dados em memória
+- Maior tempo de resposta nas primeiras consultas
 - Se o tempo de abertura for elevado e o timeout da aplicação for baixo o usuário pode receber erro de timeout  
 
 ---
