@@ -13,7 +13,7 @@ Esses conceitos formam a base para os módulos seguintes, especialmente nas áre
 
 ## Hands-on
 
-[Q0002 - SQL Server Create Database](../scripts/Q0002-create-database.sql)   
+[Q0002 - SQL Server Create Database](../../01-sql-introduction/scripts/Q0002-create-database.sql)  
 [INST-Q0004 - SQL Physical Storage Layout](../../../dba-scripts/SQL-instance-information/INST-Q0004-physical-storage-layout.sql)  
 [INST-Q0005 - SQL Database Files and Filegroups](../../../dba-scripts/SQL-instance-information/INST-Q0005-database-files-and-filegroups-overview.sql)
 
