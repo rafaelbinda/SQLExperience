@@ -18,7 +18,7 @@ Este material aborda propriedades de bancos de dados no SQL Server relacionadas 
 
 ## Hands-on  
 
-[INST-Q0003 -SQL Version and Compatibility](../../../dba-scripts/SQL-instance-information/INST-Q0003-version-and-compatibility.sql)  
+[INST-Q0003 - SQL Version and Compatibility](../../../dba-scripts/SQL-instance-information/INST-Q0003-version-and-compatibility.sql)  
 [INST-Q0006 - SQL Database Properties and Access Modes](../../../dba-scripts/SQL-instance-information/INST-Q0006-database-properties-and-access-modes.sql)
 
 ---
