@@ -10,9 +10,9 @@ Description : Returns database file details including logical name, physical
 Notes       : notes/A0003-mantendo-banco-de-dados.md
 Examples    : scripts/Q0001-sql-database-file-management.sql
 ===============================================================================
-
 INDEX
 1 - Database files space usage
+===============================================================================
 */
 
 -------------------------------------------------------------------------------
