@@ -4,7 +4,7 @@ Author      : Rafael Binda
 Created     : 2026-03-29
 Version     : 1.0
 Task        : Q0001 - SQL Database File Management
-Object      : Hands-on Script
+Object      : Script
 Description : Demonstrates database file growth, file usage analysis, shrink
               operations and transaction log behavior in SQL Server
 Notes       : notes/A0003-mantendo-banco-de-dados.md
@@ -33,6 +33,7 @@ INDEX
 20 - Optional final SHRINKDATABASE
 21 - Final validation
 22 - Cleanup
+===============================================================================
 */
 
 USE master;
