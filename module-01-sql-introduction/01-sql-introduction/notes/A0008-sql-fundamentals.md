@@ -21,7 +21,7 @@
 ---
 
 ## Hands-on  
-[SQL Server Fundamentals](../scripts/Q0003-sql-fundamentals.sql)   
+[Q0003 - SQL Server Fundamentals](../scripts/Q0003-sql-fundamentals.sql)   
 
 ---
 
