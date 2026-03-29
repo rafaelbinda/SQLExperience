@@ -16,7 +16,10 @@ O foco é compreender como essas operações funcionam internamente, seus impact
 
 ## Hands-on  
 
-—  
+[Q0001 - SQL Database File Management](../scripts/Q0001-sql-database-file-management.sql)  
+[Q0002 - SQL Move Database File](../scripts/Q0002-sql-move-database-file.sql)  
+[INST-Q0007 - SQL Database Files Space Usage](../../../dba-scripts/SQL-instance-information/INST-Q0007-database-files-space-usage.sql)  
+[INST-Q0008 - SQL Virtual Log File Overview](../../../dba-scripts/SQL-instance-information/INST-Q0008-log-vlf-overview.sql)  
 
 ---
 
