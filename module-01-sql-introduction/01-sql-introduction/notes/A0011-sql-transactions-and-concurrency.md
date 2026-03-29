@@ -11,8 +11,8 @@ Este documento apresenta informações a respeito de transações e concorrênci
 ---
 
 ## Hands-on  
-[Transactions and Concurrency ](../scripts/Q0009-sql-transactions-and-concurrency.sql)  
-[Blocking Troubleshooting Queries](../../../dba-scripts/SQL-transactions-and-concurrency/TRAN-Q0001-blocking-troubleshooting-queries.sql)
+[Q0009 - Transactions and Concurrency ](../scripts/Q0009-sql-transactions-and-concurrency.sql)  
+[TRAN-Q0001 - Blocking Troubleshooting Queries](../../../dba-scripts/SQL-transactions-and-concurrency/TRAN-Q0001-blocking-troubleshooting-queries.sql)
 
 ---
 
