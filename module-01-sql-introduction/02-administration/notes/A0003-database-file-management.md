@@ -1,15 +1,22 @@
-===============================================================================
-Author      : Rafael Binda
-Created     : 2026-03-29
-Version     : 1.0
-Title       : A0003 - Mantendo banco de dados
-===============================================================================
+# A0003 – Mantendo banco de dados
+
+Author: Rafael Binda  
+Created: 2026-03-29  
+Version: 1.0
+
+---
 
 ## Descrição
 
 Este material aborda a manutenção e o gerenciamento de arquivos de banco de dados no SQL Server, incluindo redução de tamanho (shrink), crescimento de arquivos e movimentação de arquivos de dados e log
 
 O foco é compreender como essas operações funcionam internamente, seus impactos no desempenho e em quais cenários devem ou não ser utilizadas em ambientes produtivos
+
+---
+
+## Hands-on  
+
+—  
 
 ---
 
@@ -34,6 +41,10 @@ DBCC SHRINKDATABASE (<databasename>, 10)
 #### O SHRINK apaga os dados?
 → Resposta: Não  
 → O SQL Server realiza uma operação de condensação dos dados no início do arquivo, liberando espaço no final para permitir a redução física
+
+#### Boa prática
+
+O SHRINK deve ser uma operação **pontual**, executada apenas quando realmente necessário
 
 #### Como funciona internamente
 
@@ -65,10 +76,6 @@ Embora o comando não apague dados, ele pode causar fragmentação e gerar impac
 
 - O banco reduz o arquivo, mas depois precisa crescer novamente
 - Esse ciclo de shrink e crescimento contínuo pode levar a alocações em áreas diferentes do disco, piorando a performance e a fragmentação
-
-#### Boa prática
-
-O SHRINK deve ser uma operação **pontual**, executada apenas quando realmente necessário
 
 #### Exemplo de cenário
 
