@@ -12,7 +12,7 @@ Este documento apresenta os fundamentos de consulta de dados utilizando SELECT, 
 ---
 
 ## Hands-on
-[SQL Server Data Querying](../scripts/Q0004-sql-data-querying.sql) 
+[Q0004 - SQL Server Data Querying](../scripts/Q0004-sql-data-querying.sql) 
 
 ---
 
