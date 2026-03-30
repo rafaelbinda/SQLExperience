@@ -1,4 +1,4 @@
-# A0003 – Mantendo banco de dados
+# A0003 – Database File Management and Maintenance
 
 Author: Rafael Binda  
 Created: 2026-03-29  
