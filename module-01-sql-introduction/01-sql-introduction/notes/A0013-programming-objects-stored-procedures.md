@@ -1,4 +1,4 @@
-﻿# A0013 – SQL Programming Objects
+﻿# A0013 – Programming Objects in SQL Server
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-17  
 > **Version:** 1.0 
