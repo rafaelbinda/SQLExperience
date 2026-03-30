@@ -7,7 +7,7 @@ Task        : Q0001 - SQL Database File Management
 Object      : Script
 Description : Demonstrates database file growth, file usage analysis, shrink
               operations and transaction log behavior in SQL Server
-Notes       : notes/A0003-mantendo-banco-de-dados.md
+Notes       : notes/A0003-database-file-management.md
 ===============================================================================
 
 INDEX
