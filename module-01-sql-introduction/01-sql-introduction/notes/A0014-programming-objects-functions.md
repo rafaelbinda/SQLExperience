@@ -1,4 +1,4 @@
-﻿# A0014 – Objetos de programação do SQL Server
+﻿# A0014 – Sql Server Programming Objects
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-17  
 > **Version:** 1.0 
@@ -13,8 +13,8 @@ Este documento apresenta uma visão geral sobre Functions no SQL Server, incluin
 
 ## Hands-on  
 
-[Functions](../scripts/Q0012-sql-functions.sql)  
-[Function Metadata Objects](../../../dba-scripts/SQL-programming-objects/FUNC-Q0001-function-metadata.sql) 
+[Q0012 - Functions](../scripts/Q0012-sql-functions.sql)  
+[FUNC-Q0001 - Function Metadata Objects](../../../dba-scripts/SQL-programming-objects/FUNC-Q0001-function-metadata.sql) 
 
 ---
 
