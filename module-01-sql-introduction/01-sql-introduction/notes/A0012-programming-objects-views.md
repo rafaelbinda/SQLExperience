@@ -1,4 +1,4 @@
-﻿# A0012 – Objetos de programação do SQL Server
+﻿# A0012 – Programming Objects in SQL Server
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-11  
 > **Version:** 4.0 
