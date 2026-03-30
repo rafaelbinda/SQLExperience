@@ -7,7 +7,7 @@ Task        : Q0002 - SQL Move Database File
 Object      : Script
 Description : Demonstrates how to move a database file (log file) to a new
               location using ALTER DATABASE and offline/online operations
-Notes       : notes/A0003-mantendo-banco-de-dados.md
+Notes       : notes/A0003-database-file-management.md
 ===============================================================================
 
 INDEX
