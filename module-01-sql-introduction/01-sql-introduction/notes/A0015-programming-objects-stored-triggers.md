@@ -1,4 +1,4 @@
-﻿# A0015 – Objetos de programação do SQL Server
+﻿# A0015 – Sql Server Programming Objects
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-17  
 > **Version:** 1.0 
@@ -13,8 +13,8 @@ Este documento apresenta uma visão geral sobre Triggers no SQL Server, incluind
 
 ## Hands-on  
 
-[Triggers](../scripts/Q0013-sql-triggers.sql)  
-[Trigger Metadata Objects](../../../dba-scripts/SQL-programming-objects/TRIG-Q0001-trigger-metadata.sql) 
+[Q0013 - Triggers](../scripts/Q0013-sql-triggers.sql)  
+[TRIG-Q0001 - Trigger Metadata Objects](../../../dba-scripts/SQL-programming-objects/TRIG-Q0001-trigger-metadata.sql) 
 
 ---
 
