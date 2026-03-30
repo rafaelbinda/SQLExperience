@@ -13,8 +13,8 @@ Este documento apresenta uma visão geral sobre Views no SQL Server, incluindo c
 
 ## Hands-on  
 
-[Views](../scripts/Q0010-sql-views.sql)   
-[View Metadata Objects](../../../dba-scripts/SQL-programming-objects/VIEW-Q0001-view-metadata.sql)   
+[Q0010 - Views](../scripts/Q0010-sql-views.sql)   
+[VIEW-Q0001 - View Metadata Objects](../../../dba-scripts/SQL-programming-objects/VIEW-Q0001-view-metadata.sql)   
 
 ---
 
