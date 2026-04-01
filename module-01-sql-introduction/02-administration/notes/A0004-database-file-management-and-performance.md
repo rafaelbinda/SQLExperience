@@ -48,7 +48,6 @@ A organização física dos arquivos influencia diretamente o desempenho do SQL 
 ## 2 – Instant File Initialization (IFI)  
 
 Por padrão, ao criar ou expandir arquivos, o SQL Server preenche o espaço com zeros (zeroing), o que pode impactar diretamente o tempo de criação e crescimento dos arquivos
-
 O Instant File Initialization (IFI) permite que arquivos de dados sejam criados e expandidos sem esse preenchimento, reduzindo significativamente o tempo dessas operações
 
 ### Funcionamento
@@ -100,7 +99,7 @@ Para evitar crescimento frequente e garantir melhor desempenho, recomenda-se def
 
 ## 3 – TempDB  
 
-O TempDB é um banco de sistema crítico utilizado como área temporária
+O TempDB é um banco de sistema crítico utilizado como área temporária pelo SQL Server
 
 ### Características:
 
@@ -111,18 +110,28 @@ O TempDB é um banco de sistema crítico utilizado como área temporária
   - Triggers  
   - Tabelas temporárias  
 
+### Problema comum: contenção no TempDB  
+
+Em ambientes com alta concorrência, o TempDB pode apresentar gargalos internos devido ao alto volume de operações simultâneas
+Essa contenção é frequentemente identificada através do wait type **PAGELATCH**
+
 ### PAGELATCH (explicação)
 
-PAGELATCH é um tipo de espera (wait) relacionado à contenção em memória, não em disco  
-Ocorre quando múltiplas sessões tentam acessar estruturas internas do SQL Server ao mesmo tempo
+PAGELATCH é um tipo de espera (wait) relacionado à contenção em memória, não em disco
+Ocorre quando múltiplas sessões tentam acessar simultaneamente estruturas internas do SQL Server, especialmente páginas responsáveis pelo controle de alocação
 
-#### Estruturas internas:
+### Estruturas internas de alocação responsáveis pela contenção
 
-- PFS (Page Free Space): controla espaço livre nas páginas  
-- GAM (Global Allocation Map): indica quais extents estão livres  
-- SGAM (Shared Global Allocation Map): controla extents compartilhados  
+- **PFS (Page Free Space)**  
+  Controla o espaço livre dentro das páginas  
 
-Essas estruturas podem gerar contenção em ambientes com alta concorrência
+- **GAM (Global Allocation Map)**  
+  Indica quais extents estão livres  
+
+- **SGAM (Shared Global Allocation Map)**  
+  Controla extents compartilhados  
+
+Essas estruturas são altamente acessadas em operações no TempDB e podem gerar contenção em cenários de alta concorrência.
 
 ### Boas práticas:
 
@@ -150,6 +159,7 @@ Configurar valores ligeiramente acima
 
 ### Benefícios:
 
+- Redução de contenção (PAGELATCH)  
 - Evita crescimento sequencial após startup  
 - Reduz fragmentação  
 - Melhora desempenho inicial  
@@ -229,7 +239,23 @@ ALTER DATABASE SeuBanco SET ENCRYPTION ON;
 
 ## 6 – Backup e Restore com TDE  
 
-### Exportar certificado
+Ao utilizar Transparent Data Encryption (TDE), o processo de backup e restore exige cuidados adicionais devido à dependência do certificado utilizado na criptografia
+
+### Funcionamento  
+
+- O banco de dados é criptografado utilizando uma **Database Encryption Key (DEK)**  
+- A DEK é protegida por um **certificado armazenado no banco master**  
+- Durante o backup, os dados permanecem criptografados  
+
+
+### Ponto crítico  
+
+Para restaurar um banco com TDE em outra instância, é obrigatório que o certificado utilizado na criptografia esteja presente no servidor de destino
+Sem esse certificado, o SQL Server não consegue acessar a DEK e o banco não pode ser restaurado
+
+### Etapas obrigatórias para restore  
+
+#### 1 – Exportar o certificado no servidor de origem  
 
 ```sql
 BACKUP CERTIFICATE DBCriptCert 
@@ -241,7 +267,7 @@ WITH PRIVATE KEY
 );
 ```
 
-### Importar certificado
+#### 2 – Importar o certificado no servidor de destino  
 
 ```sql
 CREATE CERTIFICATE DBCriptCert 
@@ -253,14 +279,36 @@ WITH PRIVATE KEY
 );
 ```
 
-### Erro comum:
+#### 3 – Restaurar o banco de dados normalmente  
 
+Após a importação do certificado, o restore pode ser realizado sem necessidade de ajustes adicionais.
+
+### Erro comum  
+
+Caso o certificado não esteja presente no servidor de destino, o seguinte erro será retornado:
+
+```sql
 Msg 33111  
-Cannot find server certificate  
+Cannot find server certificate with thumbprint...
+```
+
+### Boas práticas  
+
+- Realizar backup do certificado imediatamente após habilitar o TDE  
+- Armazenar o certificado e a chave privada em local seguro  
+- Proteger a senha utilizada na exportação  
+- Manter cópias do certificado fora do servidor principal  
+- Garantir que ambientes de homologação e contingência possuam o certificado  
+
+### Considerações de DBA  
+
+- Sem o certificado, o banco criptografado torna-se irrecuperável  
+- O backup do banco não é suficiente sem o backup do certificado  
+- O TDE protege os dados em repouso, incluindo backups  
+- O restore depende exclusivamente da cadeia de criptografia estar íntegra  
 
 ---
-
-## 7 – Considerações Importantes  
+## 7 – Importante  
 
 - Planejar crescimento dos arquivos  
 - TempDB mal configurado gera contenção  
