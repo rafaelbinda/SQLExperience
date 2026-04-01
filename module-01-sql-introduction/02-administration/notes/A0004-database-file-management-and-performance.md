@@ -117,7 +117,7 @@ Essa contenção é frequentemente identificada através do wait type **PAGELATC
 
 ### PAGELATCH (explicação)
 
-PAGELATCH é um tipo de espera (wait) relacionado à contenção em memória, não em disco
+PAGELATCH é um tipo de espera (wait) relacionado à contenção em memória, não em disco  
 Ocorre quando múltiplas sessões tentam acessar simultaneamente estruturas internas do SQL Server, especialmente páginas responsáveis pelo controle de alocação
 
 ### Estruturas internas de alocação responsáveis pela contenção
