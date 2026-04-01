@@ -12,10 +12,10 @@ Este documento apresenta os tipos de Dados no SQL Server
 ---
 
 ## Hands-on  
-[SQL Server String Data Types](../scripts/Q0005-sql-string-data-types.sql)  
-[SQL Server Numeric and Bit Data Types](../scripts/Q0006-sql-numeric-and-bit-data-types.sql)  
-[SQL Server Date and Time Data Types](../scripts/Q0007-sql-date-and-time-data-types.sql)  
-[SQL Server Special Data Types](../scripts/Q0008-sql-special-data-types.sql)
+[Q0005 - SQL Server String Data Types](../scripts/Q0005-sql-string-data-types.sql)  
+[Q0006 - SQL Server Numeric and Bit Data Types](../scripts/Q0006-sql-numeric-and-bit-data-types.sql)  
+[Q0007 - SQL Server Date and Time Data Types](../scripts/Q0007-sql-date-and-time-data-types.sql)  
+[Q0008 - SQL Server Special Data Types](../scripts/Q0008-sql-special-data-types.sql)
 
 ---
 

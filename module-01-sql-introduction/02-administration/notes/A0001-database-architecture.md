@@ -1,4 +1,4 @@
-# A0001 – Arquitetura dos bancos de dados  
+# A0001 – SQL Server Database Architecture
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-23  
 > **Version:** 2.0  

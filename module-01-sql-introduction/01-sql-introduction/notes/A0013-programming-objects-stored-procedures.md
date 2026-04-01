@@ -1,4 +1,4 @@
-﻿# A0013 – Objetos de programação do SQL Server
+﻿# A0013 – Sql Server Programming Objects
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-17  
 > **Version:** 1.0 
@@ -13,8 +13,8 @@ Este documento apresenta uma visão geral sobre Stored Procedures no SQL Server,
 
 ## Hands-on  
 
-[Stored Procedures](../scripts/Q0011-sql-procedures.sql)  
-[Procedures Metadata Objects](../../../dba-scripts/SQL-programming-objects/PROC-Q0001-procedures-metadata.sql) 
+[Q0011 - Stored Procedures](../scripts/Q0011-sql-procedures.sql)  
+[PROC-Q0001 - Procedures Metadata Objects](../../../dba-scripts/SQL-programming-objects/PROC-Q0001-procedures-metadata.sql) 
 
 ---
 

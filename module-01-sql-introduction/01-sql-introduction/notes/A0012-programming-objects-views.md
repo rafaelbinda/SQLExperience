@@ -1,4 +1,4 @@
-﻿# A0012 – Objetos de programação do SQL Server
+﻿# A0012 – Sql Server Programming Objects
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-11  
 > **Version:** 4.0 
@@ -13,8 +13,8 @@ Este documento apresenta uma visão geral sobre Views no SQL Server, incluindo c
 
 ## Hands-on  
 
-[Views](../scripts/Q0010-sql-views.sql)   
-[View Metadata Objects](../../../dba-scripts/SQL-programming-objects/VIEW-Q0001-view-metadata.sql)   
+[Q0010 - Views](../scripts/Q0010-sql-views.sql)   
+[VIEW-Q0001 - View Metadata Objects](../../../dba-scripts/SQL-programming-objects/VIEW-Q0001-view-metadata.sql)   
 
 ---
 
