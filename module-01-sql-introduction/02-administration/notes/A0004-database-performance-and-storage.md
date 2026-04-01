@@ -1,4 +1,4 @@
-# A0004 – Database File Management and Performance  
+# A0004 – Database Storage and Performance  
 Author: Rafael Binda  
 Created: 2026-03-31  
 Version: 1.0  
@@ -14,6 +14,12 @@ O entendimento desses tópicos é essencial para administração eficiente, otim
 ---
 
 Hands-on  
+
+
+[Q0002 – Database creation and file configuration](../../scripts/Q0002-create-database.sql)  
+[Q0009 – Transactions and concurrency behavior (TempDB usage)](../scripts/Q0009-sql-transactions-and-concurrency.sql)  
+[CONN-Q0001 – Active connections analysis](../../../dba-scripts/SQL-connections/CONN-Q0001-active-connections.sql)  
+[INST-Q0005 – Database files and filegroups overview](../../../dba-scripts/SQL-instance-information/INST-Q0005-database-files-and-filegroups-overview.sql)  
 
 
 ---
@@ -131,7 +137,7 @@ Ocorre quando múltiplas sessões tentam acessar simultaneamente estruturas inte
 - **SGAM (Shared Global Allocation Map)**  
   Controla extents compartilhados  
 
-Essas estruturas são altamente acessadas em operações no TempDB e podem gerar contenção em cenários de alta concorrência.
+Essas estruturas são altamente acessadas em operações no TempDB e podem gerar contenção em cenários de alta concorrência
 
 ### Boas práticas:
 
@@ -182,133 +188,9 @@ O crescimento automático deve ser tratado como exceção, não regra
 - Fragmentação de arquivos  
 - No log: aumento excessivo de VLFs  
 
----
-
-## 5 – Transparent Data Encryption (TDE)  
-
-TDE permite criptografar dados em repouso no banco de dados
-
-### Características:
-
-- Transparente para aplicações  
-- Não criptografa dados em trânsito  
-- Impacto em CPU  
-
-### Hierarquia de criptografia:
-
-```code
-Windows DPAPI  
-↓  
-Service Master Key  
-↓  
-Database Master Key  
-↓  
-Database Encryption Key  
-```
-
-### Configuração:
-
-#### 1 – Criar master key
-
-```sql
-CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'StrongPassword';
-```
-
-#### 2 – Criar certificado
-
-```sql
-CREATE CERTIFICATE DBCriptCert 
-WITH SUBJECT = 'Certificado para criptografia';
-```
-
-#### 3 – Criar encryption key
-
-```sql
-CREATE DATABASE ENCRYPTION KEY
-WITH ALGORITHM = AES_128
-ENCRYPTION BY SERVER CERTIFICATE DBCriptCert;
-```
-
-#### 4 – Habilitar TDE
-
-```sql
-ALTER DATABASE SeuBanco SET ENCRYPTION ON;
-```
 
 ---
-
-## 6 – Backup e Restore com TDE  
-
-Ao utilizar Transparent Data Encryption (TDE), o processo de backup e restore exige cuidados adicionais devido à dependência do certificado utilizado na criptografia
-
-### Funcionamento  
-
-- O banco de dados é criptografado utilizando uma **Database Encryption Key (DEK)**  
-- A DEK é protegida por um **certificado armazenado no banco master**  
-- Durante o backup, os dados permanecem criptografados  
-
-
-### Ponto crítico  
-
-Para restaurar um banco com TDE em outra instância, é obrigatório que o certificado utilizado na criptografia esteja presente no servidor de destino
-Sem esse certificado, o SQL Server não consegue acessar a DEK e o banco não pode ser restaurado
-
-### Etapas obrigatórias para restore  
-
-#### 1 – Exportar o certificado no servidor de origem  
-
-```sql
-BACKUP CERTIFICATE DBCriptCert 
-TO FILE = 'D:\certificados\DBScriptCert.cer'
-WITH PRIVATE KEY 
-(
-    FILE = 'D:\certificados\DBScriptCert.key',
-    ENCRYPTION BY PASSWORD = 'Password'
-);
-```
-
-#### 2 – Importar o certificado no servidor de destino  
-
-```sql
-CREATE CERTIFICATE DBCriptCert 
-FROM FILE = 'D:\certificados\DBScriptCert.cer'
-WITH PRIVATE KEY 
-(
-    FILE = 'D:\certificados\DBScriptCert.key',
-    ENCRYPTION BY PASSWORD = 'Password'
-);
-```
-
-#### 3 – Restaurar o banco de dados normalmente  
-
-Após a importação do certificado, o restore pode ser realizado sem necessidade de ajustes adicionais.
-
-### Erro comum  
-
-Caso o certificado não esteja presente no servidor de destino, o seguinte erro será retornado:
-
-```sql
-Msg 33111  
-Cannot find server certificate with thumbprint...
-```
-
-### Boas práticas  
-
-- Realizar backup do certificado imediatamente após habilitar o TDE  
-- Armazenar o certificado e a chave privada em local seguro  
-- Proteger a senha utilizada na exportação  
-- Manter cópias do certificado fora do servidor principal  
-- Garantir que ambientes de homologação e contingência possuam o certificado  
-
-### Considerações de DBA  
-
-- Sem o certificado, o banco criptografado torna-se irrecuperável  
-- O backup do banco não é suficiente sem o backup do certificado  
-- O TDE protege os dados em repouso, incluindo backups  
-- O restore depende exclusivamente da cadeia de criptografia estar íntegra  
-
----
-## 7 – Importante  
+## 5 – Importante  
 
 - Planejar crescimento dos arquivos  
 - TempDB mal configurado gera contenção  
