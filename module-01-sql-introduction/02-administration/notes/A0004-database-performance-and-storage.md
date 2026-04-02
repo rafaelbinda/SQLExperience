@@ -54,24 +54,92 @@ A organização física dos arquivos influencia diretamente o desempenho do SQL 
 
 ## 2 – Instant File Initialization (IFI)  
 
-Por padrão, ao criar ou expandir arquivos, o SQL Server preenche o espaço com zeros (zeroing), o que pode impactar diretamente o tempo de criação e crescimento dos arquivos
-O Instant File Initialization (IFI) permite que arquivos de dados sejam criados e expandidos sem esse preenchimento, reduzindo significativamente o tempo dessas operações
+Por padrão, ao criar ou expandir arquivos, o SQL Server realiza o processo de **zeroing**, que consiste em preencher com zeros todo o espaço alocado antes de utilizá-lo  
+Esse comportamento impacta diretamente o tempo de criação e crescimento dos arquivos, pois envolve operações de I/O síncronas  
+O **Instant File Initialization (IFI)** permite que arquivos de dados sejam criados e expandidos sem essa etapa de inicialização, reduzindo significativamente o tempo dessas operações  
 
-### Funcionamento
+### Zeroing (preenchimento com zeros)
 
-- Aplicável apenas a arquivos de dados (MDF / NDF)  
-- Arquivos de log (LDF) continuam exigindo zeroing  
-- SQL Server 2022 trouxe melhorias no crescimento do log, porém não equivale ao IFI completo  
+Zeroing é o processo no qual o SQL Server inicializa o espaço alocado em disco antes de utilizá-lo  
+Esse comportamento ocorre durante:  
+- Criação de arquivos  
+- Crescimento (autogrowth)  
+
+O objetivo principal do zeroing está relacionado a requisitos de segurança no nível do sistema operacional, garantindo que blocos de disco previamente utilizados sejam inicializados antes de serem reutilizados  
+
+### Consideração sobre segurança no uso de espaço em disco
+
+Quando o SQL Server solicita espaço ao sistema operacional, ele pode receber blocos de disco que já foram utilizados anteriormente por outros arquivos ou processos  
+Esses blocos podem conter dados residuais, como:  
+- Informações de arquivos previamente removidos  
+- Dados de outros bancos de dados  
+- Conteúdos gerados por outros processos do sistema  
+
+O processo de zeroing garante que todo o espaço seja inicializado antes do uso, atendendo a requisitos de segurança do sistema operacional  
+É importante destacar que, mesmo sem zeroing (com IFI habilitado), o SQL Server mantém controle lógico sobre as páginas alocadas, garantindo que dados não inicializados não sejam acessados por consultas  
+
+### Funcionamento do IFI
+
+O IFI atua diretamente na criação e crescimento dos arquivos de dados:  
+- Aplicável apenas aos arquivos de dados (MDF / NDF)  
+- Permite que esses arquivos sejam criados ou expandidos sem a etapa de zeroing  
+- O espaço é alocado rapidamente, reduzindo o impacto de operações de crescimento  
+
+Esse comportamento melhora significativamente o desempenho em cenários onde há criação ou expansão frequente de arquivos
+
+### Comportamento dos arquivos de log
+
+Os arquivos de log (LDF) possuem um funcionamento diferente:  
+- Continuam exigindo zeroing para garantir a integridade da sequência de gravação das transações  
+- Esse comportamento é essencial para o funcionamento correto do mecanismo de recovery (REDO/UNDO)  
+
+### Diferença entre versões
+
+- Em versões anteriores ao SQL Server 2022:
+  - O IFI não se aplica aos arquivos de log  
+  - Todo crescimento do log envolve zeroing  
+  - Pode haver impacto perceptível de desempenho em cenários de crescimento frequente  
+
+- A partir do SQL Server 2022:
+  - Foram introduzidas otimizações no crescimento do arquivo de log  
+  - Para crescimentos de até 64 MB, o impacto do zeroing é reduzido  
+  - Apesar disso, o crescimento do log ainda envolve operações de inicialização (zeroing), não sendo equivalente ao comportamento do IFI aplicado aos arquivos de dados  
 
 ### Configuração
 
 - Pode ser habilitado durante a instalação  
 - Após instalação: via **Local Security Policy (Windows)**  
-  - Permissão: *Perform volume maintenance tasks*  
+
+#### Passo a passo:
+
+- Abrir o Local Security Policy: `secpol.msc`  
+- Acessar:  
+  Local Policies → User Rights Assignment  
+- Abrir:  
+  *Perform volume maintenance tasks*  
+- Adicionar a conta de serviço do SQL Server  
+- Reiniciar o serviço do SQL Server  
+
+### Verificação
+
+- Consultar o log do SQL Server buscando por:  
+  "Instant File Initialization"  
+
+- Consultar a DMV:
+
+```sql
+SELECT 
+    servicename,
+    service_account,
+    instant_file_initialization_enabled
+FROM sys.dm_server_services;
+```
+
+---
 
 ### Abordagem prática para dimensionamento de arquivos
 
-Para evitar crescimento frequente e garantir melhor desempenho, recomenda-se definir o tamanho inicial dos arquivos com base no comportamento real do ambiente
+Para evitar crescimento frequente e garantir melhor desempenho, recomenda-se definir o tamanho inicial dos arquivos com base no comportamento real do ambiente.
 
 #### Passo a passo:
 
@@ -88,6 +156,8 @@ Para evitar crescimento frequente e garantir melhor desempenho, recomenda-se def
    - Configurar valores ligeiramente acima do uso observado  
    - Aplicar tanto para arquivos de dados quanto para log  
 
+---
+
 ### Benefícios dessa abordagem
 
 - Evita crescimento sequencial logo após o startup  
@@ -95,12 +165,57 @@ Para evitar crescimento frequente e garantir melhor desempenho, recomenda-se def
 - Melhora o desempenho inicial do servidor  
 - Diminui overhead causado por autogrowth  
 
+---
+
 ### Boas práticas
 
 - Definir tamanho inicial adequado para arquivos  
 - Evitar crescimento por porcentagem  
 - Preferir crescimento fixo em MB  
 - Planejar crescimento ao invés de depender de autogrowth  
+- Em versões anteriores ao SQL Server 2022:
+  - Considerar crescimento de log mais conservador devido ao custo de zeroing  
+
+---
+
+### Abordagem prática para dimensionamento de arquivos
+
+Para evitar crescimento frequente e garantir melhor desempenho, recomenda-se definir o tamanho inicial dos arquivos com base no comportamento real do ambiente.
+
+#### Passo a passo:
+
+1. Iniciar o SQL Server e monitorar o comportamento do banco  
+   - Observar o crescimento dos arquivos durante a operação normal  
+   - Identificar até que ponto os arquivos crescem e se estabilizam  
+
+2. Analisar o crescimento observado  
+   - Exemplo:
+     - Arquivo de dados estabiliza em ~500 MB  
+     - Arquivo de log estabiliza em ~100 MB  
+
+3. Ajustar o tamanho inicial (SIZE)  
+   - Configurar valores ligeiramente acima do uso observado  
+   - Aplicar tanto para arquivos de dados quanto para log  
+
+---
+
+### Benefícios dessa abordagem
+
+- Evita crescimento sequencial logo após o startup  
+- Reduz fragmentação no disco  
+- Melhora o desempenho inicial do servidor  
+- Diminui overhead causado por autogrowth  
+
+---
+
+### Boas práticas
+
+- Definir tamanho inicial adequado para arquivos  
+- Evitar crescimento por porcentagem  
+- Preferir crescimento fixo em MB  
+- Planejar crescimento ao invés de depender de autogrowth  
+- Em versões anteriores ao SQL Server 2022:
+  - Considerar crescimento de log mais conservador devido ao custo de zeroing  
 
 ---
 
