@@ -1,4 +1,4 @@
-# A0004 – Database Storage and Performance  
+# A0019 – Database Storage and Performance  
 Author: Rafael Binda  
 Created: 2026-03-31  
 Version: 2.0  
@@ -14,9 +14,9 @@ O entendimento desses tópicos é essencial para administração eficiente, otim
 ---
 
 Hands-on  
-
 [Q0002 – Database creation and file configuration](../../01-sql-introduction/scripts/Q0002-create-database.sql)  
-[Q0009 – Transactions and concurrency behavior (TempDB usage)](../../scripts/Q0009-sql-transactions-and-concurrency.sql)  
+[Q0009 – Transactions and concurrency behavior (TempDB usage)](../../01-sql-introduction/scripts/Q0009-sql-transactions-and-concurrency.sql)  
+[Q0016 – TempDB and file configuration](../scripts/Q0016-sql-tempdb-and-file-configuration.sql)
 [CONN-Q0001 – Active connections analysis](../../../dba-scripts/SQL-connections/CONN-Q0001-active-connections.sql)  
 [INST-Q0005 – Database files and filegroups overview](../../../dba-scripts/SQL-instance-information/INST-Q0005-database-files-and-filegroups-overview.sql)  
 

@@ -3,12 +3,12 @@
 Author      : Rafael Binda
 Created     : 2026-04-01
 Version     : 1.0
-Task        : Q0003 - TempDB and File Configuration
+Task        : Q0016 - TempDB and File Configuration
 Object      : Script
 Description : Examples demonstrating Instant File Initialization verification,
               TempDB file validation, size standardization, autogrowth
               configuration and TempDB space usage
-Notes       : notes/A0004-database-storage-and-performance.md
+Notes       : notes/A0019-database-storage-and-performance.md
 ===============================================================================
 
 INDEX
@@ -26,12 +26,12 @@ INDEX
 ===============================================================================
 */
 
-USE master
-GO
-
 -------------------------------------------------------------------------------
 -- 1 - Verify Instant File Initialization (IFI)
 -------------------------------------------------------------------------------
+
+USE master
+GO
 
 SELECT 
 servicename,

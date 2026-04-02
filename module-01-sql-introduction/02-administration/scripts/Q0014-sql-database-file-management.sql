@@ -3,11 +3,11 @@
 Author      : Rafael Binda
 Created     : 2026-03-29
 Version     : 1.0
-Task        : Q0001 - SQL Database File Management
+Task        : Q0014 - SQL Database File Management
 Object      : Script
 Description : Demonstrates database file growth, file usage analysis, shrink
               operations and transaction log behavior in SQL Server
-Notes       : notes/A0003-database-file-management.md
+Notes       : notes/A0018-database-file-management.md
 ===============================================================================
 
 INDEX
@@ -36,12 +36,12 @@ INDEX
 ===============================================================================
 */
 
-USE master;
-GO
-
 -------------------------------------------------------------------------------
 -- 1 - Recreate test database
 -------------------------------------------------------------------------------
+
+USE master;
+GO
 
 DROP DATABASE IF EXISTS ExamplesDB_FileManagement;
 GO

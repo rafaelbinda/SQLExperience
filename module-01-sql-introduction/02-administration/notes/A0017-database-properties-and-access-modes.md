@@ -1,4 +1,4 @@
-# A0002 – SQL Server Database Properties and Access Modes
+# A0017 – SQL Server Database Properties and Access Modes
 
 Author: Rafael Binda  
 Created: 2026-03-24  

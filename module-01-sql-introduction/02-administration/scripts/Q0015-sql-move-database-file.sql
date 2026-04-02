@@ -3,11 +3,11 @@
 Author      : Rafael Binda
 Created     : 2026-03-29
 Version     : 1.0
-Task        : Q0002 - SQL Move Database File
+Task        : Q0015 - SQL Move Database File
 Object      : Script
 Description : Demonstrates how to move a database file (log file) to a new
               location using ALTER DATABASE and offline/online operations
-Notes       : notes/A0003-database-file-management.md
+Notes       : notes/A0018-database-file-management.md
 ===============================================================================
 
 INDEX
@@ -19,6 +19,7 @@ INDEX
 6 - Set database ONLINE
 7 - Validate file location
 8 - Cleanup
+===============================================================================
 */
 
 -------------------------------------------------------------------------------
