@@ -1,13 +1,13 @@
 # A0004 – Database Storage and Performance  
 Author: Rafael Binda  
 Created: 2026-03-31  
-Version: 1.0  
+Version: 2.0  
 
 ---
 
 ## Descrição  
 
-Este material aborda conceitos avançados de gerenciamento de arquivos no SQL Server com foco em desempenho, organização física, TempDB, Instant File Initialization (IFI) e criptografia com Transparent Data Encryption (TDE)
+Este material aborda conceitos avançados de gerenciamento de arquivos no SQL Server com foco em desempenho, organização física, TempDB e Instant File Initialization (IFI)
 
 O entendimento desses tópicos é essencial para administração eficiente, otimização de I/O e resolução de problemas em ambientes de produção
 
@@ -15,13 +15,10 @@ O entendimento desses tópicos é essencial para administração eficiente, otim
 
 Hands-on  
 
-
 [Q0002 – Database creation and file configuration](../../01-sql-introduction/scripts/Q0002-create-database.sql)  
 [Q0009 – Transactions and concurrency behavior (TempDB usage)](../../scripts/Q0009-sql-transactions-and-concurrency.sql)  
 [CONN-Q0001 – Active connections analysis](../../../dba-scripts/SQL-connections/CONN-Q0001-active-connections.sql)  
 [INST-Q0005 – Database files and filegroups overview](../../../dba-scripts/SQL-instance-information/INST-Q0005-database-files-and-filegroups-overview.sql)  
-  
-
 
 ---
 
@@ -62,6 +59,7 @@ O **Instant File Initialization (IFI)** permite que arquivos de dados sejam cria
 
 Zeroing é o processo no qual o SQL Server inicializa o espaço alocado em disco antes de utilizá-lo  
 Esse comportamento ocorre durante:  
+
 - Criação de arquivos  
 - Crescimento (autogrowth)  
 
@@ -71,6 +69,7 @@ O objetivo principal do zeroing está relacionado a requisitos de segurança no 
 
 Quando o SQL Server solicita espaço ao sistema operacional, ele pode receber blocos de disco que já foram utilizados anteriormente por outros arquivos ou processos  
 Esses blocos podem conter dados residuais, como:  
+
 - Informações de arquivos previamente removidos  
 - Dados de outros bancos de dados  
 - Conteúdos gerados por outros processos do sistema  
@@ -81,6 +80,7 @@ O processo de zeroing garante que todo o espaço seja inicializado antes do uso,
 ### Funcionamento do IFI
 
 O IFI atua diretamente na criação e crescimento dos arquivos de dados:  
+
 - Aplicável apenas aos arquivos de dados (MDF / NDF)  
 - Permite que esses arquivos sejam criados ou expandidos sem a etapa de zeroing  
 - O espaço é alocado rapidamente, reduzindo o impacto de operações de crescimento  
@@ -90,6 +90,7 @@ Esse comportamento melhora significativamente o desempenho em cenários onde há
 ### Comportamento dos arquivos de log
 
 Os arquivos de log (LDF) possuem um funcionamento diferente:  
+
 - Continuam exigindo zeroing para garantir a integridade da sequência de gravação das transações  
 - Esse comportamento é essencial para o funcionamento correto do mecanismo de recovery (REDO/UNDO)  
 
@@ -139,7 +140,7 @@ FROM sys.dm_server_services;
 
 ### Abordagem prática para dimensionamento de arquivos
 
-Para evitar crescimento frequente e garantir melhor desempenho, recomenda-se definir o tamanho inicial dos arquivos com base no comportamento real do ambiente.
+Para evitar crescimento frequente e garantir melhor desempenho, recomenda-se definir o tamanho inicial dos arquivos com base no comportamento real do ambiente
 
 #### Passo a passo:
 
@@ -156,57 +157,12 @@ Para evitar crescimento frequente e garantir melhor desempenho, recomenda-se def
    - Configurar valores ligeiramente acima do uso observado  
    - Aplicar tanto para arquivos de dados quanto para log  
 
----
-
 ### Benefícios dessa abordagem
 
 - Evita crescimento sequencial logo após o startup  
 - Reduz fragmentação no disco  
 - Melhora o desempenho inicial do servidor  
 - Diminui overhead causado por autogrowth  
-
----
-
-### Boas práticas
-
-- Definir tamanho inicial adequado para arquivos  
-- Evitar crescimento por porcentagem  
-- Preferir crescimento fixo em MB  
-- Planejar crescimento ao invés de depender de autogrowth  
-- Em versões anteriores ao SQL Server 2022:
-  - Considerar crescimento de log mais conservador devido ao custo de zeroing  
-
----
-
-### Abordagem prática para dimensionamento de arquivos
-
-Para evitar crescimento frequente e garantir melhor desempenho, recomenda-se definir o tamanho inicial dos arquivos com base no comportamento real do ambiente.
-
-#### Passo a passo:
-
-1. Iniciar o SQL Server e monitorar o comportamento do banco  
-   - Observar o crescimento dos arquivos durante a operação normal  
-   - Identificar até que ponto os arquivos crescem e se estabilizam  
-
-2. Analisar o crescimento observado  
-   - Exemplo:
-     - Arquivo de dados estabiliza em ~500 MB  
-     - Arquivo de log estabiliza em ~100 MB  
-
-3. Ajustar o tamanho inicial (SIZE)  
-   - Configurar valores ligeiramente acima do uso observado  
-   - Aplicar tanto para arquivos de dados quanto para log  
-
----
-
-### Benefícios dessa abordagem
-
-- Evita crescimento sequencial logo após o startup  
-- Reduz fragmentação no disco  
-- Melhora o desempenho inicial do servidor  
-- Diminui overhead causado por autogrowth  
-
----
 
 ### Boas práticas
 
@@ -234,7 +190,7 @@ O TempDB é um banco de sistema crítico utilizado como área temporária pelo S
 
 ### Problema comum: contenção no TempDB  
 
-Em ambientes com alta concorrência, o TempDB pode apresentar gargalos internos devido ao alto volume de operações simultâneas
+Em ambientes com alta concorrência, o TempDB pode apresentar gargalos internos devido ao alto volume de operações simultâneas  
 Essa contenção é frequentemente identificada através do wait type **PAGELATCH**
 
 ### PAGELATCH (explicação)
@@ -304,13 +260,12 @@ O crescimento automático deve ser tratado como exceção, não regra
 - Fragmentação de arquivos  
 - No log: aumento excessivo de VLFs  
 
-
 ---
+
 ## 5 – Importante  
 
 - Planejar crescimento dos arquivos  
 - TempDB mal configurado gera contenção  
 - Log mal dimensionado impacta recovery  
-- Sem certificado TDE → banco não pode ser restaurado  
 
 ---
