@@ -18,7 +18,7 @@ Hands-on
 [Q0009 – Transactions and concurrency behavior (TempDB usage)](../../01-sql-introduction/scripts/Q0009-sql-transactions-and-concurrency.sql)  
 [Q0016 – TempDB and file configuration](../scripts/Q0016-sql-tempdb-and-file-configuration.sql)  
 [CONN-Q0001 – Active connections analysis](../../../dba-scripts/SQL-connections/CONN-Q0001-active-connections.sql)  
-[INST-Q0005 – Database files and filegroups overview](../../../dba-scripts/SQL-instance-information/INST-Q0005-database-files-and-filegroups-overview.sql) 
+[INST-Q0005 – Database files and filegroups overview](../../../dba-scripts/SQL-instance-information/INST-Q0005-database-files-and-filegroups-overview.sql)   
 [INST-Q0009 – Database I/O and Performance Metrics](../../../dba-scripts/SQL-instance-information/INST-Q0009-database-io-and-performance-metrics.sql)
 
 
