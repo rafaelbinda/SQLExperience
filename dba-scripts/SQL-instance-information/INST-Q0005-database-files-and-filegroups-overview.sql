@@ -7,7 +7,7 @@ Task        : INST-Q0005 - Database Files and Filegroups Overview
 Object      : Script
 Description : Queries for quick inspection of database files, filegroups,
               growth settings, physical paths, and log file configuration
-Notes       : notes/A0001-database-architecture.md
+Notes       : notes/A0016-database-architecture.md
 ===============================================================================
 */
 

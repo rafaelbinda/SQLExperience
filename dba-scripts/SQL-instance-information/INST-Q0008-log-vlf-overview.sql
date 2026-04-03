@@ -7,8 +7,8 @@ Task        : INST-Q0008 - Log VLF Overview
 Object      : Script
 Description : Returns transaction log VLF information to help inspect log
               structure, active and inactive VLFs, and shrink behavior
-Notes       : notes/A0003-mantendo-banco-de-dados.md
-Examples    : scripts/Q0001-sql-database-file-management.sql
+Notes       : notes/A0018-database-file-management.md
+Examples    : scripts/Q0014-sql-database-file-management.sql
 ===============================================================================
 
 INDEX

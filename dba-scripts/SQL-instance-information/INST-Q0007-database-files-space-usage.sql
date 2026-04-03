@@ -7,8 +7,8 @@ Task        : INST-Q0007 - Database Files Space Usage
 Object      : Script
 Description : Returns database file details including logical name, physical
               name, file type, size, used space, free space and percent used
-Notes       : notes/A0003-mantendo-banco-de-dados.md
-Examples    : scripts/Q0001-sql-database-file-management.sql
+Notes       : notes/A0018-database-file-management.md
+Examples    : scripts/Q0014-sql-database-file-management.sql
 ===============================================================================
 INDEX
 1 - Database files space usage

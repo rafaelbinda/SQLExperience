@@ -8,7 +8,7 @@ Object      : Script
 Description : Queries for inspecting database properties, compatibility level,
               recovery model, access-related settings, file sizes, and
               DATABASEPROPERTYEX values in SQL Server
-Notes       : notes/A0002-database-properties-and-access-modes.md
+Notes       : notes/A0017-database-properties-and-access-modes.md
 ===============================================================================
 */
 
