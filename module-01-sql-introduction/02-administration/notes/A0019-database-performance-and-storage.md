@@ -18,7 +18,9 @@ Hands-on
 [Q0009 – Transactions and concurrency behavior (TempDB usage)](../../01-sql-introduction/scripts/Q0009-sql-transactions-and-concurrency.sql)  
 [Q0016 – TempDB and file configuration](../scripts/Q0016-sql-tempdb-and-file-configuration.sql)  
 [CONN-Q0001 – Active connections analysis](../../../dba-scripts/SQL-connections/CONN-Q0001-active-connections.sql)  
-[INST-Q0005 – Database files and filegroups overview](../../../dba-scripts/SQL-instance-information/INST-Q0005-database-files-and-filegroups-overview.sql)  
+[INST-Q0005 – Database files and filegroups overview](../../../dba-scripts/SQL-instance-information/INST-Q0005-database-files-and-filegroups-overview.sql) 
+[INST-Q0009 – Database I/O and Performance Metrics](../../../dba-scripts/SQL-instance-information/INST-Q0009-database-io-and-performance-metrics.sql)
+
 
 ---
 
@@ -262,10 +264,101 @@ O crescimento automático deve ser tratado como exceção, não regra
 
 ---
 
-## 5 – Importante  
+## 5 – Pontos de atenção  
 
 - Planejar crescimento dos arquivos  
 - TempDB mal configurado gera contenção  
 - Log mal dimensionado impacta recovery  
 
 ---
+
+## 6 – Monitoramento de I/O e Performance  
+
+Após definir corretamente a arquitetura de storage, dimensionamento de arquivos e configuração do TempDB, é fundamental monitorar o comportamento real do ambiente  
+
+O SQL Server disponibiliza DMVs que permitem analisar o uso de I/O, identificar gargalos e validar se a infraestrutura está adequada para a carga de trabalho  
+
+---
+
+### Objetivo do monitoramento  
+
+- Identificar gargalos de disco  
+- Validar decisões de arquitetura de storage  
+- Apoiar troubleshooting de performance  
+- Correlacionar comportamento do SQL Server com a capacidade do hardware  
+
+---
+
+### Principais fontes de informação  
+
+#### sys.dm_io_virtual_file_stats  
+
+- Retorna estatísticas de I/O por arquivo  
+- Permite identificar:
+
+  - Arquivos com maior volume de leitura e escrita  
+  - Tempo acumulado de espera (stall)  
+  - Diferenças de comportamento entre data files e log files  
+
+Uso prático:
+
+- Identificar arquivos com maior pressão de I/O  
+- Detectar possíveis gargalos de disco  
+- Avaliar distribuição de carga entre arquivos  
+
+---
+
+#### sys.dm_os_wait_stats  
+
+- Retorna estatísticas de espera do SQL Server  
+- Permite identificar onde o servidor está aguardando recursos  
+
+Waits comuns relacionados a I/O:
+
+- PAGEIOLATCH  
+→ Indica espera por leitura de páginas em disco  
+
+- WRITELOG  
+→ Indica espera por gravação no transaction log  
+
+- IO_COMPLETION  
+→ Indica espera por operações de I/O  
+
+Uso prático:
+
+- Identificar pressão de I/O no ambiente  
+- Correlacionar waits com problemas de performance  
+
+---
+
+#### sys.dm_db_session_space_usage  
+
+- Retorna uso de espaço no TempDB por sessão  
+
+Uso prático:
+- Identificar sessões que consomem muitos recursos temporários  
+- Diagnosticar problemas relacionados a consultas que utilizam TempDB  
+
+---
+
+### Interpretação prática  
+
+O monitoramento deve ser analisado em conjunto com o comportamento do ambiente  
+
+Exemplos:
+
+- Alta espera em WRITELOG  
+→ Pode indicar problema de latência no disco de log  
+
+- Alta ocorrência de PAGEIOLATCH  
+→ Pode indicar gargalo de leitura em disco  
+
+- Arquivos com maior tempo de espera acumulado  
+→ Podem indicar distribuição inadequada de I/O  
+
+- Alto consumo de TempDB por sessões  
+→ Pode indicar necessidade de ajuste em queries ou configuração  
+
+---
+
+
