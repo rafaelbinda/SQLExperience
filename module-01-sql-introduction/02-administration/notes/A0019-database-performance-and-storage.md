@@ -29,14 +29,12 @@ Hands-on
 A organização física dos arquivos influencia diretamente o desempenho do SQL Server
 
 ### Boas práticas:
-
 - Manter o arquivo de paginação do Windows em disco separado  
 - Separar arquivos de dados e log  
 - Separar o TempDB dos bancos de usuários  
 - Distribuir arquivos em múltiplos discos para melhor throughput  
 
 ### Explicação técnica:
-
 - Arquivos de log (LDF) utilizam escrita sequencial (sequential write)  
 - Arquivos de dados (MDF/NDF) utilizam leitura e escrita aleatória (random I/O)  
 - Misturar ambos no mesmo disco gera contenção de I/O  
@@ -61,11 +59,11 @@ O **Instant File Initialization (IFI)** permite que arquivos de dados sejam cria
 
 Zeroing é o processo no qual o SQL Server inicializa o espaço alocado em disco antes de utilizá-lo  
 Esse comportamento ocorre durante:  
-
 - Criação de arquivos  
 - Crescimento (autogrowth)  
 
-O objetivo principal do zeroing está relacionado a requisitos de segurança no nível do sistema operacional, garantindo que blocos de disco previamente utilizados sejam inicializados antes de serem reutilizados  
+O objetivo principal do zeroing está relacionado a requisitos de segurança no nível do sistema operacional, garantindo que blocos de disco previamente utilizados sejam inicializados antes de serem reutilizados 
+ 
 
 ### Consideração sobre segurança no uso de espaço em disco
 
@@ -82,7 +80,6 @@ O processo de zeroing garante que todo o espaço seja inicializado antes do uso,
 ### Funcionamento do IFI
 
 O IFI atua diretamente na criação e crescimento dos arquivos de dados:  
-
 - Aplicável apenas aos arquivos de dados (MDF / NDF)  
 - Permite que esses arquivos sejam criados ou expandidos sem a etapa de zeroing  
 - O espaço é alocado rapidamente, reduzindo o impacto de operações de crescimento  
@@ -92,7 +89,6 @@ Esse comportamento melhora significativamente o desempenho em cenários onde há
 ### Comportamento dos arquivos de log
 
 Os arquivos de log (LDF) possuem um funcionamento diferente:  
-
 - Continuam exigindo zeroing para garantir a integridade da sequência de gravação das transações  
 - Esse comportamento é essencial para o funcionamento correto do mecanismo de recovery (REDO/UNDO)  
 
@@ -109,25 +105,18 @@ Os arquivos de log (LDF) possuem um funcionamento diferente:
   - Apesar disso, o crescimento do log ainda envolve operações de inicialização (zeroing), não sendo equivalente ao comportamento do IFI aplicado aos arquivos de dados  
 
 ### Configuração
-
 - Pode ser habilitado durante a instalação  
 - Após instalação: via **Local Security Policy (Windows)**  
 
 #### Passo a passo:
-
 - Abrir o Local Security Policy: `secpol.msc`  
-- Acessar:  
-  Local Policies → User Rights Assignment  
-- Abrir:  
-  *Perform volume maintenance tasks*  
+- Acessar `Local Policies → User Rights Assignment`  
+- Abrir `*Perform volume maintenance tasks*`  
 - Adicionar a conta de serviço do SQL Server  
 - Reiniciar o serviço do SQL Server  
 
 ### Verificação
-
-- Consultar o log do SQL Server buscando por:  
-  "Instant File Initialization"  
-
+- Consultar o log do SQL Server buscando por `Instant File Initialization`  
 - Consultar a DMV:
 
 ```sql
@@ -160,14 +149,12 @@ Para evitar crescimento frequente e garantir melhor desempenho, recomenda-se def
    - Aplicar tanto para arquivos de dados quanto para log  
 
 ### Benefícios dessa abordagem
-
 - Evita crescimento sequencial logo após o startup  
 - Reduz fragmentação no disco  
 - Melhora o desempenho inicial do servidor  
 - Diminui overhead causado por autogrowth  
 
 ### Boas práticas
-
 - Definir tamanho inicial adequado para arquivos  
 - Evitar crescimento por porcentagem  
 - Preferir crescimento fixo em MB  
@@ -182,7 +169,6 @@ Para evitar crescimento frequente e garantir melhor desempenho, recomenda-se def
 O TempDB é um banco de sistema crítico utilizado como área temporária pelo SQL Server
 
 ### Características:
-
 - Recriado a cada inicialização  
 - Utilizado para:
   - Controle de concorrência  
@@ -196,7 +182,6 @@ Em ambientes com alta concorrência, o TempDB pode apresentar gargalos internos 
 Essa contenção é frequentemente identificada através do wait type **PAGELATCH**
 
 ### PAGELATCH (explicação)
-
 PAGELATCH é um tipo de espera (wait) relacionado à contenção em memória, não em disco  
 Ocorre quando múltiplas sessões tentam acessar simultaneamente estruturas internas do SQL Server, especialmente páginas responsáveis pelo controle de alocação
 
@@ -214,7 +199,6 @@ Ocorre quando múltiplas sessões tentam acessar simultaneamente estruturas inte
 Essas estruturas são altamente acessadas em operações no TempDB e podem gerar contenção em cenários de alta concorrência
 
 ### Boas práticas:
-
 - Separar o TempDB em disco dedicado  
 - Criar múltiplos arquivos de dados  
 - Manter arquivos com mesmo tamanho e crescimento  
@@ -231,14 +215,12 @@ Essas estruturas são altamente acessadas em operações no TempDB e podem gerar
 3. Ajustar SIZE com base no uso real  
 
 Exemplo:
-
 - Dados: 500 MB  
 - Log: 100 MB  
 
 Configurar valores ligeiramente acima  
 
 ### Benefícios:
-
 - Redução de contenção (PAGELATCH)  
 - Evita crescimento sequencial após startup  
 - Reduz fragmentação  
@@ -251,13 +233,11 @@ Configurar valores ligeiramente acima
 O crescimento automático deve ser tratado como exceção, não regra
 
 ### Boas práticas:
-
 - Evitar crescimento por porcentagem  
 - Preferir crescimento fixo em MB  
 - Definir tamanho inicial adequado  
 
 ### Problemas comuns:
-
 - Crescimento frequente → impacto de performance  
 - Fragmentação de arquivos  
 - No log: aumento excessivo de VLFs  
@@ -275,24 +255,17 @@ O crescimento automático deve ser tratado como exceção, não regra
 ## 6 – Monitoramento de I/O e Performance  
 
 Após definir corretamente a arquitetura de storage, dimensionamento de arquivos e configuração do TempDB, é fundamental monitorar o comportamento real do ambiente  
-
 O SQL Server disponibiliza DMVs que permitem analisar o uso de I/O, identificar gargalos e validar se a infraestrutura está adequada para a carga de trabalho  
 
----
-
 ### Objetivo do monitoramento  
-
 - Identificar gargalos de disco  
 - Validar decisões de arquitetura de storage  
 - Apoiar troubleshooting de performance  
 - Correlacionar comportamento do SQL Server com a capacidade do hardware  
 
----
-
 ### Principais fontes de informação  
 
 #### sys.dm_io_virtual_file_stats  
-
 - Retorna estatísticas de I/O por arquivo  
 - Permite identificar:
 
@@ -301,45 +274,25 @@ O SQL Server disponibiliza DMVs que permitem analisar o uso de I/O, identificar 
   - Diferenças de comportamento entre data files e log files  
 
 Uso prático:
-
 - Identificar arquivos com maior pressão de I/O  
 - Detectar possíveis gargalos de disco  
 - Avaliar distribuição de carga entre arquivos  
 
----
-
 #### sys.dm_os_wait_stats  
-
 - Retorna estatísticas de espera do SQL Server  
 - Permite identificar onde o servidor está aguardando recursos  
 
-Waits comuns relacionados a I/O:
-
-- PAGEIOLATCH  
-→ Indica espera por leitura de páginas em disco  
-
-- WRITELOG  
-→ Indica espera por gravação no transaction log  
-
-- IO_COMPLETION  
-→ Indica espera por operações de I/O  
-
 Uso prático:
-
 - Identificar pressão de I/O no ambiente  
 - Correlacionar waits com problemas de performance  
 
----
-
 #### sys.dm_db_session_space_usage  
-
 - Retorna uso de espaço no TempDB por sessão  
 
 Uso prático:
+
 - Identificar sessões que consomem muitos recursos temporários  
 - Diagnosticar problemas relacionados a consultas que utilizam TempDB  
-
----
 
 ### Interpretação prática  
 
@@ -348,7 +301,7 @@ O monitoramento deve ser analisado em conjunto com o comportamento do ambiente
 Exemplos:
 
 - Alta espera em WRITELOG  
-→ Pode indicar problema de latência no disco de log  
+→ Pode indicar latência no disco de log  
 
 - Alta ocorrência de PAGEIOLATCH  
 → Pode indicar gargalo de leitura em disco  
@@ -359,6 +312,46 @@ Exemplos:
 - Alto consumo de TempDB por sessões  
 → Pode indicar necessidade de ajuste em queries ou configuração  
 
----
+### Waits relacionados a I/O  
+
+Durante o monitoramento de performance, alguns wait types indicam diretamente operações de I/O e ajudam a identificar gargalos de storage  
+
+#### Principais waits  
+
+- **PAGEIOLATCH_SH**  
+→ Espera por leitura de páginas em disco (operações de leitura)  
+
+- **PAGEIOLATCH_EX**  
+→ Espera por leitura de páginas antes de escrita  
+
+- **PAGEIOLATCH_UP**  
+→ Espera por leitura com intenção de atualização  
+
+- **WRITELOG**  
+→ Espera pela gravação no transaction log (impacta COMMIT)  
+
+- **IO_COMPLETION**  
+→ Espera genérica por operações de I/O  
+
+- **ASYNC_IO_COMPLETION**  
+→ Espera por operações de I/O assíncronas  
+
+### Interpretação dos waits  
+
+- Esperas elevadas em **PAGEIOLATCH**  
+→ Indicam pressão de leitura em disco  
+
+- Esperas elevadas em **WRITELOG**  
+→ Indicam possível gargalo no disco de log  
+
+- Esperas elevadas em **IO_COMPLETION / ASYNC_IO_COMPLETION**  
+→ Podem indicar limitação de throughput do storage  
+
+#### Observação  
+
+- A análise deve sempre considerar o contexto do ambiente, o padrão de workload e as métricas coletadas nas DMVs  
+- Valores isolados não necessariamente indicam problema, sendo importante avaliar tendência e impacto na aplicação  
+
+
 
 
