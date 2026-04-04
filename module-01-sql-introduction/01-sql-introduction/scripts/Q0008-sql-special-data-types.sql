@@ -792,16 +792,16 @@ TRUNCATE TABLE dbo.Example_Hierarchy;
 GO
 
 INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
-VALUES (hierarchyid::GetRoot(), '7 - HIERARCHYID');
+VALUES (hierarchyid::GetRoot(), '8 - HIERARCHYID');
 GO
 
 DECLARE @Root HIERARCHYID;
-DECLARE @N71 HIERARCHYID;
-DECLARE @N712 HIERARCHYID;
-DECLARE @N72 HIERARCHYID;
-DECLARE @N721 HIERARCHYID;
-DECLARE @N722 HIERARCHYID;
-DECLARE @N723 HIERARCHYID;
+DECLARE @N81 HIERARCHYID;
+DECLARE @N812 HIERARCHYID;
+DECLARE @N82 HIERARCHYID;
+DECLARE @N821 HIERARCHYID;
+DECLARE @N822 HIERARCHYID;
+DECLARE @N823 HIERARCHYID;
 
 SELECT @Root = Node
 FROM dbo.Example_Hierarchy
@@ -820,7 +820,7 @@ INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
 VALUES (@N812, '8.1.2 - SR - Getting the Parent Node');
 
 -- 8.2
-SET @N82 = @Root.GetDescendant(@N71, NULL);
+SET @N82 = @Root.GetDescendant(@N81, NULL);
 
 INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
 VALUES (@N82, '8.2 - Example Using GetDescendant()');
@@ -832,13 +832,13 @@ INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
 VALUES (@N821, '8.2.1 - GD - Inserting the Root Node');
 
 -- 8.2.2
-SET @N822 = @N82.GetDescendant(@N721, NULL);
+SET @N822 = @N82.GetDescendant(@N821, NULL);
 
 INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
 VALUES (@N822, '8.2.2 - GD - Inserting Children');
 
 -- 8.2.3
-SET @N823 = @N82.GetDescendant(@N722, NULL);
+SET @N823 = @N82.GetDescendant(@N822, NULL);
 
 INSERT INTO dbo.Example_Hierarchy (Node, EmployeeName)
 VALUES (@N823, '8.2.3 - GD - Viewing the Hierarchy');
