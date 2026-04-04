@@ -23,7 +23,6 @@ O Transparent Data Encryption (TDE) é um recurso utilizado para criptografar os
 A criptografia ocorre de forma transparente para aplicações e usuários, sem necessidade de alterações no código  
 
 ### Objetivo  
-
 - Proteger dados em repouso  
 - Evitar acesso indevido a arquivos físicos  
 - Atender requisitos de segurança e compliance  
@@ -35,7 +34,6 @@ A criptografia ocorre de forma transparente para aplicações e usuários, sem n
 O TDE realiza a criptografia no nível de página antes da gravação em disco e descriptografa durante a leitura  
 
 ### Características  
-
 - Criptografia aplicada em arquivos de dados (MDF / NDF)  
 - Criptografia aplicada no arquivo de log (LDF)  
 - Criptografia aplicada em backups  
@@ -43,13 +41,11 @@ O TDE realiza a criptografia no nível de página antes da gravação em disco e
 - Não criptografa dados em trânsito  
 
 ### Disponibilidade  
-
 - SQL Server 2008+  
 - Enterprise (inicialmente)  
 - Standard a partir de 2016  
 
 ### Impacto  
-
 - Pequeno overhead de CPU  
 - Baixo impacto em I/O  
 - Sem impacto na aplicação  
@@ -125,13 +121,11 @@ O TDE realiza a criptografia no nível de página antes da gravação em disco e
 ## 4 – Tipos de chave envolvidos  
 
 - Chave simétrica (DEK – Database Encryption Key)  
-
   - Utilizada para criptografar os dados do banco  
   - Alta performance para operações de leitura e escrita  
   - Utiliza algoritmos eficientes como AES  
 
   Observação:  
-
   - Utiliza a mesma chave para criptografar e descriptografar  
   - É ideal para grandes volumes de dados devido ao baixo custo computacional  
 
@@ -140,7 +134,6 @@ O TDE realiza a criptografia no nível de página antes da gravação em disco e
 ### Sobre criptografia simétrica  
 
 - A alta performance da DEK ocorre porque utiliza algoritmos como AES (Advanced Encryption Standard)  
-
 - O AES é um algoritmo de criptografia simétrica amplamente utilizado no mercado  
 
   - Trabalha com blocos de dados (block cipher)  
@@ -308,10 +301,10 @@ WITH PRIVATE KEY (
 ## 7 – Erro comum  
 
 Ao tentar restaurar um banco de dados protegido com TDE em outro servidor, pode ocorrer o seguinte erro:
-
+```sql
 Msg 33111, Level 16, State 3, Line 66  
 Cannot find server certificate with thumbprint...
-
+```
 ---
 
 ### Causa  
@@ -342,21 +335,26 @@ Como o TDE utiliza uma cadeia de criptografia, o banco de dados não pode ser ac
 
 1. Exportar o certificado no servidor de origem:
 
+```sql
     BACKUP CERTIFICATE DBCriptCert  
     TO FILE = 'C:\certificados\DBCriptCert.cer'  
     WITH PRIVATE KEY (  
         FILE = 'C:\certificados\DBCriptCert.key',  
         ENCRYPTION BY PASSWORD = 'password'  
-    );  
+    );
+```  
 
 2. Importar o certificado no servidor destino:
 
+
+```sql
     CREATE CERTIFICATE DBCriptCert  
     FROM FILE = 'C:\certificados\DBCriptCert.cer'  
     WITH PRIVATE KEY (  
         FILE = 'C:\certificados\DBCriptCert.key',  
         DECRYPTION BY PASSWORD = 'password'  
-    );  
+    );
+```  
 
 3. Realizar o restore normalmente após a importação  
 
@@ -376,20 +374,53 @@ Como o TDE utiliza uma cadeia de criptografia, o banco de dados não pode ser ac
 - Sem o certificado (e sua chave privada), o banco de dados é irrecuperável  
 - Não existe workaround ou bypass para esse cenário  
 - Esse é um dos principais riscos operacionais ao utilizar TDE  
-```
 
 ---
 
 ## 8 – Monitoramento  
 
-- sys.dm_database_encryption_keys  
-- Status  
-- Progresso  
-- Algoritmo  
+O status da criptografia pode ser acompanhado através de Dynamic Management Views (DMVs) do SQL Server  
 
 ---
 
-## 9 – Impactos e Considerações  
+### Principal DMV  
+
+- sys.dm_database_encryption_keys
+
+```sql
+SELECT 
+    db_name(database_id) AS database_name,
+    encryption_state,
+    percent_complete,
+    key_algorithm,
+    key_length
+FROM sys.dm_database_encryption_keys;
+```
+
+---
+
+### Interpretação do encryption_state  
+
+- 0 → No database encryption key present  
+- 1 → Unencrypted  
+- 2 → Encryption in progress  
+- 3 → Encrypted  
+- 4 → Key change in progress  
+- 5 → Decryption in progress  
+- 6 → Protection change in progress  
+
+---
+
+### Uso prático  
+
+- Acompanhar o progresso da criptografia inicial  
+- Verificar se o banco está realmente criptografado  
+- Identificar operações de criptografia ou descriptografia em andamento  
+- Validar o algoritmo utilizado (ex: AES_128, AES_256)  
+
+---
+
+## 9 – Impactos e considerações operacionais do TDE
 
 ### Impactos  
 
@@ -412,14 +443,8 @@ Como o TDE utiliza uma cadeia de criptografia, o banco de dados não pode ser ac
 - Testar restore  
 - Utilizar AES  
 - Documentar processo  
-
----
-
-## 11 – Dicas  
-
-- Mesmo certificado entre servidores  
 - Criar em homologação  
-- Testar recuperação  
+- Usar o mesmo certificado entre servidores  
 
 ---
 
@@ -446,11 +471,3 @@ O uso do TDE contribui diretamente para práticas de segurança exigidas pela LG
   - Auditoria  
   - Criptografia em trânsito  
   - Políticas de segurança  
-
----
-
-## 13 – Observações finais  
-
-- Pode ser habilitado online  
-- Sem indisponibilidade  
-- Protege apenas dados em repouso  
