@@ -17,6 +17,13 @@ Embora o TDE não substitua controles de acesso, auditoria ou criptografia em tr
 
 ---
 
+## Hands-on  
+
+[Q0017 – Transparent Data Encryption (TDE)](../scripts/Q0017-sql-transparent-data-encryption.sql)  
+[INST-Q0010 – Transparent Data Encryption (TDE) Overview](../../../dba-scripts/SQL-instance-information/INST-Q0010-transparent-data-encryption-overview.sql)  
+
+---
+
 ## 1 – O que é TDE  
 
 O Transparent Data Encryption (TDE) é um recurso utilizado para criptografar os dados armazenados em disco no SQL Server  

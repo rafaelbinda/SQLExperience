@@ -13,7 +13,7 @@ O entendimento desses tópicos é essencial para administração eficiente, otim
 
 ---
 
-Hands-on  
+## Hands-on  
 [Q0002 – Database creation and file configuration](../../01-sql-introduction/scripts/Q0002-create-database.sql)  
 [Q0009 – Transactions and concurrency behavior (TempDB usage)](../../01-sql-introduction/scripts/Q0009-sql-transactions-and-concurrency.sql)  
 [Q0016 – TempDB and file configuration](../scripts/Q0016-sql-tempdb-and-file-configuration.sql)  
