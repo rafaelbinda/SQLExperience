@@ -1,7 +1,7 @@
 # A0021 – Resource Governor (RG)
 Author      : Rafael Binda  
 Created     : 2026-04-06  
-Version     : 1.0  
+Version     : 2.0
 
 ---
 
@@ -12,6 +12,13 @@ O **Resource Governor (RG)** é um recurso do SQL Server que permite **controlar
 Seu principal objetivo é garantir que uma carga de trabalho não degrade a performance das demais, promovendo isolamento e previsibilidade no uso dos recursos da instância  
 
 Esse recurso é amplamente utilizado em ambientes com múltiplas aplicações, relatórios ou usuários concorrentes  
+
+---
+
+## Hands-on  
+
+[Q0018 - Resource Governor Configuration](../scripts/Q0018-resource-governor-configuration.sql)  
+[INST-Q0011 - Resource Governor Overview](../../../dba-scripts/SQL-instance-information/INST-Q0011-resource-governor-overview.sql)
 
 ---
 
@@ -39,6 +46,25 @@ Esse recurso é amplamente utilizado em ambientes com múltiplas aplicações, r
 - Relatórios com grande volume de dados (ex: período de 10 anos)  
 - Aplicações concorrentes compartilhando a mesma instância  
 - Ambientes com múltiplos tipos de workload (OLTP + Reporting)  
+
+---
+
+## Quando usar o Resource Governor
+
+- Ambientes com múltiplos workloads concorrentes  
+- Necessidade de proteger workloads críticos (ex: OLTP)  
+- Controle de queries ad-hoc ou mal otimizadas  
+- Ambientes multi-tenant  
+- Processos de ETL competindo com cargas transacionais  
+
+---
+
+## Quando NÃO usar o Resource Governor 
+
+- Para corrigir problemas de performance causados por queries mal otimizadas  
+- Ambientes com baixa concorrência  
+- Ausência de contenção de recursos  
+- Como substituto de tuning (indexação, modelagem, etc.)  
 
 ---
 
@@ -81,6 +107,9 @@ Ele é composto por três elementos principais:
 4. O grupo está vinculado a um **Resource Pool**  
 5. Os limites de CPU e memória são aplicados durante a execução  
 
+Observação:  
+A classificação ocorre apenas no momento da conexão. Sessões já existentes não são reclassificadas automaticamente  
+
 ---
 
 ## Estrutura lógica  
@@ -116,6 +145,27 @@ Servidor → Management → Resource Governor
 
 - O Resource Governor vem **desabilitado por padrão**  
 - É necessário habilitá-lo manualmente para uso  
+
+---
+
+## Monitoramento  
+
+As seguintes DMVs são utilizadas para análise do Resource Governor:  
+
+- sys.dm_resource_governor_resource_pools  
+- sys.dm_resource_governor_workload_groups  
+- sys.dm_exec_sessions  
+- sys.dm_exec_requests  
+
+---
+
+## Limitações  
+
+- A classificação ocorre apenas na conexão (não por query)  
+- Não controla diretamente I/O de disco  
+- Não garante percentual exato de CPU em tempo real  
+- Não cancela queries nem derruba conexões  
+- Atua principalmente em cenários de contenção de recursos  
 
 ---
 
