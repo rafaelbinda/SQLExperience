@@ -2,29 +2,38 @@
 ===============================================================================
 Author      : Rafael Binda
 Created     : 2026-04-06
-Version     : 1.0
+Version     : 2.0
 Task        : INST-Q0011 - Resource Governor Overview
 Object      : Script
 Description : The queries below are useful for quick investigation of
-              Resource Governor configuration, pools, workload groups,
-              classifier function, active sessions, active requests,
-              and current resource usage
+              Resource Governor configuration, setup workflow, pools,
+              workload groups, classifier function, session classification,
+              active requests, and current resource usage
 Notes       : notes/A0021-resource-governor.md
 Examples    : scripts/Q0018-resource-governor-configuration.sql
 ===============================================================================
+
 INDEX
 1  - Check whether Resource Governor is enabled
-2  - View classifier function
-3  - View stored Resource Pool configuration
-4  - View Resource Pool affinity
-5  - View current Resource Pool state and statistics
-6  - View stored Workload Group configuration
-7  - View current Workload Group state and statistics
-8  - View user sessions classified by Resource Governor
-9  - View active requests by workload group and pool
-10 - View memory usage by pool
-11 - View sessions assigned to the default group 
-===============================================================================*/
+2  - Create Resource Pools
+3  - Create Workload Groups
+4  - Create the Classifier Function
+5  - Bind the Classifier Function to Resource Governor
+6  - Apply the Resource Governor configuration
+7  - Validate session classification
+8  - View classifier function
+9  - View stored Resource Pool configuration
+10 - View Resource Pool affinity
+11 - View current Resource Pool state and statistics
+12 - View stored Workload Group configuration
+13 - View current Workload Group state and statistics
+14 - View user sessions classified by Resource Governor
+15 - View active requests by workload group and pool
+16 - View memory usage by pool
+17 - View sessions assigned to the default group
+18 - Cleanup
+===============================================================================
+*/
 
 USE master
 GO
@@ -43,7 +52,133 @@ FROM sys.resource_governor_configuration
 GO
 
 -------------------------------------------------------------------------------
--- 2 - View classifier function
+-- 2 - Create Resource Pools
+-------------------------------------------------------------------------------
+/*
+→ Creates dedicated Resource Pools for OLTP and reporting workloads
+→ These pools define CPU and memory boundaries for each type of session
+*/
+
+CREATE RESOURCE POOL Pool_OLTP
+WITH
+(
+    MAX_CPU_PERCENT = 70,
+    MAX_MEMORY_PERCENT = 70
+)
+GO
+
+CREATE RESOURCE POOL Pool_Report
+WITH
+(
+    MAX_CPU_PERCENT = 30,
+    MAX_MEMORY_PERCENT = 30
+)
+GO
+
+-------------------------------------------------------------------------------
+-- 3 - Create Workload Groups
+-------------------------------------------------------------------------------
+/*
+→ Creates Workload Groups and maps them to their respective Resource Pools
+*/
+
+CREATE WORKLOAD GROUP Group_OLTP
+USING Pool_OLTP
+GO
+
+CREATE WORKLOAD GROUP Group_Report
+USING Pool_Report
+GO
+
+-------------------------------------------------------------------------------
+-- 4 - Create the Classifier Function
+-------------------------------------------------------------------------------
+/*
+→ This function classifies incoming sessions based on the application name
+
+Examples:
+- Connections using Application Name=OLTP     -> Group_OLTP
+- Connections using Application Name=Report   -> Group_Report
+- Any other connection                        -> default group
+*/
+CREATE OR ALTER FUNCTION dbo.Classify_Workload()
+RETURNS sysname
+WITH SCHEMABINDING
+AS
+BEGIN
+
+    DECLARE @GroupName sysname
+
+    IF APP_NAME() LIKE '%Report%'
+        SET @GroupName = 'Group_Report'
+    ELSE IF APP_NAME() LIKE '%OLTP%'
+        SET @GroupName = 'Group_OLTP'
+    ELSE
+        SET @GroupName = 'default'
+
+    RETURN @GroupName
+
+END
+GO
+
+-------------------------------------------------------------------------------
+-- 5 - Bind the Classifier Function to Resource Governor
+-------------------------------------------------------------------------------
+/*
+→ Associates the classifier function with Resource Governor
+*/
+ALTER RESOURCE GOVERNOR
+WITH (CLASSIFIER_FUNCTION = dbo.Classify_Workload)
+GO
+
+-------------------------------------------------------------------------------
+-- 6 - Apply the Resource Governor configuration
+-------------------------------------------------------------------------------
+/*
+→ Applies the configuration so that new connections can be classified
+*/
+ALTER RESOURCE GOVERNOR RECONFIGURE
+GO
+
+SELECT
+is_enabled,
+classifier_function_id
+FROM sys.resource_governor_configuration
+GO
+
+-------------------------------------------------------------------------------
+-- 7 - Validate session classification
+-------------------------------------------------------------------------------
+-- Shows pools, groups, and user sessions currently assigned by Resource Governor
+
+--View Resource Pools currently available in Resource Governor
+SELECT *
+FROM sys.dm_resource_governor_resource_pools
+GO
+
+-- View Workload Groups currently available in Resource Governor
+SELECT *
+FROM sys.dm_resource_governor_workload_groups
+GO
+
+--View user sessions and their assigned Workload Group and Resource Pool
+SELECT
+s.session_id,
+s.login_name,
+s.program_name,
+wg.name AS workload_group,
+rp.name AS resource_pool
+FROM sys.dm_exec_sessions AS s
+INNER JOIN sys.dm_resource_governor_workload_groups AS wg
+    ON s.group_id = wg.group_id
+INNER JOIN sys.dm_resource_governor_resource_pools AS rp
+    ON wg.pool_id = rp.pool_id
+WHERE s.is_user_process = 1
+ORDER BY s.session_id
+GO
+
+-------------------------------------------------------------------------------
+-- 8 - View classifier function
 -------------------------------------------------------------------------------
 /*
 → Shows the classifier function currently associated with Resource Governor,
@@ -70,7 +205,7 @@ WHERE o.object_id =
 GO
 
 -------------------------------------------------------------------------------
--- 3 - View stored Resource Pool configuration
+-- 9 - View stored Resource Pool configuration
 -------------------------------------------------------------------------------
 /*
 → Shows the stored metadata for each Resource Pool
@@ -91,13 +226,13 @@ ORDER BY pool_id
 GO
 
 -------------------------------------------------------------------------------
--- 4 - View Resource Pool affinity
+-- 10 - View Resource Pool affinity
 -------------------------------------------------------------------------------
 /*
 → Shows CPU and NUMA affinity for Resource Pools
 
 Note:
-→ Pools using automatic affinity may not return rows here, because there is no 
+→ Pools using automatic affinity may not return rows here, because there is no
   explicit affinity mapping to display
 → Resource Pool Affinity allows binding a Resource Pool to specific CPUs
   (schedulers) or NUMA nodes
@@ -112,10 +247,9 @@ Important:
 - Incorrect configuration may reduce performance
 
 Summary:
-→ Resource Governor controls how much resource is used, Affinity controls where 
+→ Resource Governor controls how much resource is used, Affinity controls where
   the workload runs
 */
-
 SELECT
 pool_id,
 processor_group,
@@ -125,7 +259,7 @@ ORDER BY pool_id, processor_group
 GO
 
 -------------------------------------------------------------------------------
--- 5 - View current Resource Pool state and statistics
+-- 11 - View current Resource Pool state and statistics
 -------------------------------------------------------------------------------
 /*
 → Shows the current in-memory state and cumulative statistics for each pool
@@ -154,10 +288,10 @@ ORDER BY pool_id
 GO
 
 -------------------------------------------------------------------------------
--- 6 - View stored Workload Group configuration
+-- 12 - View stored Workload Group configuration
 -------------------------------------------------------------------------------
 /*
-→ Shows the stored configuration of each Workload Group and the pool to which 
+→ Shows the stored configuration of each Workload Group and the pool to which
   it belongs
 */
 SELECT
@@ -177,11 +311,11 @@ ORDER BY wg.group_id
 GO
 
 -------------------------------------------------------------------------------
--- 7 - View current Workload Group state and statistics
+-- 13 - View current Workload Group state and statistics
 -------------------------------------------------------------------------------
 /*
 → Shows current Workload Group statistics, including requests, CPU usage,
-  queue activity, and memory grant behavior.
+  queue activity, and memory grant behavior
 */
 SELECT
 wg.group_id,
@@ -210,11 +344,11 @@ ORDER BY wg.group_id
 GO
 
 -------------------------------------------------------------------------------
--- 8 - View user sessions classified by Resource Governor
+-- 14 - View user sessions classified by Resource Governor
 -------------------------------------------------------------------------------
 /*
-→ Shows user sessions and the Workload Group and Resource Pool to which each 
-  session is currently assigned.
+→ Shows user sessions and the Workload Group and Resource Pool to which each
+  session is currently assigned
 */
 SELECT
 s.session_id,
@@ -236,10 +370,10 @@ ORDER BY s.session_id
 GO
 
 -------------------------------------------------------------------------------
--- 9 - View active requests by workload group and pool
+-- 15 - View active requests by workload group and pool
 -------------------------------------------------------------------------------
 /*
-→ Shows currently running requests together with wait information, CPU time, 
+→ Shows currently running requests together with wait information, CPU time,
   reads, writes, and the assigned group and pool
 */
 SELECT
@@ -270,7 +404,7 @@ ORDER BY r.cpu_time DESC, r.total_elapsed_time DESC
 GO
 
 -------------------------------------------------------------------------------
--- 10 - View memory usage by pool
+-- 16 - View memory usage by pool
 -------------------------------------------------------------------------------
 /*
 → Shows memory-related values per pool in KB and MB
@@ -291,11 +425,11 @@ ORDER BY used_memory_kb DESC
 GO
 
 -------------------------------------------------------------------------------
--- 11 - View sessions assigned to the default group
+-- 17 - View sessions assigned to the default group
 -------------------------------------------------------------------------------
 /*
 → Sessions assigned to the default group are usually connections that did not
-  match any custom rule in the classifier function.
+  match any custom rule in the classifier function
 */
 SELECT
 s.session_id,
@@ -310,6 +444,37 @@ INNER JOIN sys.dm_resource_governor_workload_groups AS wg
 INNER JOIN sys.dm_resource_governor_resource_pools AS rp
     ON wg.pool_id = rp.pool_id
 WHERE s.is_user_process = 1
-AND wg.name = 'default'
+  AND wg.name = 'default'
 ORDER BY s.session_id
+GO
+
+-------------------------------------------------------------------------------
+-- 18 - Cleanup
+-------------------------------------------------------------------------------
+/*
+→ Removes the configuration created in this script
+*/
+ALTER RESOURCE GOVERNOR
+WITH (CLASSIFIER_FUNCTION = NULL)
+GO
+
+ALTER RESOURCE GOVERNOR RECONFIGURE
+GO
+
+DROP FUNCTION dbo.Classify_Workload
+GO
+
+DROP WORKLOAD GROUP Group_OLTP
+GO
+
+DROP WORKLOAD GROUP Group_Report
+GO
+
+DROP RESOURCE POOL Pool_OLTP
+GO
+
+DROP RESOURCE POOL Pool_Report
+GO
+
+ALTER RESOURCE GOVERNOR DISABLE
 GO
