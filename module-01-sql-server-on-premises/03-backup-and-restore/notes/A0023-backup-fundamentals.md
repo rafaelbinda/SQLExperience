@@ -1,4 +1,4 @@
-# A0023 - Fundamentos de Backup
+# A0023 - Backup Fundamentals
 >**Author:** Rafael Binda  
 >**Created:** 2026-04-08  
 >**Version:** 3.0  
