@@ -1,4 +1,4 @@
-# A0024 - Fundamentos de Recovery e Restore
+# A0024 - Recovery and Restore Fundamentals
 >**Author:** Rafael Binda  
 >**Created:** 2026-04-09  
 >**Version:** 1.0  
