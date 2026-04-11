@@ -1,24 +1,192 @@
-# A0024 - Recovery and Restore Fundamentals
+# A0024 - Fundamentos de Recovery e Restore
 >**Author:** Rafael Binda  
 >**Created:** 2026-04-09  
->**Version:** 1.0  
+>**Version:** 2.0  
 
 ---
 
 ## Descrição
 
-Este material apresenta os conceitos fundamentais de recuperação de dados no SQL Server, incluindo recovery models, estratégias de restore e recuperação point-in-time
+Este material apresenta os conceitos fundamentais de recuperação de dados no SQL Server, incluindo recovery models, funcionamento do processo de restore, operações de REDO e UNDO, opções de execução (RECOVERY, NORECOVERY e STANDBY) e estratégias de recuperação como point-in-time
+
 
 ---
 
-## 1 - Recovery Models
+## 1 - Introdução ao Restore
 
-Define como o transaction log será gerenciado
+- Não é necessário criar previamente um banco vazio para executar o restore  
+- Permissões necessárias:
+  - Banco já existente: `sysadmin` ou `db_owner`
+  - Criação de novo banco: `sysadmin` ou `db_creator`
 
-### SIMPLE
+---
 
-No recovery model SIMPLE, o SQL Server realiza o truncamento automático do transaction log a cada CHECKPOINT  
-Isso significa que o log não mantém histórico completo das transações, apenas o necessário para garantir a consistência do banco
+## 2 - Fases do processo de restore
+
+O processo de restore pode ser dividido em duas fases principais:
+
+#### 1ª fase – Cópia  
+Consiste na transferência dos dados do backup para os arquivos de dados (MDF/NDF) e log (LDF)
+
+#### 2ª fase – Recovery  
+Consiste na aplicação das operações de REDO e UNDO utilizando o transaction log, garantindo a consistência do banco de dados
+
+---
+
+## 3 - REDO e UNDO
+
+Durante a fase de recovery, o SQL Server utiliza o transaction log para garantir a consistência do banco de dados através das operações de REDO e UNDO
+
+---
+
+### REDO (Refazer)
+
+- Consiste em reaplicar todas as transações que já estavam confirmadas (committed) no momento do backup, mas que ainda não tinham sido gravadas fisicamente nos arquivos de dados (MDF/NDF)
+- Garante que todas as transações confirmadas sejam aplicadas no banco  
+
+Exemplo:  
+Uma transação de INSERT já havia recebido COMMIT, porém seus dados ainda não tinham sido persistidos no arquivo MDF  
+Durante o recovery, o SQL Server reaplica essa transação para garantir que os dados estejam corretamente no banco  
+
+
+---
+
+### UNDO (Desfazer)
+
+- Consiste em desfazer (rollback) todas as transações que não estavam confirmadas (uncommitted) no momento do backup
+- Garante que nenhuma transação não confirmada permaneça no banco 
+
+Exemplo:  
+Um UPDATE foi iniciado, mas não recebeu COMMIT antes do backup  
+Durante o recovery, o SQL Server desfaz essa transação para evitar inconsistência nos dados  
+
+---
+
+## 4 - Opções de Restore
+
+### RECOVERY (default)
+
+- Executa as duas fases do restore:
+  - Cópia dos dados
+  - Recovery (REDO e UNDO)
+- Ao final do processo, o banco é colocado online e liberado para uso  
+- Encerra a sequência de restore, não permitindo a aplicação de backups adicionais (FULL, diferencial ou log)
+
+---
+
+### NORECOVERY
+
+- Executa apenas a fase de cópia dos dados, sem aplicar o recovery (REDO e UNDO)  
+- O banco permanece indisponível, com status: `Restoring`  
+- Permite a aplicação de backups adicionais na sequência (diferencial ou log)  
+- Deve ser utilizado em todos os passos intermediários do processo de restore
+
+---
+
+### STANDBY
+
+- Executa as fases de cópia e recovery (REDO e UNDO), porém mantém o banco disponível apenas para leitura  
+- O banco fica acessível em modo read-only entre os restores  
+- Permite a aplicação de backups adicionais na sequência (como no NORECOVERY)  
+- Utiliza um arquivo auxiliar (undo file) para armazenar temporariamente as transações desfeitas (UNDO)  
+- Esse arquivo é utilizado nos restores seguintes para reaplicar ou descartar corretamente essas transações
+
+---
+ 
+## 5 - Cenários de exemplo usando RECOVERY e NORECOVERY
+
+### Tempo total para um processo completo de restore
+
+1 FULL NORECOVERY     2 horas  
+2 DIFF NORECOVERY     30 minutos  
+3 LOG  NORECOVERY     30 minutos  
+4 LOG  NORECOVERY     30 minutos  
+5 LOG  RECOVERY       30 minutos  
+
+---
+
+### Cenário 1
+
+- Foi utilizado NORECOVERY no último passo (5)  
+- O banco permaneceu fora do ar (status: Restoring)  
+
+#### Solução 1
+
+Reexecutar o último comando utilizando RECOVERY  
+
+- O SQL Server identifica que a fase de cópia já foi concluída  
+- Executa apenas a fase de recovery (REDO e UNDO)  
+
+---
+
+#### Solução 2
+
+Executar o comando:
+
+`RESTORE LOG banco WITH RECOVERY`
+
+- Não é necessário utilizar mídia de backup  
+- O SQL Server executa somente a fase de recovery  
+
+---
+
+### Cenário 2
+
+- Foi utilizado RECOVERY no passo 3  
+- Ainda existiam backups adicionais (LOG 4 e LOG 5) para serem restaurados  
+
+#### Problema
+
+Ao executar RECOVERY antes do fim da sequência, o SQL Server:
+
+- Finaliza o processo de restore  
+- Impede a aplicação de novos backups  
+
+---
+
+#### Solução
+
+Será necessário reiniciar todo o processo desde o início:
+
+1 FULL NORECOVERY     2 horas  
+2 DIFF NORECOVERY     30 minutos  
+3 LOG  NORECOVERY     30 minutos  
+4 LOG  NORECOVERY     30 minutos  
+5 LOG  RECOVERY       30 minutos  
+
+---
+
+### Resumo
+
+- NORECOVERY → Utilizar enquanto ainda há backups a serem aplicados  
+- RECOVERY → Utilizar apenas no último passo  
+
+ 
+---
+
+## 6 - Recovery Models
+
+Define como o transaction log será gerenciado e quais estratégias de recuperação estarão disponíveis no SQL Server
+
+O recovery model determina:
+
+- Como o transaction log registra as operações  
+- Quando o log pode ser truncado  
+- Se é possível realizar backup de log  
+- O nível de granularidade na recuperação dos dados (ex: point-in-time)  
+
+Em outras palavras, o recovery model impacta diretamente:
+
+- A capacidade de recuperação do banco  
+- O risco de perda de dados  
+- A estratégia de backup adotada  
+
+---
+
+### RECOVERY MODEL SIMPLE
+
+- No recovery model SIMPLE, o SQL Server realiza o truncamento automático do transaction log a cada CHECKPOINT  
+- Isso significa que o log não mantém histórico completo das transações, apenas o necessário para garantir a consistência do banco
 
 ---
 
@@ -98,10 +266,10 @@ O modelo SIMPLE prioriza simplicidade e baixo gerenciamento, porém com limitaç
 
 ---
 
-### FULL
+### RECOVERY MODEL FULL
 
-No recovery model FULL, o SQL Server mantém o histórico completo das transações no transaction log até que seja realizado um backup de log  
-Isso permite a recuperação do banco de dados até qualquer ponto específico no tempo (point-in-time)
+- No recovery model FULL, o SQL Server mantém o histórico completo das transações no transaction log até que seja realizado um backup de log  
+- Isso permite a recuperação do banco de dados até qualquer ponto específico no tempo (point-in-time)
 
 ---
 
@@ -187,9 +355,9 @@ O modelo FULL oferece o maior nível de proteção de dados, sendo o padrão rec
 
 ---
 
-### BULK_LOGGED
+### RECOVERY MODEL BULK_LOGGED
 
-Modelo intermediário entre SIMPLE e FULL
+- Modelo intermediário entre SIMPLE e FULL
 
 #### Quando utilizar
 
@@ -249,6 +417,7 @@ O recovery model define diretamente quais tipos de restore são possíveis
 ---
 
 ### Troca de recovery model
+
 ---
 
 #### SIMPLE → FULL
@@ -272,78 +441,7 @@ O recovery model define diretamente quais tipos de restore são possíveis
 
 ---
 
-## 2 - Cadeia de Backup
-
-- Backups são interdependentes via LSN
-- Quebra da cadeia inviabiliza restore completo
-
----
-
-## 3 - COPY_ONLY
-
-O backup COPY_ONLY é um tipo especial de backup que não interfere na cadeia de backups existente  
-Ele é utilizado quando é necessário realizar um backup pontual sem impactar a estratégia padrão configurada no ambiente  
-
----
-
-### Objetivo
-
-Permitir a criação de backups sob demanda sem alterar:
-- A base de backups diferenciais  
-- A sequência de backups de log  
-
----
-
-### Funcionamento
-
-O comportamento varia conforme o tipo de backup:
-
-#### COPY_ONLY FULL
-
-- Não altera a base para backups diferenciais  
-- O próximo backup diferencial continua baseado no último FULL tradicional  
-
----
-
-#### COPY_ONLY LOG
-
-- Não interfere na sequência da cadeia de backups de log  
-- Mantém a continuidade dos LSNs  
-
----
-
-### Exemplo prático
-
-Cenário:
-- Backup FULL diário às 00:00  
-- Backups diferenciais ao longo do dia  
-
-Durante o dia, um backup manual é executado:
-`BACKUP DATABASE MinhaBase TO DISK = 'backup.bak' WITH COPY_ONLY;`
-
-Resultado:
-- Esse backup não passa a ser a nova base do diferencial  
-- O próximo diferencial continua baseado no FULL das 00:00  
-
----
-
-### Quando utilizar
-
-- Antes de testes ou intervenções no ambiente  
-- Para envio de backup para outro ambiente  
-- Para cópias temporárias de segurança  
-- Em atividades de troubleshooting  
-
----
-
-### Quando NÃO utilizar
-
-- Como estratégia padrão de backup  
-- Substituindo backups FULL regulares  
-
----
-
-## 4 - Point-in-Time Restore
+## 7 - Point-in-Time Restore
 
 Permite restaurar o banco de dados para um momento específico no tempo, geralmente utilizado em cenários de erro humano, como exclusões ou atualizações indevidas  
 O Point-in-Time Restore permite recuperar o banco com alta precisão, reduzindo perda de dados e sendo essencial em ambientes críticos  
@@ -365,11 +463,9 @@ Sem esses elementos, não é possível realizar recuperação ponto no tempo
 O Point-in-Time Restore utiliza a cadeia de backups de log para avançar o banco até um momento exato  
 
 O processo ocorre da seguinte forma:
-
 1. Restaurar o backup FULL com NORECOVERY  
 2. Restaurar backups diferenciais (se houver) com NORECOVERY  
 3. Restaurar backups de LOG em sequência  
-
 4. No último backup de log, aplicar a cláusula STOPAT  
 
 Isso permite interromper a recuperação exatamente no momento desejado  
@@ -413,7 +509,7 @@ Mesmo sem backup exatamente às 22:37, é possível recuperar:
 
 ---
 
-## 5 - Observações finais
+## 8 - Observações finais
 
 Backup não garante recuperação  
 Somente restore testado garante recuperação
