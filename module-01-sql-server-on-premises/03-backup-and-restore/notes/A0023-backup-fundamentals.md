@@ -258,11 +258,77 @@ Restore:
 FULL + LOG1 + LOG2 + LOG3 (todos os LOGs em sequência)
 
 - Um backup do log é dependente do outro 
-- Ocorre um controle do SQL Server pelo LSN incial e LSN final 
+- Ocorre um controle do SQL Server pelo LSN incial e LSN final
 
 ---
 
-## 6 - Tail Log Backup (NO_TRUNCATE)
+
+## 6 - Backup COPY_ONLY
+
+O backup COPY_ONLY é um tipo especial de backup que não interfere na cadeia de backups existente  
+Ele é utilizado quando é necessário realizar um backup pontual sem impactar a estratégia padrão configurada no ambiente  
+
+---
+
+### Objetivo
+
+Permitir a criação de backups sob demanda sem alterar:
+- A base de backups diferenciais  
+- A sequência de backups de log  
+
+---
+
+### Funcionamento
+
+O comportamento varia conforme o tipo de backup:
+
+#### COPY_ONLY FULL
+
+- Não altera a base para backups diferenciais  
+- O próximo backup diferencial continua baseado no último FULL tradicional  
+
+---
+
+#### COPY_ONLY LOG
+
+- Não interfere na sequência da cadeia de backups de log  
+- Mantém a continuidade dos LSNs  
+
+---
+
+### Exemplo prático
+
+Cenário:
+- Backup FULL diário às 00:00  
+- Backups diferenciais ao longo do dia  
+
+Durante o dia, um backup manual é executado:
+`BACKUP DATABASE MinhaBase TO DISK = 'backup.bak' WITH COPY_ONLY;`
+
+Resultado:
+- Esse backup não passa a ser a nova base do diferencial  
+- O próximo diferencial continua baseado no FULL das 00:00  
+
+---
+
+### Quando utilizar
+
+- Antes de testes ou intervenções no ambiente  
+- Para envio de backup para outro ambiente  
+- Para cópias temporárias de segurança  
+- Em atividades de troubleshooting  
+
+---
+
+### Quando NÃO utilizar
+
+- Como estratégia padrão de backup  
+- Substituindo backups FULL regulares  
+
+
+---
+
+## 7 - Tail Log Backup (NO_TRUNCATE)
 
 O Tail Log Backup é o backup final do transaction log realizado após uma falha, com o objetivo de capturar todas as transações ocorridas desde o último backup de log
 
@@ -347,7 +413,7 @@ Com o Tail Log Backup:
 
 ---
 
-## 7 - CONTINUE_AFTER_ERROR
+## 8 - CONTINUE_AFTER_ERROR
 
 A opção CONTINUE_AFTER_ERROR permite que o SQL Server continue o processo de backup mesmo quando encontra erros de leitura em páginas de dados
 
@@ -412,7 +478,7 @@ Em cenários de falha crítica, o CONTINUE_AFTER_ERROR pode ser utilizado em con
 
 ---
 
-## 8 - Ordem de execução em cenários de falha
+## 9 - Ordem de execução em cenários de falha
 
 Em cenários de corrupção ou falha crítica, a ordem de execução dos backups é fundamental para maximizar a recuperação de dados
 
