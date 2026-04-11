@@ -1,7 +1,7 @@
 # A0023 - Backup Fundamentals
 >**Author:** Rafael Binda  
 >**Created:** 2026-04-08  
->**Version:** 3.0  
+>**Version:** 4.0  
 
 ---
 
@@ -154,7 +154,7 @@ Esse processo garante que, em caso de incidente, a recuperação será executada
 
 ---
 
-## 3 - Backup Full
+## 4 - Backup Full
 
 - Backup completo do banco de dados
 - Leva todo o conteúdo dos arquivos de dados `MDF` e `LDF`
@@ -192,7 +192,7 @@ Isso garante que o banco seja restaurado exatamente no estado consistente do mom
 
 ---
 
-## 4 - Backup Diferencial
+## 5 - Backup Diferencial
 
 - Backup dos dados alterados desde o último backup full
 - Precisa de um backup full para ser recuperado na sequencia 
@@ -241,7 +241,7 @@ Isso garante que o banco seja recuperado exatamente no estado consistente do mom
 
 ---
 
-## 5 - Backup de Log
+## 6 - Backup de Log
 
 - Não pode estar no modo RECOVERY MODEL SIMPLE
 - Realiza o backup de todo o conteúdo do transaction log (ldf)
@@ -263,7 +263,7 @@ FULL + LOG1 + LOG2 + LOG3 (todos os LOGs em sequência)
 ---
 
 
-## 6 - Backup COPY_ONLY
+## 7 - Backup COPY_ONLY
 
 O backup COPY_ONLY é um tipo especial de backup que não interfere na cadeia de backups existente  
 Ele é utilizado quando é necessário realizar um backup pontual sem impactar a estratégia padrão configurada no ambiente  
@@ -328,7 +328,7 @@ Resultado:
 
 ---
 
-## 7 - Tail Log Backup (NO_TRUNCATE)
+## 8 - Tail Log Backup (NO_TRUNCATE)
 
 O Tail Log Backup é o backup final do transaction log realizado após uma falha, com o objetivo de capturar todas as transações ocorridas desde o último backup de log
 
@@ -413,7 +413,7 @@ Com o Tail Log Backup:
 
 ---
 
-## 8 - CONTINUE_AFTER_ERROR
+## 9 - CONTINUE_AFTER_ERROR
 
 A opção CONTINUE_AFTER_ERROR permite que o SQL Server continue o processo de backup mesmo quando encontra erros de leitura em páginas de dados
 
@@ -478,7 +478,7 @@ Em cenários de falha crítica, o CONTINUE_AFTER_ERROR pode ser utilizado em con
 
 ---
 
-## 9 - Ordem de execução em cenários de falha
+## 10 - Ordem de execução em cenários de falha
 
 Em cenários de corrupção ou falha crítica, a ordem de execução dos backups é fundamental para maximizar a recuperação de dados
 
