@@ -408,7 +408,92 @@ Caso 2 - O restore FULL foi interrompido no meio e não existe garantia de consi
 - O FILEGROUP restaurado precisa ser levado ao mesmo ponto transacional do restante do banco por meio da aplicação correta da cadeia de LOG  
 - Essa estratégia é especialmente valiosa em bancos muito grandes onde um restore completo demoraria demais  
 - O ponto principal é entender que a arquitetura física do banco pode ser usada a favor da recuperação quando bem planejada  
-- Também reforça a importância de separar dados por FILEGROUP de forma estratégica quando o banco exige alta disponibilidade operacional  
+- Também reforça a importância de separar dados por FILEGROUP de forma estratégica quando o banco exige alta disponibilidade operacional
+
+---
+
+## Cenário 10 - Interrupção recorrente de backup FULL e impacto na recuperação  
+
+### Estratégia  
+
+- RECOVERY MODEL FULL  
+- BACKUP FULL semanal aos sábados iniciando às 04:00  
+- BACKUP DIFFERENTIAL diário às 22:00  
+- BACKUP LOG diário das 08:00 às 21:00 a cada 1 hora  
+- Horário comercial: 08:00 às 20:00  
+- Operação logística: 20:00 às 02:00  
+
+### Linha do tempo:  
+
+- Sábado 04:00 início do BACKUP FULL  
+- Domingo 08:00 início do horário comercial  
+- Domingo 15:00 BACKUP FULL ainda em execução com 73%  
+- Domingo 15:10 usuários relatam lentidão e travamentos  
+- Domingo 15:20 BACKUP FULL é interrompido manualmente via KILL  
+- Situação se repete pelos últimos 3 finais de semana consecutivos  
+
+Durante a semana:  
+
+- BACKUP LOG ocorre diariamente às 08:00 09:00 10:00 11:00 12:00 13:00 14:00 15:00 16:00 17:00 18:00 19:00 20:00 e 21:00  
+- BACKUP DIFFERENTIAL ocorre diariamente às 22:00  
+
+Evento de falha:  
+
+- Sexta-feira 15:00 falha generalizada de rede  
+- Servidor de produção é derrubado  
+- Corrupção no arquivo MDF primário  
+
+---
+
+### Como recuperar o banco?  
+
+1 - NÃO existe backup FULL recente válido disponível para restore  
+2 - Os backups DIFFERENTIAL não podem ser utilizados pois dependem de um FULL base válido  
+3 - A cadeia de LOG não pode ser aplicada sem um FULL base consistente  
+
+#### Caminho possível de recuperação:
+
+1 - Tentar realizar BACKUP do TAIL LOG WITH NO_TRUNCATE  
+2 - Caso o TAIL LOG seja realizado com sucesso, ele deverá ser utilizado ao final da sequência de restore  
+3 - Identificar o último BACKUP FULL válido concluído com sucesso (anterior aos últimos 3 finais de semana)  
+4 - Restore desse BACKUP FULL WITH NORECOVERY  
+5 - Restore sequencial de TODOS os BACKUP LOG a partir desse FULL até o último LOG disponível antes da falha  
+   - Restore LOG 08:00 WITH NORECOVERY  
+   - Restore LOG 09:00 WITH NORECOVERY  
+   - Restore LOG 10:00 WITH NORECOVERY  
+   - ... seguir sequência cronológica até o último LOG disponível
+     
+6 - Restore do TAIL LOG WITH RECOVERY  
+
+#### Caso o TAIL LOG não possa ser realizado:
+
+1 - Restore do BACKUP FULL válido WITH NORECOVERY  
+2 - Restore sequencial dos BACKUP LOG até o último disponível WITH NORECOVERY  
+3 - Finalizar com RESTORE WITH RECOVERY  
+
+---
+
+### Resultado:  
+
+- O banco será recuperado a partir do último FULL válido disponível  
+- Todos os dados entre esse FULL e o último LOG aplicado poderão ser recuperados  
+- Existe risco de perda de dados dependendo da disponibilidade do TAIL LOG  
+- O tempo de restore será elevado devido à grande quantidade de LOGs acumulados  
+- O RTO será significativamente alto  
+
+---
+
+### Análise final:  
+
+- O principal erro desse cenário é a interrupção recorrente do BACKUP FULL sem garantir um novo FULL válido  
+- Sem um FULL base consistente não é possível utilizar DIFFERENTIAL nem garantir uma cadeia de recuperação eficiente  
+- Os backups DIFFERENTIAL tornam-se inúteis se não houver um FULL base válido recente  
+- A cadeia de LOG continua sendo gerada, porém depende de um FULL válido para ser utilizada no restore  
+- Esse cenário gera um acúmulo muito grande de LOGs, aumentando drasticamente o tempo de recuperação  
+- Em ambientes reais isso impacta diretamente o RTO e pode tornar o recovery inviável dentro da janela de negócio  
+- A lentidão causada pelo FULL indica problema de estratégia de backup, podendo envolver falta de tuning, limitação de I/O ou ausência de uma janela adequada  
+- A ação correta não é interromper o FULL, mas sim ajustar a estratégia, como uso de compressão, backup em múltiplos arquivos, otimização de I/O ou mudança de janela  
+- Esse cenário é crítico porque demonstra como decisões operacionais incorretas ao longo do tempo comprometem a capacidade de recuperação em um incidente real  
 
 ---
 
