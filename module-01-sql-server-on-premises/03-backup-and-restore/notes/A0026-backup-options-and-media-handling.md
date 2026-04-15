@@ -1,4 +1,5 @@
-# A0026 – Executing Backup and Restore  
+# A0026 – Backup Options and Media Handling
+
 >**Author:** Rafael Binda  
 >**Created:** 2026-04-13  
 >**Version:** 1.0  
@@ -6,6 +7,10 @@
 ---
 
 ## Descrição  
+
+Este conteúdo aborda as principais opções de configuração de backup no SQL Server, com foco no comportamento da mídia de backup, manipulação de backup sets e impacto das opções utilizadas durante a execução  
+São apresentados conceitos como INIT, FORMAT, NOINIT, compressão, mirror, checksum e copy_only, além de sua influência na estrutura e reutilização dos arquivos de backup  
+O objetivo é compreender como o SQL Server gerencia a mídia de backup e como essas opções impactam diretamente a estratégia de backup e restore  
 
 ---
 
@@ -158,5 +163,7 @@ Uso típico:
 - Backups ad-hoc (fora da rotina padrão definida) 
 - Cópias para testes  
 - Entrega de backup para terceiros  
+
+[Mais informações sobre COPY_ONLY – ver item 7](A0023-backup-fundamentals.md)
 
 ---
