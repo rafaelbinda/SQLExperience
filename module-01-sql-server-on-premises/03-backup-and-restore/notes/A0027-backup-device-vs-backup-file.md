@@ -9,7 +9,6 @@
 ## Descrição  
 
 Este conteúdo apresenta a diferença entre **Backup Device** e **Backup File** no SQL Server, mostrando como cada abordagem funciona, onde a informação fica registrada, como o SQL Server trata a mídia de backup e quais opções podem impactar o comportamento do arquivo gerado  
-
 O objetivo é entender a diferença entre utilizar um destino lógico previamente registrado no `master` e informar diretamente um arquivo físico no comando `BACKUP DATABASE`  
 
 ---
@@ -23,14 +22,12 @@ O objetivo é entender a diferença entre utilizar um destino lógico previament
 ### Conceito  
 
 Backup Device é um objeto lógico registrado previamente no banco `master` apontando para um destino físico de backup, como um arquivo em disco ou dispositivo de fita  
-
 Na prática, ele funciona como um alias para um caminho físico já cadastrado no SQL Server  
-
 Essa configuração pode ser visualizada em:  
 
-- Server Objects  
-- Backup Devices  
-
+```
+-> Server Objects -> Backup Devices  
+```
 ---
 
 ### Criação de Backup Device  
@@ -63,9 +60,8 @@ GO
 ```
 
 Nesse exemplo:  
-
 - `BackupMaster` é o nome lógico do device  
-- o caminho físico já foi previamente registrado no `master`  
+- O caminho físico já foi previamente registrado no `master`  
 
 ---
 
@@ -84,13 +80,9 @@ Nesse exemplo:
 Pela interface é possível visualizar os backups contidos na mídia associada ao device  
 
 Caminho:  
-
-- Server Objects  
-- Backup Devices  
-- BackupMaster  
-- Botão direito  
-- Properties  
-- Media Contents  
+```
+- Server Objects -> Backup Devices -> BackupMaster -> Botão direito -> Properties -> Media Contents  
+```
 
 Isso permite listar os backup sets contidos naquele arquivo de backup  
 
@@ -101,7 +93,6 @@ Isso permite listar os backup sets contidos naquele arquivo de backup
 ### Conceito  
 
 Backup File é o backup realizado diretamente para um arquivo físico informado no comando, sem necessidade de cadastro prévio de um device no banco `master`  
-
 Essa é a forma mais comum de executar backup em ambientes atuais  
 
 ---
@@ -121,16 +112,16 @@ GO
 Ao executar um backup para um arquivo `.bak` já existente, o comportamento dependerá das opções utilizadas no comando  
 
 Por padrão, o SQL Server utiliza `NOINIT`, ou seja:  
-
-- acrescenta um novo backup set ao arquivo existente  
-- mantém os backups anteriores dentro da mesma mídia  
-- aumenta o tamanho do arquivo físico  
+- Acrescenta um novo backup set ao arquivo existente  
+- Mantém os backups anteriores dentro da mesma mídia  
+- Aumenta o tamanho do arquivo físico  
 
 Exemplo conceitual:  
-
-- Execução 1 → o arquivo contém 1 backup set  
-- Execução 2 → o arquivo passa a conter 2 backup sets  
-- Execução 3 → o arquivo passa a conter 3 backup sets  
+```
+Execução 1 → o arquivo contém 1 backup set  
+Execução 2 → o arquivo passa a conter 2 backup sets  
+Execução 3 → o arquivo passa a conter 3 backup sets  
+```
 
 Isso explica por que, ao executar novamente o backup para o mesmo arquivo, o `.bak` aumenta de tamanho  
 
@@ -158,38 +149,33 @@ Isso explica por que, ao executar novamente o backup para o mesmo arquivo, o `.b
 
 No SQL Server Management Studio, ao acessar as propriedades do banco e as opções de backup, algumas opções mudam conforme o contexto do banco e do tipo de backup escolhido  
 
-Exemplo de navegação:  
+Exemplos de navegação:  
 
-- AdventureWorks  
-- Properties  
-- Options  
-- Recovery Model = Simple  
+```
+-> AdventureWorks -> Properties -> Options -> Recovery Model    = Simple
+                                                                  Bulk Logged
+                                                                  Full 
 
-Depois:  
-
-- AdventureWorks  
-- Tasks  
-- Backup  
+-> AdventureWorks -> Tasks -> Back Up -> General -> Backup Type = Full 
+                                                                  Differential
+```
 
 ---
 
 ### Comportamento observado no Recovery Model SIMPLE  
 
 Quando o banco está em `RECOVERY MODEL SIMPLE`:  
-
-- não aparece opção de backup de LOG  
-- a interface limita algumas possibilidades conforme o tipo de backup selecionado  
+- Não aparece opção de backup de LOG  
+- A interface limita algumas possibilidades conforme o tipo de backup selecionado  
 
 Motivo:  
+- No modelo SIMPLE não existe backup de LOG  
+- Por isso não há como realizar recuperação ponto a ponto utilizando transaction log  
 
-- no modelo SIMPLE não existe backup de LOG  
-- por isso não há como realizar recuperação ponto a ponto utilizando transaction log  
-
-Observação importante:  
-
-- a disponibilidade das opções de backup de **File** e **Filegroup** não depende apenas do Recovery Model  
-- essas opções estão ligadas também ao tipo de banco, à estrutura física do banco e ao tipo de backup selecionado na interface  
-- o Recovery Model influencia diretamente a existência de backup de LOG, mas não é o único fator para exibição de opções de File e Filegroup  
+Importante:  
+- A disponibilidade das opções de backup de **File** e **Filegroup** não depende apenas do Recovery Model  
+- Essas opções estão ligadas também ao tipo de banco, à estrutura física do banco e ao tipo de backup selecionado na interface  
+- O Recovery Model influencia diretamente a existência de backup de LOG, mas não é o único fator para exibição de opções de File e Filegroup  
 
 ---
 
@@ -253,10 +239,9 @@ GO
 - Ajuda na identificação do backup dentro do arquivo  
 
 Importante:  
-
 - `NAME` define o nome do **backup set**  
-- não define o nome do arquivo físico  
-- não deve ser confundido com `MEDIANAME`, que identifica o media set  
+- Não define o nome do arquivo físico  
+- Não deve ser confundido com `MEDIANAME`, que identifica o media set  
 
 ---
 
@@ -305,7 +290,6 @@ Ao acessar as opções de mídia no assistente de backup, alguns comportamentos 
 - Sobrescreve os backup sets existentes na mídia  
 
 Observação:  
-
 - `INIT` sobrescreve os backup sets existentes  
 - `FORMAT` recria completamente a mídia  
 - embora muitas vezes as duas opções sejam associadas à sobrescrita, tecnicamente elas não são idênticas  
@@ -322,15 +306,13 @@ Observação:
 ## Expiração de backup  
 
 O SQL Server permite definir expiração para um backup set utilizando opções como `EXPIREDATE` ou `RETAINDAYS`  
-
 Quando a expiração está em uso, a sobrescrita pode ser bloqueada se o backup ainda estiver dentro do prazo de retenção  
-
 Para esse comportamento funcionar corretamente, normalmente é necessário observar:  
 
-- uso de `INIT` quando a intenção é sobrescrever backup sets existentes  
-- existência de backup set anterior com expiração ativa  
-- correspondência do `MEDIANAME`, quando esse controle estiver sendo utilizado  
-- validações habilitadas na operação de backup  
+- Uso de `INIT` quando a intenção é sobrescrever backup sets existentes  
+- Existência de backup set anterior com expiração ativa  
+- Correspondência do `MEDIANAME`, quando esse controle estiver sendo utilizado  
+- Validações habilitadas na operação de backup  
 
 ---
 
@@ -341,11 +323,10 @@ Para esse comportamento funcionar corretamente, normalmente é necessário obser
 É o conjunto da mídia de backup utilizado pelo SQL Server  
 
 Exemplo:  
-
-- um arquivo `.bak`  
-- múltiplos arquivos de um backup dividido  
-- uma fita  
-- conjunto espelhado de mídias  
+- Um arquivo `.bak`  
+- Múltiplos arquivos de um backup dividido  
+- Uma fita  
+- Conjunto espelhado de mídias  
 
 ---
 
@@ -354,10 +335,9 @@ Exemplo:
 É cada backup individual gravado dentro da mídia  
 
 Exemplo:  
-
-- um FULL gravado hoje  
-- um DIFFERENTIAL gravado amanhã  
-- outro FULL gravado depois  
+- Um FULL gravado hoje  
+- Um DIFFERENTIAL gravado amanhã  
+- Outro FULL gravado depois  
 
 Todos esses podem estar armazenados dentro do mesmo arquivo físico quando se utiliza `NOINIT`  
 
