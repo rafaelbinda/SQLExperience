@@ -12,6 +12,11 @@ O objetivo é desenvolver raciocínio técnico para recuperação de dados consi
 Todos os cenários seguem o mesmo padrão com estratégia linha do tempo sequência correta de restore resultado esperado e análise final  
 
 ---
+## Hands-on
+
+[Q0022 – Tail Log Backup (NO_TRUNCATE)](../scripts/Q0022-sql-tail-log-backup.sql)
+
+---
 
 ## Cenário 1 - Estratégia de backup FULL  
 
