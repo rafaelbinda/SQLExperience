@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-04-05
 Version     : 1.0
-Task        : INST-Q0009 - Transparent Data Encryption Overview
+Task        : INST-Q0010 - Transparent Data Encryption Overview
 Object      : Script
 Description : Useful commands and queries for configuring and validating
               Transparent Data Encryption (TDE) in SQL Server, including
