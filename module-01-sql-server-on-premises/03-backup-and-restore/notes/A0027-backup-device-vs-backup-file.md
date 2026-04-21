@@ -15,6 +15,8 @@ O objetivo é entender a diferença entre utilizar um destino lógico previament
 
 ## Hands-on  
 
+[Q0024 – Backup Device vs Backup File](../scripts/Q0024-sql-backup-device-vs-backup-file.sql)
+
 ---
 
 ## Backup Device  
