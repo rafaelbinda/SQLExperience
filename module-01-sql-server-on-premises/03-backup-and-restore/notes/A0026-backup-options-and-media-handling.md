@@ -16,6 +16,8 @@ O objetivo é compreender como o SQL Server gerencia a mídia de backup e como e
 
 ## Hands-on  
 
+[Q0023 – Backup Options and Media Handling](../scripts/Q0023-sql-backup-options-and-media-handling.sql)
+
 ---
 
 ## Opções para backup  
