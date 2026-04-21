@@ -18,6 +18,8 @@ Esse recurso é essencial em cenários onde backups são armazenados fora do amb
 
 ## Hands-on   
 
+[Q0025 – Backup Encryption](../scripts/Q0025-backup-encryption.sql)
+
 ---
 
 ## Referências relacionadas  

@@ -8,6 +8,7 @@ Object      : Script
 Description : Demonstrates tail log backup (NO_TRUNCATE) in a failure scenario
               and its importance to preserve last transactions
 Notes       : 03-backup-and-restore/notes/A0023-backup-fundamentals.md
+              03-backup-and-restore/notes/A0025-backup-and-restore-exercises.md
 ===============================================================================
 
 INDEX

@@ -10,6 +10,11 @@
 Este material apresenta os conceitos fundamentais de backup no SQL Server, incluindo tipos de backup, funcionamento interno, dependências entre backups, estratégias de armazenamento e conceitos críticos como RPO, RTO e cadeia de backup
 
 ---
+## Hands-on
+
+[Q0019 – Backup FULL / DIFFERENTIAL / LOG](../scripts/Q0019-sql-backup-full-differential-log.sql)
+
+---
 
 ## 1 - Visão geral de Backup
 

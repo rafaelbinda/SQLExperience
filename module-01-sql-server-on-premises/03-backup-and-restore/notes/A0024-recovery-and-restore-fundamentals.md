@@ -11,6 +11,12 @@ Este material apresenta os conceitos fundamentais de recuperação de dados no S
 
 
 ---
+## Hands-on
+
+[Q0020 – Restore with NORECOVERY / RECOVERY](../scripts/Q0020-sql-restore-norecovery-recovery.sql)  
+[Q0021 – Restore with STANDBY](../scripts/Q0021-sql-restore-standby.sql)
+
+---
 
 ## 1 - Introdução ao Restore
 
