@@ -1,4 +1,4 @@
-# A0029 – Point-in-Time Restore and Marked Transactions
+# A0026 – Point-in-Time Restore and Marked Transactions
 >**Author:** Rafael Binda  
 >**Created:** 2026-04-21  
 >**Version:** 1.0  
@@ -15,7 +15,7 @@ São apresentados os pré-requisitos, funcionamento do transaction log, utiliza�
 
 ## Hands-on  
 
-[Q0026 – Point-in-Time Restore and Marked Transactions](../scripts/Q0026-sql-point-in-time-restore.sql)
+[Q0023 – Point-in-Time Restore and Marked Transactions](../scripts/Q0023-sql-point-in-time-restore.sql)
 
 ---
 

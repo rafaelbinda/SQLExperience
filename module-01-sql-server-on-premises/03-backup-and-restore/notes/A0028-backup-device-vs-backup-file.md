@@ -1,4 +1,4 @@
-# A0027 – Backup Device vs Backup File  
+# A0028 – Backup Device vs Backup File  
 
 >**Author:** Rafael Binda  
 >**Created:** 2026-04-14  
@@ -15,7 +15,7 @@ O objetivo é entender a diferença entre utilizar um destino lógico previament
 
 ## Hands-on  
 
-[Q0024 – Backup Device vs Backup File](../scripts/Q0024-sql-backup-device-vs-backup-file.sql)
+[Q0025 – Backup Device vs Backup File](../scripts/Q0025-sql-backup-device-vs-backup-file.sql)
 
 ---
 

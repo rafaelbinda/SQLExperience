@@ -1,4 +1,4 @@
-# A0026 – Backup Options and Media Handling
+# A0027 – Backup Options and Media Handling
 
 >**Author:** Rafael Binda  
 >**Created:** 2026-04-13  
@@ -16,7 +16,7 @@ O objetivo é compreender como o SQL Server gerencia a mídia de backup e como e
 
 ## Hands-on  
 
-[Q0023 – Backup Options and Media Handling](../scripts/Q0023-sql-backup-options-and-media-handling.sql)
+[Q0024 – Backup Options and Media Handling](../scripts/Q0024-sql-backup-options-and-media-handling.sql)
 
 ---
 

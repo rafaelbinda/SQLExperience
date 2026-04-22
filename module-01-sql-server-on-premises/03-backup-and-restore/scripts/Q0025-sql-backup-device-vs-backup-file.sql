@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-04-21
 Version     : 1.0
-Task        : Q0024 - Backup Device vs Backup File
+Task        : Q0025 - Backup Device vs Backup File
 Object      : Script
 Description : Demonstrates the difference between Backup Device and Backup File
               using a dedicated lab database

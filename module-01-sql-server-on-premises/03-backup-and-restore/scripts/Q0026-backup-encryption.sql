@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-04-21
 Version     : 1.0
-Task        : Q0025 - Backup Encryption
+Task        : Q0026 - Backup Encryption
 Object      : Script
 Description : Demonstrates backup encryption and restore scenarios, including
               failure without certificate and successful restore after import

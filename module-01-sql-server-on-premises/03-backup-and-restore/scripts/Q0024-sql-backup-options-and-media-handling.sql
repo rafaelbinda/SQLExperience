@@ -3,7 +3,7 @@
 Author      : Rafael Binda
 Created     : 2026-04-21
 Version     : 1.0
-Task        : Q0023 - Backup Options and Media Handling
+Task        : Q0024 - Backup Options and Media Handling
 Object      : Script
 Description : Demonstrates backup options and media behavior including FORMAT,
               INIT, NOINIT, COMPRESSION, CHECKSUM and COPY_ONLY

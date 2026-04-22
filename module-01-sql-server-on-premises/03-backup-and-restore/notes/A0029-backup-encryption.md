@@ -1,7 +1,7 @@
-# A0028 – Backup Encryption (Criptografia de Backup)  
+# A0029 – Backup Encryption  
 Author: Rafael Binda  
 Created: 2026-04-17  
-Version: 1.1  
+Version: 1.0  
 
 ---
 
@@ -18,7 +18,7 @@ Esse recurso é essencial em cenários onde backups são armazenados fora do amb
 
 ## Hands-on   
 
-[Q0025 – Backup Encryption](../scripts/Q0025-backup-encryption.sql)
+[Q0026 – Backup Encryption](../scripts/Q0026-backup-encryption.sql)
 
 ---
 
