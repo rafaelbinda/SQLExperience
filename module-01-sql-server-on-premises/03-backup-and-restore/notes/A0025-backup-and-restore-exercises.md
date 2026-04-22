@@ -502,6 +502,98 @@ Evento de falha:
 
 ---
 
+## Cenário 11 - Recuperação até ponto específico (STOPAT)
+
+### Estratégia  
+
+- RECOVERY MODEL FULL  
+- BACKUP FULL diário às 18:00  
+- BACKUP LOG em intervalos regulares  
+
+### Linha do tempo:  
+
+- Segunda-feira 18:00 backup FULL  
+- Terça-feira backups LOG às 08:00 09:00 10:00 e 11:00  
+- Terça-feira 11:15 execução incorreta de DELETE  
+- Terça-feira 11:30 identificação do erro  
+
+### Como recuperar o banco?  
+
+1 - Realizar BACKUP do TAIL LOG WITH NO_TRUNCATE  
+2 - Restore do backup FULL de segunda-feira 18:00 WITH NORECOVERY  
+3 - Restore do backup LOG de terça-feira 08:00 WITH NORECOVERY  
+4 - Restore do backup LOG de terça-feira 09:00 WITH NORECOVERY  
+5 - Restore do backup LOG de terça-feira 10:00 WITH NORECOVERY  
+6 - Restore do backup LOG de terça-feira 11:00 WITH NORECOVERY  
+7 - Restore do TAIL LOG WITH STOPAT 'Terça-feira 11:14:59' WITH RECOVERY  
+
+### Resultado:  
+
+- O banco é restaurado para o momento imediatamente anterior ao erro  
+- A operação incorreta de DELETE não é aplicada  
+
+### Análise final:  
+
+- STOPAT permite controle preciso baseado em data e hora  
+- Depende da identificação correta do momento do erro  
+- O TAIL LOG garante a recuperação das últimas transações antes da falha  
+- Esse cenário é comum em erros operacionais e falhas de aplicação  
+
+---
+
+## Cenário 12 - Recuperação com transação marcada (STOPATMARK / STOPBEFOREMARK)
+
+### Estratégia  
+
+- RECOVERY MODEL FULL  
+- Uso de transações marcadas para controle de deploy  
+- BACKUP FULL e LOG conforme estratégia padrão  
+
+### Linha do tempo:  
+
+- Segunda-feira 18:00 backup FULL  
+- Terça-feira 10:00 início de deploy com transação marcada (Deploy_V1)  
+- Terça-feira 10:05 execução de alterações no banco  
+- Terça-feira 10:10 finalização do deploy  
+- Terça-feira 10:30 identificação de problema no deploy  
+
+### Como recuperar o banco (STOPATMARK)?  
+
+1 - Realizar BACKUP do TAIL LOG WITH NO_TRUNCATE  
+2 - Restore do backup FULL WITH NORECOVERY  
+3 - Restore dos LOGs necessários WITH NORECOVERY  
+4 - Restore do LOG WITH STOPATMARK 'Deploy_V1' WITH RECOVERY  
+
+### Resultado:  
+
+- O banco é restaurado até o ponto da execução da transação marcada  
+- As alterações do deploy são incluídas  
+
+---
+
+### Como recuperar o banco (STOPBEFOREMARK)?  
+
+1 - Realizar BACKUP do TAIL LOG WITH NO_TRUNCATE  
+2 - Restore do backup FULL WITH NORECOVERY  
+3 - Restore dos LOGs necessários WITH NORECOVERY  
+4 - Restore do LOG WITH STOPBEFOREMARK 'Deploy_V1' WITH RECOVERY  
+
+### Resultado:  
+
+- O banco é restaurado antes da execução da transação marcada  
+- As alterações do deploy não são aplicadas  
+
+---
+
+### Análise final:  
+
+- STOPATMARK e STOPBEFOREMARK permitem controle preciso baseado em transações  
+- São mais confiáveis que STOPAT em cenários de deploy controlado  
+- Não dependem de horário exato, mas sim de um ponto lógico definido  
+- O uso de transações marcadas é uma prática avançada e recomendada em processos críticos  
+
+---
+
 ## Observações gerais  
 
 - Sempre manter a cadeia de backup íntegra  
