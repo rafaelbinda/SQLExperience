@@ -7,7 +7,7 @@ Task        : Q0026 - Backup Encryption
 Object      : Script
 Description : Demonstrates backup encryption and restore scenarios, including
               failure without certificate and successful restore after import
-Notes       : 03-backup-and-restore/notes/A0028-backup-encryption.md
+Notes       : 03-backup-and-restore/notes/A0029-backup-encryption.md
 ===============================================================================
 
 INDEX
