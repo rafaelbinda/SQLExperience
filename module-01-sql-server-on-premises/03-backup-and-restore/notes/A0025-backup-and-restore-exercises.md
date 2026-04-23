@@ -14,7 +14,10 @@ Todos os cenários seguem o mesmo padrão com estratégia linha do tempo sequên
 ---
 ## Hands-on
 
-[Q0022 – Tail Log Backup (NO_TRUNCATE)](../scripts/Q0022-sql-tail-log-backup.sql)
+[Q0022 – Tail Log Backup (NO_TRUNCATE)](../scripts/Q0022-sql-tail-log-backup.sql)   
+[INST-Q0013 – Tail Log and Recovery Investigation](../../../dba-scripts/SQL-instance-information/INST-Q0013-tail-log-and-recovery-investigation.sql)  
+[INST-Q0014 – Tail Log and Recovery Readiness](../../../dba-scripts/SQL-instance-information/INST-Q0014-tail-log-and-recovery-readiness.sql)  
+
 
 ---
 
