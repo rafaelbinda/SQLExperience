@@ -19,6 +19,7 @@ Esse recurso é essencial em cenários onde backups são armazenados fora do amb
 ## Hands-on   
 
 [Q0026 – Backup Encryption](../scripts/Q0026-backup-encryption.sql)
+[INST-Q0018 – Backup Encryption and Certificate Validation](../../../dba-scripts/SQL-instance-information/INST-Q0018-backup-encryption-and-certificate-validation.sql)
 
 ---
 
