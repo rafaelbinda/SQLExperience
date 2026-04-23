@@ -17,8 +17,7 @@ Este material apresenta os conceitos fundamentais de recuperação de dados no S
 [Q0021 – Restore with STANDBY](../scripts/Q0021-sql-restore-standby.sql)  
 [INST-Q0012 – Backup Chain and Restore Sequence Inspection](../../../dba-scripts/SQL-instance-information/INST-Q0012-backup-chain-and-restore-sequence-inspection.sql)  
 [INST-Q0013 – Tail Log and Recovery Investigation](../../../dba-scripts/SQL-instance-information/INST-Q0013-tail-log-and-recovery-investigation.sql)  
-[INST-Q0014 – Tail Log and Recovery Readiness](../../../dba-scripts/SQL-instance-information/INST-Q0014-tail-log-and-recovery-readiness.sql)  
-[INST-Q0015 – Point-in-Time and Marked Transaction Inspection](../../../dba-scripts/SQL-instance-information/INST-Q0015-point-in-time-and-marked-transaction-inspection.sql)
+[INST-Q0014 – Tail Log and Recovery Readiness](../../../dba-scripts/SQL-instance-information/INST-Q0014-tail-log-and-recovery-readiness.sql)   
 
 ---
 
