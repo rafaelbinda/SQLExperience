@@ -12,7 +12,8 @@ Este material apresenta os conceitos fundamentais de backup no SQL Server, inclu
 ---
 ## Hands-on
 
-[Q0019 – Backup FULL / DIFFERENTIAL / LOG](../scripts/Q0019-sql-backup-full-differential-log.sql)
+[Q0019 – Backup FULL / DIFFERENTIAL / LOG](../scripts/Q0019-sql-backup-full-differential-log.sql)  
+[INST-Q0016 – Backup Media and History Analysis](../../../dba-scripts/SQL-instance-information/INST-Q0016-backup-media-and-history-analysis.sql)
 
 ---
 

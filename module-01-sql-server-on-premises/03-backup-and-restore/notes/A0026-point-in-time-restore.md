@@ -17,7 +17,8 @@ O objetivo é compreender como o SQL Server utiliza o transaction log para recon
 
 ## Hands-on  
 
-[Q0023 – Point-in-Time Restore and Marked Transactions](../scripts/Q0023-sql-point-in-time-restore.sql)
+[Q0023 – Point-in-Time Restore and Marked Transactions](../scripts/Q0023-sql-point-in-time-restore.sql)  
+[INST-Q0015 – Point-in-Time and Marked Transaction Inspection](../../../dba-scripts/SQL-instance-information/INST-Q0015-point-in-time-and-marked-transaction-inspection.sql)
 
 ---
 
