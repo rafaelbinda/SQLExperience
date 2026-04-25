@@ -99,13 +99,43 @@ Impacto:
 - Reduz tempo de escrita em disco  
 - Pode reduzir tempo de restore  
 
-Trade-off:
+#### Configuração de Compressão Padrão
 
-- Aumenta consumo de CPU durante o backup  
+O SQL Server pode ser configurado para utilizar compressão de backup por padrão em nível de instância
 
-Observação:
+```sql
+EXEC sp_configure 'show advanced options', 1;
+RECONFIGURE;
 
-- Em ambientes com gargalo de I/O, costuma trazer ganho significativo  
+EXEC sp_configure 'backup compression default', 1;
+RECONFIGURE;
+```
+
+##### Comportamento
+
+- Quando habilitado, todos os backups passam a utilizar compressão por padrão
+- Reduz o consumo de espaço em disco
+- Diminui a quantidade de I/O durante o processo de backup
+- Em muitos cenários, pode melhorar o tempo de execução
+
+#### Considerações
+
+- A compressão aumenta o consumo de CPU
+- O impacto depende do workload e da capacidade do servidor
+- Em ambientes com gargalo de I/O, costuma trazer ganho significativo
+- Pode ser sobrescrita no comando de backup:
+
+```sql
+BACKUP DATABASE ExamplesDB
+TO DISK = 'C:\Backup.bak'
+WITH NO_COMPRESSION;
+```
+
+#### Observação
+
+- A configuração é aplicada em nível de instância
+- Afeta todos os backups realizados após a alteração
+- Recomenda-se validar impacto em ambientes de produção antes de habilitar
 
 ---
 
