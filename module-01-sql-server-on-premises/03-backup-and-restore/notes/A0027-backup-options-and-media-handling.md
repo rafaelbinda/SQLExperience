@@ -2,7 +2,7 @@
 
 >**Author:** Rafael Binda  
 >**Created:** 2026-04-13  
->**Version:** 1.0  
+>**Version:** 3.0  
 
 ---
 
@@ -199,3 +199,41 @@ Uso típico:
 [Mais informações sobre COPY_ONLY – ver item 7](A0023-backup-fundamentals.md)
 
 ---
+
+## Permissões para backup em diretório de rede
+
+Quando o backup é gravado em um diretório de rede ou em uma pasta compartilhada, o SQL Server precisa ter permissão de escrita no destino  
+É importante lembrar que quem grava o arquivo de backup não é o usuário conectado no SSMS, mas sim a conta de serviço utilizada pela instância do SQL Server  
+Em cenários com múltiplas instâncias ou múltiplos servidores, pode ser necessário criar contas específicas para separar permissões por instância  
+
+Exemplo conceitual:
+- Instância 1 grava backups em `S:\DATABASES\backup\instancia1`
+- Instância 2 grava backups em `S:\DATABASES\backup\instancia2`
+- Cada instância utiliza uma conta diferente com permissão apenas no seu diretório
+
+### Exemplo com PowerShell
+
+O exemplo abaixo cria usuários locais e concede permissão de modificação em pastas específicas
+
+```powershell
+$pass1 = ConvertTo-SecureString "StrongPassword_1" -AsPlainText -Force
+$pass2 = ConvertTo-SecureString "StrongPassword_2" -AsPlainText -Force
+
+# Create local users
+New-LocalUser -Name "USRSQL1" -Password $pass1 -FullName "USRSQL1" -Description "Conta para backup SQL instância 1"
+New-LocalUser -Name "USRSQL2" -Password $pass2 -FullName "USRSQL2" -Description "Conta para backup SQL instância 2"
+
+# Grant Modify permission to each user in the specific backup folder
+icacls "S:\DATABASES\backup\instancia1" /grant "USRSQL1:(OI)(CI)M" /T
+icacls "S:\DATABASES\backup\instancia2" /grant "USRSQL2:(OI)(CI)M" /T
+```
+
+### Observações importantes
+
+- A senha usada no exemplo deve ser substituída por uma senha segura
+- Evite deixar senhas reais documentadas em arquivos do repositório
+- A conta configurada no serviço do SQL Server deve ter permissão no destino do backup
+- Permissão `Modify` permite criar, alterar e excluir arquivos dentro da pasta
+- Em ambiente de domínio, prefira contas de domínio ou contas de serviço gerenciadas quando aplicável
+- Para caminhos UNC, utilize o formato `\\servidor\compartilhamento\pasta`
+- Sempre teste a escrita do backup no destino antes de depender dele em produção
