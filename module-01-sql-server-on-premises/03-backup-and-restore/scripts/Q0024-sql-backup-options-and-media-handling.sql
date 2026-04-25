@@ -19,6 +19,7 @@ INDEX
 6 - Backup with COMPRESSION and CHECKSUM
 7 - Backup with COPY_ONLY
 8 - Validate backup history in msdb
+9 - Configure backup compression default
 ===============================================================================
 */
 
@@ -361,3 +362,39 @@ ExamplesDB_BackupRestore	2026-04-20 19:55:31.000	    2026-04-20 19:55:31.000	   
 ExamplesDB_BackupRestore	2026-04-20 19:43:10.000	    2026-04-20 19:43:10.000	    D	    FULL	            0	            SRVSQLSERVER\USRSQLSERVER	C:\Backups\ExamplesDB_BackupRestore.bak
 */
 
+-------------------------------------------------------------------------------
+-- 9 - Configure backup compression default
+-------------------------------------------------------------------------------
+/*
+Note:
+- Defines whether backup compression is enabled by default at the instance level
+- Does NOT affect existing backups
+- Applies to all future backup operations
+
+Behavior:
+- When enabled, backups use compression automatically
+- Can be overridden at command level (WITH NO_COMPRESSION)
+
+Important:
+- Compression reduces disk usage and I/O
+- May increase CPU consumption
+- Recommended to validate impact in production environments
+*/
+
+-- Check current configuration
+EXEC sp_configure 'backup compression default';
+GO
+
+-- Enable advanced options (required)
+EXEC sp_configure 'show advanced options', 1;
+RECONFIGURE;
+GO
+
+-- Enable backup compression by default
+EXEC sp_configure 'backup compression default', 1;
+RECONFIGURE;
+GO
+
+-- Validate configuration
+EXEC sp_configure 'backup compression default';
+GO
