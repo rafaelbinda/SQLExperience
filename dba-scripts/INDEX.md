@@ -35,6 +35,18 @@ providing quick access based on common DBA scenarios.
 
 ---
 
+## Backup and Restore (Recovery Engineering)
+
+- [INST-Q0012 – Backup Chain and Restore Sequence Inspection](SQL-instance-information/INST-Q0012-backup-chain-and-restore-sequence-inspection.sql)  
+- [INST-Q0013 – Tail Log and Recovery Investigation](SQL-instance-information/INST-Q0013-tail-log-and-recovery-investigation.sql)  
+- [INST-Q0014 – Tail Log and Recovery Readiness](SQL-instance-information/INST-Q0014-tail-log-and-recovery-readiness.sql)  
+- [INST-Q0015 – Point-in-Time and Marked Transaction Inspection](SQL-instance-information/INST-Q0015-point-in-time-and-marked-transaction-inspection.sql)  
+- [INST-Q0016 – Backup Media and History Analysis](SQL-instance-information/INST-Q0016-backup-media-and-history-analysis.sql)  
+- [INST-Q0017 – Backup Device Inspection](SQL-instance-information/INST-Q0017-backup-device-inspection.sql)  
+- [INST-Q0018 – Backup Encryption and Certificate Validation](SQL-instance-information/INST-Q0018-backup-encryption-and-certificate-validation.sql)
+
+---
+
 ## Security  
 
 - [INST-Q0010 – Transparent Data Encryption Overview](SQL-instance-information/INST-Q0010-transparent-data-encryption-overview.sql)  
