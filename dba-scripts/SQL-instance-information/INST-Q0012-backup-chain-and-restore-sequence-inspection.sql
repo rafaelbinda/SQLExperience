@@ -2,16 +2,17 @@
 ===============================================================================
 Author      : Rafael Binda
 Created     : 2026-04-22
-Version     : 2.0
+Version     : 3.0
 Task        : INST-Q0012 - Backup Chain and Restore Sequence Inspection
 Object      : Script
-Description : Queries to analyze backup chain, restore sequence, LSN continuity,
-              differential base, backup media, compression, and restore readiness
-              for a database since the latest FULL backup
+Description : Description : Queries to analyze backup chain, restore sequence, LSN continuity,
+              differential base, and restore readiness for a database since the
+              latest FULL backup
 Notes       : 03-backup-and-restore/notes/A0023-backup-fundamentals.md
               03-backup-and-restore/notes/A0024-recovery-and-restore-fundamentals.md
 Examples    : 03-backup-and-restore/scripts/Q0019-sql-backup-full-differential-log.sql
               03-backup-and-restore/scripts/Q0020-sql-restore-norecovery-recovery.sql
+              03-backup-and-restore/scripts/Q0021-sql-restore-standby.sql
 ===============================================================================
 
 INDEX
@@ -24,6 +25,7 @@ INDEX
 7  - Analyze LOG chain continuity since latest FULL
 8  - Identify FULL backup base for each DIFFERENTIAL backup
 9  - Evaluate restore readiness
+10 - Reference restore examples
 ===============================================================================
 */
 
@@ -382,3 +384,34 @@ LEFT JOIN LatestDiff AS ld
 LEFT JOIN LatestLog AS ll
     ON 1 = 1;
 GO
+
+-------------------------------------------------------------------------------
+-- 10 - Reference restore examples
+-------------------------------------------------------------------------------
+/*
+→ This script focuses on backup chain inspection and restore readiness analysis
+→ It does NOT execute restore operations
+
+For practical restore execution examples, refer to:
+
+- Q0019 - Backup FULL / DIFFERENTIAL / LOG
+- Q0020 - Restore with NORECOVERY / RECOVERY
+- Q0021 - Restore with STANDBY
+
+Typical restore sequence:
+
+1. RESTORE DATABASE ... WITH NORECOVERY      -- FULL
+2. RESTORE DATABASE ... WITH NORECOVERY      -- DIFFERENTIAL (optional)
+3. RESTORE LOG ... WITH NORECOVERY           -- LOG sequence
+4. RESTORE LOG ... WITH RECOVERY             -- Final step
+
+Important:
+- RECOVERY must be executed only at the final step
+- Executing RECOVERY prematurely requires restarting the entire restore process
+- Use STANDBY when read-only access between restores is required
+
+For full executable scripts, see:
+03-backup-and-restore/scripts/Q0019-sql-backup-full-differential-log.sql
+03-backup-and-restore/scripts/Q0020-sql-restore-norecovery-recovery.sql
+03-backup-and-restore/scripts/Q0021-sql-restore-standby.sql
+*/

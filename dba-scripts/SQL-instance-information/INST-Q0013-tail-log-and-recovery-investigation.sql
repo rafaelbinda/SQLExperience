@@ -21,7 +21,7 @@ INDEX
 4 - Measure exposure since last LOG backup
 5 - Review log reuse and log file status
 6 - Evaluate tail log backup applicability
-7 - Review tail log backup command examples
+7 - Reference tail log backup example
 ===============================================================================
 */
 
@@ -163,6 +163,7 @@ Interpretation:
     FROM msdb.dbo.backupset
     WHERE database_name = @DATABASE
     AND type = 'L'
+    AND (@LASTFULL IS NULL OR backup_start_date >= @LASTFULL)
     ORDER BY backup_finish_date DESC, backup_set_id DESC
 )
 SELECT
@@ -245,6 +246,7 @@ LatestLogBackup AS
     FROM msdb.dbo.backupset
     WHERE database_name = @DATABASE
     AND type = 'L'
+    AND (@LASTFULL IS NULL OR backup_start_date >= @LASTFULL)
     ORDER BY backup_finish_date DESC, backup_set_id DESC
 )
 SELECT
@@ -279,38 +281,33 @@ LEFT JOIN LatestLogBackup AS llb
     ON 1 = 1;
 
 -------------------------------------------------------------------------------
--- 7 - Review tail log backup command examples
+-- 7 - Reference tail log backup example
 -------------------------------------------------------------------------------
 /*
-→ These examples are intentionally commented.
+→ This script focuses on Tail Log investigation and decision-making
+→ It does NOT execute BACKUP LOG commands
+
+For practical Tail Log execution examples, refer to:
+
+- Q0022 - Tail Log Backup (NO_TRUNCATE)
+
+Typical Tail Log decision points:
+
+1. Database online and restore will start immediately
+   → Consider BACKUP LOG ... WITH NORECOVERY
+
+2. Database damaged but transaction log is still accessible
+   → Consider BACKUP LOG ... WITH NO_TRUNCATE
+
+3. Severe failure scenario with possible read errors
+   → Consider CONTINUE_AFTER_ERROR only when required
 
 Important:
-- Validate the restore scenario before executing any command
-- Adjust file paths before use
-- Use WITH NORECOVERY when the database is online and you want to leave it ready
-  for restore
-- Use WITH NO_TRUNCATE when the database is damaged but the log file is still
-  accessible
-- Use CONTINUE_AFTER_ERROR only when required by the failure scenario
-*/
+- Tail Log Backup depends on the failure scenario
+- The transaction log file must be available
+- Use INST-Q0012 to validate the complete restore sequence
+- Use Q0022 for the executable hands-on flow
 
-/*
--- Scenario 1: Database is online and will be restored after the tail log backup
-BACKUP LOG [ExamplesDB_BackupRestore]
-TO DISK = 'C:\SQLBackups\ExamplesDB_BackupRestore_TailLog.trn'
-WITH NORECOVERY, INIT, COMPRESSION, CHECKSUM, STATS = 10;
-GO
-
--- Scenario 2: Database is damaged, but the transaction log is still accessible
-BACKUP LOG [ExamplesDB_BackupRestore]
-TO DISK = 'C:\SQLBackups\ExamplesDB_BackupRestore_TailLog.trn'
-WITH NO_TRUNCATE, INIT, COMPRESSION, CHECKSUM, STATS = 10;
-GO
-
--- Scenario 3: Severe failure scenario, only when necessary
-BACKUP LOG [ExamplesDB_BackupRestore]
-TO DISK = 'C:\SQLBackups\ExamplesDB_BackupRestore_TailLog.trn'
-WITH NO_TRUNCATE, CONTINUE_AFTER_ERROR, INIT, COMPRESSION, CHECKSUM, STATS = 10;
-GO
-*/
-GO
+For the full executable script, see:
+03-backup-and-restore/scripts/Q0022-sql-tail-log-backup.sql
+*/ 

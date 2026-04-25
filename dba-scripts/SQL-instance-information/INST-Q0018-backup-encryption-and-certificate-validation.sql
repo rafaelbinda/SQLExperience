@@ -5,9 +5,10 @@ Created     : 2026-04-22
 Version     : 1.0
 Task        : INST-Q0018 - Backup Encryption and Certificate Validation
 Object      : Script
-Description : Queries to validate encrypted backups, certificate availability,
-              and restore readiness in encrypted environments
+Description : Queries to evaluate encrypted backups, certificate availability, 
+              and restore risk in encrypted environments
 Notes       : 03-backup-and-restore/notes/A0029-backup-encryption.md
+Examples    : 03-backup-and-restore/scripts/Q0026-backup-encryption.sql
 Reference   : 02-administration/notes/A0020-transparent-data-encryption.md
               INST-Q0010 - Transparent Data Encryption Overview
 ===============================================================================
@@ -19,6 +20,7 @@ INDEX
 4 - Identify backups from encrypted databases
 5 - Evaluate restore risk without certificate
 6 - Validate tempdb encryption behavior
+7 - Reference backup encryption examples
 ===============================================================================
 */
 
@@ -64,7 +66,7 @@ GO
 -- 3 - Validate certificate availability
 -------------------------------------------------------------------------------
 /*
-→ Critical for restore of encrypted backups
+→ Required to successfully restore encrypted backups
 */
 
 SELECT

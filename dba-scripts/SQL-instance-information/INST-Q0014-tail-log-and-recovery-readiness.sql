@@ -5,15 +5,16 @@ Created     : 2026-04-22
 Version     : 1.0
 Task        : INST-Q0014 - Tail Log and Recovery Readiness (All Databases)
 Object      : Script
-Description : Evaluates tail log necessity and recovery readiness across all
-              user databases based on recovery model and backup history
+Description : Evaluates tail log exposure and recovery risk across all user
+              databases based on recovery model and latest LOG backup history
 Notes       : 03-backup-and-restore/notes/A0024-recovery-and-restore-fundamentals.md
               03-backup-and-restore/notes/A0025-backup-and-restore-exercises.md
+Related     : INST-Q0013 - Tail Log and Recovery Investigation
 ===============================================================================
 
 INDEX
 1 - Identify latest LOG backup per database
-2 - Evaluate recovery readiness
+2 - Evaluate tail log exposure and recovery risk
 3 - Highlight potential risk scenarios
 ===============================================================================
 */
@@ -36,7 +37,7 @@ WITH LatestLogBackup AS
 )
 
 -------------------------------------------------------------------------------
--- 2 - Evaluate recovery readiness
+-- 2 - Evaluate tail log exposure and recovery risk
 -------------------------------------------------------------------------------
 
 SELECT
@@ -91,18 +92,32 @@ GO
 Interpretation:
 
 HIGH RISK
-- No log backup history in FULL/BULK_LOGGED
-- Cannot perform point-in-time restore
+- No LOG backup history in FULL/BULK_LOGGED recovery model
+- LOG chain is broken or does not exist
+- Point-in-time restore is NOT possible
 
 MEDIUM RISK
-- Log backups exist but are outdated
-- Possible data loss window
+- LOG backups exist but are outdated
+- Increased exposure to potential data loss
+- Recovery window may be larger than expected
 
 LOW RISK
-- Recent log backups exist
-- Recovery window is controlled
+- Recent LOG backups exist
+- LOG chain is active and recovery window is controlled
 
-TAIL LOG MAY BE REQUIRED
-- Indicates that if a failure occurs, tail log backup should be considered
-- Depends on database accessibility at failure time
+TAIL LOG CONSIDERATION
+- Indicates that a Tail Log Backup may be required in case of failure
+- Depends on database state at failure time (ONLINE, SUSPECT, OFFLINE)
+- Requires transaction log file availability
+
+-------------------------------------------------------------------------------
+Scope:
+
+This script provides an all-database overview only.
+
+For detailed investigation of a specific database, use:
+- INST-Q0013 - Tail Log and Recovery Investigation
+
+For complete backup chain validation, use:
+- INST-Q0012 - Backup Chain and Restore Sequence Inspection
 */

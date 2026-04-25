@@ -211,108 +211,30 @@ ORDER BY device_risk_status, bd.name;
 GO
 
 -------------------------------------------------------------------------------
--- 8 - Backup device creation and usage examples
+-- 8 - Reference backup device examples
 -------------------------------------------------------------------------------
 /*
-Purpose:
-- Demonstrates how to create, validate, use, and drop a backup device.
-- Backup Device is a logical object registered in master.
-- It points to a physical backup destination.
-- Modern environments often use direct file paths, but backup devices are useful
-  for understanding SQL Server backup metadata and legacy configurations.
+→ This script focuses on registered backup device inspection
+→ It does NOT execute backup device creation, backup, or drop commands
+
+For practical backup device examples, refer to:
+
+- Q0025 - Backup Device vs Backup File
+
+Covered hands-on topics:
+1. Create backup device with sp_addumpdevice
+2. Execute backup using a registered backup device
+3. Execute backup using a direct physical file path
+4. Compare backup device usage versus direct file usage
+5. Validate backup metadata using RESTORE HEADERONLY
+6. Validate media metadata using RESTORE LABELONLY
+7. Drop backup device with sp_dropdevice
 
 Important:
-- Adjust paths before executing.
-- These examples are commented to avoid accidental changes.
-*/
+- INST-Q0017 inspects registered backup devices from sys.backup_devices
+- INST-Q0016 analyzes backup media/history from msdb
+- Q0025 demonstrates the operational difference between Backup Device and Backup File
 
-/*
--------------------------------------------------------------------------------
--- Example 1 - Drop existing backup device if it exists
--------------------------------------------------------------------------------
-
-USE master;
-GO
-
-IF EXISTS
-(
-    SELECT 1
-    FROM sys.backup_devices
-    WHERE name = N'BackupDevice_ExamplesDB_BackupRestore'
-)
-BEGIN
-    EXEC master.dbo.sp_dropdevice
-        @logicalname = N'BackupDevice_ExamplesDB_BackupRestore';
-END;
-GO
-
--------------------------------------------------------------------------------
--- Example 2 - Create backup device
--------------------------------------------------------------------------------
-
-EXEC master.dbo.sp_addumpdevice
-    @devtype = N'disk',
-    @logicalname = N'BackupDevice_ExamplesDB_BackupRestore',
-    @physicalname = N'C:\Backups\ExamplesDB_BackupRestore_Device.bak';
-GO
-
--------------------------------------------------------------------------------
--- Example 3 - Validate backup device registration
--------------------------------------------------------------------------------
-
-SELECT
-name,
-physical_name,
-type_desc
-FROM sys.backup_devices
-WHERE name = N'BackupDevice_ExamplesDB_BackupRestore';
-GO
-
--------------------------------------------------------------------------------
--- Example 4 - Execute backup using registered backup device
--------------------------------------------------------------------------------
-
-BACKUP DATABASE ExamplesDB_BackupRestore
-TO BackupDevice_ExamplesDB_BackupRestore
-WITH
-    INIT,
-    COMPRESSION,
-    CHECKSUM,
-    STATS = 10;
-GO
-
--------------------------------------------------------------------------------
--- Example 5 - Inspect backup generated through device physical path
--------------------------------------------------------------------------------
-
-RESTORE HEADERONLY
-FROM DISK = N'C:\Backups\ExamplesDB_BackupRestore_Device.bak';
-GO
-
-RESTORE LABELONLY
-FROM DISK = N'C:\Backups\ExamplesDB_BackupRestore_Device.bak';
-GO
-
--------------------------------------------------------------------------------
--- Example 6 - Drop backup device registration
--------------------------------------------------------------------------------
--- Note:
--- sp_dropdevice removes the registered logical device.
--- The physical backup file is not deleted unless @delfile = 'delfile' is used.
--------------------------------------------------------------------------------
-
-EXEC master.dbo.sp_dropdevice
-    @logicalname = N'BackupDevice_ExamplesDB_BackupRestore';
-GO
-
--------------------------------------------------------------------------------
--- Example 7 - Drop backup device and delete physical file
--------------------------------------------------------------------------------
--- Use with caution.
--------------------------------------------------------------------------------
-
-EXEC master.dbo.sp_dropdevice
-    @logicalname = N'BackupDevice_ExamplesDB_BackupRestore',
-    @delfile = N'delfile';
-GO
+For the full executable script, see:
+03-backup-and-restore/scripts/Q0025-sql-backup-device-vs-backup-file.sql
 */

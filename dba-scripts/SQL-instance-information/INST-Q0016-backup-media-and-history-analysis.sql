@@ -8,6 +8,7 @@ Object      : Script
 Description : Analyze backup files, media usage, compression, and distribution
               for a specific database since the latest FULL backup
 Notes       : 03-backup-and-restore/notes/A0023-backup-fundamentals.md
+Examples    : 03-backup-and-restore/scripts/Q0024-sql-backup-options-and-media-handling.sql
 Related     : INST-Q0012 - Backup Chain and Restore Sequence Inspection
 ===============================================================================
 
@@ -17,7 +18,8 @@ INDEX
 3 - List backup files used since last FULL
 4 - Identify multiple backups in the same file
 5 - Analyze compression and size
-6 - Detect lastest 5 FULL backup growth trend
+6 - Detect latest 5 FULL backup growth trend
+7 - Reference backup media handling examples
 */
 
 USE msdb;
@@ -191,3 +193,34 @@ CASE
 END AS growth_status
 FROM LatestFullBackups
 ORDER BY backup_start_date ASC;
+
+-------------------------------------------------------------------------------
+-- 7 - Reference backup media handling examples
+-------------------------------------------------------------------------------
+/*
+→ This script focuses on backup media and history inspection
+→ It does NOT execute backup commands
+
+For practical backup media handling examples, refer to:
+
+- Q0024 - Backup Options and Media Handling
+
+Covered hands-on topics:
+1. FORMAT
+2. INIT
+3. NOINIT
+4. COMPRESSION
+5. CHECKSUM
+6. COPY_ONLY
+7. RESTORE HEADERONLY
+8. RESTORE LABELONLY
+
+Important:
+- INST-Q0016 analyzes backup history and media usage from msdb
+- Q0024 demonstrates how backup options affect backup media behavior
+- Backup chain validation belongs to INST-Q0012
+- Backup device inspection belongs to INST-Q0017
+
+For the full executable script, see:
+03-backup-and-restore/scripts/Q0024-sql-backup-options-and-media-handling.sql
+*/
