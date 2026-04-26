@@ -64,7 +64,7 @@ dba-scripts/
 │   │   ├── scripts/
 │   │   └── tools/
 │   │
-│   ├── 04-recovery-databases/
+│   ├── 04-database-recovery/
 │   ├── 05-tables-and-indexes/
 │   ├── 06-security/
 │   ├── 07-in-memory-oltp/
