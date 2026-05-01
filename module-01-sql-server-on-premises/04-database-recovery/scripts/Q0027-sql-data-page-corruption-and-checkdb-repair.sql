@@ -9,7 +9,7 @@ Description : Creates a dedicated lab database to demonstrate data page
               corruption detection using PAGE_VERIFY, DBCC IND, DBCC PAGE,
               DBCC WRITEPAGE, suspect_pages and DBCC CHECKDB repair with
               REPAIR_ALLOW_DATA_LOSS
-Notes       : notes/A0030-database-corruption-and-dbcc-checkdb.md
+Notes       : 04-database-recovery/notes/A0030-database-corruption-and-dbcc-checkdb.md
 ===============================================================================
 INDEX
 1  - Important warning
