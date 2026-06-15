@@ -1,141 +1,123 @@
-# 📊 SQL Server DBA Study Repository
+# SQL Server DBA Study Repository
 
-![SQL
-Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
+![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure-0089D6?style=for-the-badge&logo=microsoft-azure&logoColor=white)
 
-------------------------------------------------------------------------
+---
 
-## 📌 Overview
+## Overview
 
-This repository contains structured SQL Server study materials, scripts,
-and architectural notes developed during my continuous learning journey.
+Structured SQL Server study materials — scripts, notes, and architectural
+references developed during my continuous DBA learning journey.
 
-------------------------------------------------------------------------
+---
 
-## 🎯 Purpose
+## Technical Scope
 
--   Centralize SQL Server study scripts
--   Maintain structured technical documentation
--   Simulate enterprise database architecture practices
--   Track long-term technical evolution
+- Microsoft SQL Server (On-Premises)
+- Azure SQL Database / Managed Instance
+- T-SQL Development and Query Optimization
+- Storage Architecture and Backup & Recovery
+- High Availability and Replication
 
-------------------------------------------------------------------------
+---
 
-## 🏗️ Technical Scope
+## Prerequisites
 
-Focused exclusively on Microsoft ecosystem technologies:
+- SQL Server 2019 or later (some scripts use features introduced in 2019+)
+- SQL Server Management Studio (SSMS) or Azure Data Studio
+- `sysadmin` or equivalent permissions for lab scripts that use DBCC commands
 
--   Microsoft SQL Server (On-Premises)
--   Azure SQL Database
--   Azure SQL Managed Instance
--   T-SQL Development
--   Query Optimization
--   Storage Architecture
--   Backup & Recovery Strategies
--   High Availability Concepts
+---
 
-------------------------------------------------------------------------
+## Repository Structure
 
-## 📂 Repository Architecture
-
-``` text
-dba-scripts/
+```text
+C:\GitHub\
 │
-├── SQL-connections/
-├── SQL-examples/
-├── SQL-instance-information/
-├── SQL-programming-objects/
-├── SQL-transactions-and-concurrency
+├── dba-scripts/                          ← Reusable monitoring and investigation utilities
+│   ├── SQL-connections/
+│   ├── SQL-examples/
+│   ├── SQL-instance-information/
+│   ├── SQL-programming-objects/
+│   └── SQL-transactions-and-concurrency/
 │
-├── module-01-sql-on-premises/
-│   ├── 01-sql-introduction/
-│   │   ├── notes/        → Study notes (chronological order)
-│   │   ├── scripts/      → SQL scripts
-│   │   └── tools/        → Utilities and supporting tools
-│   │
-│   ├── 02-administration/
-│   │   ├── notes/
-│   │   ├── scripts/
-│   │   └── tools/
-│   │
-│   ├── 03-backup-and-restore/
-│   │   ├── notes/
-│   │   ├── scripts/
-│   │   └── tools/
-│   │
-│   ├── 04-database-recovery/
-│   ├── 05-tables-and-indexes/
-│   ├── 06-security/
-│   ├── 07-in-memory-oltp/
-│   ├── 08-automating-tasks/
-│   ├── 09-monitoring-sql-server/
-│   ├── 10-concurrency-control/
-│   ├── 11-high-availability/
-│   └── 12-replication/
-│
-├── module-02-azure-infrastructure/
-├── module-03-azure-sql-server/
-├── module-04-sql-language/
-└── module-05-query-tuning/
-```
+└── module-01-sql-server-on-premises/     ← Hands-on lab exercises
+    ├── 01-sql-introduction/
+    │   ├── notes/     → Study notes (A####)
+    │   ├── scripts/   → Lab scripts (Q####)
+    │   └── tools/     → Utilities and supporting tools
+    ├── 02-administration/
+    ├── 03-backup-and-restore/
+    ├── 04-database-recovery/
+    ├── 05-tables-and-indexes/      [planned]
+    ├── 06-security/                [planned]
+    ├── 07-in-memory-oltp/          [planned]
+    ├── 08-automating-tasks/        [planned]
+    ├── 09-monitoring-sql-server/   [planned]
+    ├── 10-concurrency-control/     [planned]
+    ├── 11-high-availability/       [planned]
+    └── 12-replication/             [planned]
 
-------------------------------------------------------------------------
-
-## 🧩 Naming Convention Standard
-
-``` text
-  Prefix     Meaning
-  ---------- -------------------------
-  A+Number   Notes / Articles
-  Q+Number   Queries / Scripts
-  E+Number   Examples
-  C+Number   Checklists (future use)
-  L+Number   Labs (future use)
-
-Example:
-
-    Q0002-Create-Database.sql
-    E0001-STRING_SPLIT.sql
-    A0007-SQL-Server-Architecture.md
+module-02-azure-infrastructure/     [planned]
+module-03-azure-sql-server/         [planned]
+module-04-sql-language/             [planned]
+module-05-query-tuning/             [planned]
 ```
 
 ---
 
-## 📝 Documentation Header Standard
+## Naming Convention
+
+### Module scripts (`module-01/`)
+
+| Prefix   | Type             | Example                          |
+|----------|------------------|----------------------------------|
+| `Q####`  | Lab script       | `Q0029-page-restore.sql`         |
+| `A####`  | Study note (.md) | `A0031-page-restore.md`          |
+
+### DBA utility scripts (`dba-scripts/`)
+
+| Prefix       | Category                   | Example                               |
+|--------------|----------------------------|---------------------------------------|
+| `INST-Q####` | Instance information       | `INST-Q0021-data-page-inspection.sql` |
+| `CONN-Q####` | Connections                | `CONN-Q0001-active-connections.sql`   |
+| `TRAN-Q####` | Transactions / Concurrency | `TRAN-Q0001-blocking-queries.sql`     |
+| `PROC-Q####` | Stored procedures          | `PROC-Q0001-procedures-metadata.sql`  |
+| `FUNC-Q####` | Functions                  | `FUNC-Q0001-function-metadata.sql`    |
+| `VIEW-Q####` | Views                      | `VIEW-Q0001-view-metadata.sql`        |
+| `TRIG-Q####` | Triggers                   | `TRIG-Q0001-trigger-metadata.sql`     |
+| `E####`      | Standalone example         | `E0001-STRING_SPLIT.sql`              |
+
+Numbers are always 4-digit zero-padded. `Q####` and `A####` are globally
+sequential across all modules.
+
+---
+
+## Script Header Standard
 
 All SQL scripts follow a standardized header:
 
-``` sql
+```sql
+/*
 ===============================================================================
 Author      : Rafael Binda
 Created     : yyyy-mm-dd
 Version     : 1.0
-Task        : -
-Databases   : Databases Name
-Object      : Script | Procedure | Function | View | Notes
+Task        : Q#### - Script Title
+Object      : Script
 Description : -
-Notes       : -
+Notes       : relative/path/to/notes/A####-topic.md
 ===============================================================================
+*/
 ```
 
----
-
-## 🚀 Usage
-
-1.  Navigate to the desired module.
-2.  Review notes before executing scripts.
-3.  Use scripts as lab references.
-4.  Adapt patterns to your own SQL Server test environments.
+DBA utility scripts additionally include `Examples :` and `Related :` fields
+that cross-reference related scripts and notes.
 
 ---
 
-## 📈 Continuous Improvement
+## Continuous Improvement
 
 This repository is continuously updated as new concepts are studied and
 validated in lab environments.
-
----
-
-**Built with discipline, structured thinking, and a long-term DBA
-vision.**
