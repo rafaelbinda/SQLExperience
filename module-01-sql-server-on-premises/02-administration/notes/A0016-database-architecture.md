@@ -1,4 +1,5 @@
 # A0016 – SQL Server Database Architecture
+
 > **Author:** Rafael Binda  
 > **Created:** 2026-03-23  
 > **Version:** 2.0  
@@ -10,6 +11,8 @@
 Este material apresenta os conceitos fundamentais da arquitetura de bancos de dados no SQL Server, abordando estrutura de arquivos, organização interna, métricas de I/O, funcionamento do transaction log, checkpoint, recovery process e recovery models
 
 Esses conceitos formam a base para os módulos seguintes, especialmente nas áreas de administração, desempenho, backup e recuperação de dados
+
+---
 
 ## Hands-on
 
@@ -26,8 +29,6 @@ Todo banco de dados no SQL Server é composto por dois arquivos principais:
 - Arquivo de dados (responsável por armazenar tabelas, índices, procedures e os dados em si)
 - Arquivo de log (responsável por registrar todas as alterações realizadas no banco)
 
----
-
 ### Funcionamento geral
 
 - `SELECT` normalmente não gera entrada no log  
@@ -40,11 +41,9 @@ O transaction log é essencial para garantir:
 
 ---
 
-## 1.0 - Arquivo de dados  
+## 1 - Arquivo de dados  
 
 - Extensões: `.MDF` e `.NDF`
-
----
 
 ### Arquivo primário (.MDF)
 
@@ -164,9 +163,7 @@ Essas métricas são fundamentais para entender comportamento de leitura e escri
 
 ---
 
-## 2.0 - Arquitetura interna de dados  
-
----
+## 2 - Arquitetura interna de dados  
 
 ### Pages (8 KB)
 
@@ -193,8 +190,6 @@ Cada página é composta por:
 
 - Slot array (estrutura de controle que mantém os ponteiros para as linhas dentro da página)  
 
----
-
 ### Tipos principais de páginas
 
 #### Data Page
@@ -215,8 +210,6 @@ Cada página é composta por:
 #### SGAM
 - Indica extents mistos disponíveis  
 
----
-
 ### Extent (64 KB)
 
 - Conjunto de 8 páginas  
@@ -235,7 +228,7 @@ Cada página é composta por:
 
 ---
 
-## 3.0 - CHECKPOINT  
+## 3 - CHECKPOINT  
 
 Processo responsável por persistir dados da memória no disco
 
@@ -279,8 +272,6 @@ Processo responsável por persistir dados da memória no disco
 O recovery process ocorre quando o SQL Server é reiniciado após uma falha inesperada (queda de energia, crash, etc.)  
 Seu objetivo é garantir que o banco de dados volte a um estado consistente, utilizando as informações registradas no transaction log  
 
----
-
 ### Etapas
 
 #### 1 - Analysis
@@ -306,7 +297,7 @@ Objetivo:
 Objetivo:
 - Garantir consistência lógica do banco  
 
-### 4 - Resultado
+#### 4 - Resultado
 
 - O banco de dados retorna a um estado consistente  
 - Todas as transações confirmadas são mantidas  
@@ -315,12 +306,10 @@ Objetivo:
 
 ---
 
-## 4.0 - Transaction Log Internals  
+## 4 - Transaction Log Internals  
 
 O transaction log não é um arquivo contínuo único do ponto de vista interno  
 Ele é dividido em partes menores chamadas **VLF (Virtual Log Files)**, que são utilizadas pelo SQL Server para gerenciar gravação, reutilização e recuperação dos dados
-
----
 
 ### VLF (Virtual Log Files)
 
@@ -382,8 +371,6 @@ Esse comportamento está diretamente relacionado ao recovery model e à realiza�
 - LSN identifica operações  
 - MINLSN define ponto mínimo necessário  
 
----
-
 ### Porções
 
 - Inativa → reutilizável  
@@ -391,7 +378,7 @@ Esse comportamento está diretamente relacionado ao recovery model e à realiza�
 
 ---
 
-## 5.0 - Recovery Model  
+## 5 - Recovery Model  
 
 O recovery model define como o SQL Server gerencia o transaction log e quais tipos de recuperação são possíveis em caso de falha
 
@@ -400,8 +387,6 @@ Ele impacta diretamente:
 - comportamento do transaction log  
 - necessidade de backup  
 - capacidade de recuperação dos dados  
-
----
 
 ### SIMPLE
 
@@ -434,8 +419,6 @@ No modelo SIMPLE, o SQL Server gerencia automaticamente o transaction log
 - Ambientes de desenvolvimento  
 - Testes  
 - Bancos não críticos  
-
----
 
 ### FULL
 
@@ -470,8 +453,6 @@ No modelo FULL, todas as operações são totalmente registradas no transaction 
 - Ambientes de produção  
 - Sistemas críticos  
 - Bancos que exigem recuperação precisa  
-
----
 
 ### BULK LOGGED
 
@@ -511,8 +492,6 @@ O modelo BULK LOGGED é uma variação do FULL, focada em melhorar desempenho em
 - Cargas massivas de dados  
 - Uso temporário em operações específicas  
 
----
-
 ### Comparação resumida
 
 | Modelo       | Backup de Log | Truncamento | Point-in-time | Uso recomendado |
@@ -521,13 +500,12 @@ O modelo BULK LOGGED é uma variação do FULL, focada em melhorar desempenho em
 | FULL         | Sim          | Manual     | Sim          | Produção       |
 | BULK LOGGED  | Sim          | Manual     | Parcial      | Cargas massivas|
 
----
-
 ### Observação importante
 
 - O modelo FULL é o padrão recomendado para ambientes de produção  
 - O modelo SIMPLE simplifica a gestão, mas limita a recuperação  
 - O modelo BULK LOGGED deve ser utilizado com cuidado e, preferencialmente, de forma temporária  
+
 ---
 
 ## Observações finais  
@@ -536,3 +514,12 @@ O modelo BULK LOGGED é uma variação do FULL, focada em melhorar desempenho em
 - CHECKPOINT não substitui backup  
 - I/O impacta diretamente desempenho  
 - Dimensionamento correto é essencial  
+
+---
+
+## Referências
+
+- [Guia de arquitetura e gerenciamento de log de transações](https://learn.microsoft.com/pt-br/sql/relational-databases/sql-server-transaction-log-architecture-and-management-guide?view=sql-server-ver16)
+- [Guia de arquitetura de páginas e extensões](https://learn.microsoft.com/pt-br/sql/relational-databases/pages-and-extents-architecture-guide?view=sql-server-ver16)
+- [Modelos de recuperação (SQL Server)](https://learn.microsoft.com/pt-br/sql/relational-databases/backup-restore/recovery-models-sql-server?view=sql-server-ver16)
+- [CHECKPOINT (Transact-SQL)](https://learn.microsoft.com/pt-br/sql/t-sql/language-elements/checkpoint-transact-sql?view=sql-server-ver16)
