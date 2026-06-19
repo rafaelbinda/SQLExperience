@@ -1,75 +1,78 @@
-# A0020 – Transparent Data Encryption (TDE)  
-Author: Rafael Binda  
-Created: 2026-04-04  
-Version: 1.0  
+# A0020 – Transparent Data Encryption (TDE)
+
+> **Author:** Rafael Binda  
+> **Created:** 2026-04-04  
+> **Version:** 1.0  
 
 ---
 
-## Descrição  
+## Descrição
 
-Este material aborda o recurso Transparent Data Encryption (TDE) no SQL Server, incluindo conceitos, funcionamento, arquitetura de criptografia, configuração prática e boas práticas de administração  
+Este material aborda o recurso Transparent Data Encryption (TDE) no SQL Server, incluindo conceitos, funcionamento, arquitetura de criptografia, configuração prática e boas práticas de administração
 
-O entendimento do TDE é essencial para garantir proteção de dados em repouso, mitigar riscos de exposição de dados sensíveis e atender requisitos de segurança em ambientes corporativos  
+O entendimento do TDE é essencial para garantir proteção de dados em repouso, mitigar riscos de exposição de dados sensíveis e atender requisitos de segurança em ambientes corporativos
 
-Além disso, o uso de criptografia como o TDE contribui para a conformidade com a LGPD (Lei Geral de Proteção de Dados – Lei nº 13.709/2018), especialmente no que diz respeito à proteção de dados pessoais contra acesso não autorizado, perda ou vazamento de informações  
+Além disso, o uso de criptografia como o TDE contribui para a conformidade com a LGPD (Lei Geral de Proteção de Dados – Lei nº 13.709/2018), especialmente no que diz respeito à proteção de dados pessoais contra acesso não autorizado, perda ou vazamento de informações
 
-Embora o TDE não substitua controles de acesso, auditoria ou criptografia em trânsito, ele é um componente fundamental dentro de uma estratégia de segurança da informação alinhada às boas práticas e às exigências legais  
-
----
-
-## Hands-on  
-
-[Q0017 – Transparent Data Encryption (TDE)](../scripts/Q0017-sql-transparent-data-encryption.sql)  
-[INST-Q0010 – Transparent Data Encryption (TDE) Overview](../../../dba-scripts/SQL-instance-information/INST-Q0010-transparent-data-encryption-overview.sql)  
+Embora o TDE não substitua controles de acesso, auditoria ou criptografia em trânsito, ele é um componente fundamental dentro de uma estratégia de segurança da informação alinhada às boas práticas e às exigências legais
 
 ---
 
-## 1 – O que é TDE  
+## Hands-on
+
+[Q0017 - Transparent Data Encryption (TDE)](../scripts/Q0017-sql-transparent-data-encryption.sql)  
+[INST-Q0010 - Transparent Data Encryption (TDE) Overview](../../../dba-scripts/SQL-instance-information/INST-Q0010-transparent-data-encryption-overview.sql)
+
+---
+
+## 1 - O que é TDE
 
 O Transparent Data Encryption (TDE) é um recurso utilizado para criptografar os dados armazenados em disco no SQL Server  
-A criptografia ocorre de forma transparente para aplicações e usuários, sem necessidade de alterações no código  
+A criptografia ocorre de forma transparente para aplicações e usuários, sem necessidade de alterações no código
 
-### Objetivo  
-- Proteger dados em repouso  
-- Evitar acesso indevido a arquivos físicos  
-- Atender requisitos de segurança e compliance  
+### Objetivo
 
----
-
-## 2 – Funcionamento  
-
-O TDE realiza a criptografia no nível de página antes da gravação em disco e descriptografa durante a leitura  
-
-### Características  
-- Criptografia aplicada em arquivos de dados (MDF / NDF)  
-- Criptografia aplicada no arquivo de log (LDF)  
-- Criptografia aplicada em backups  
-- Transparente para aplicações  
-- Não criptografa dados em trânsito  
-
-### Disponibilidade  
-- SQL Server 2008+  
-- Enterprise (inicialmente)  
-- Standard a partir de 2016  
-
-### Impacto  
-- Pequeno overhead de CPU  
-- Baixo impacto em I/O  
-- Sem impacto na aplicação  
+- Proteger dados em repouso
+- Evitar acesso indevido a arquivos físicos
+- Atender requisitos de segurança e compliance
 
 ---
 
-## 3 – Arquitetura Interna – Encryption Hierarchy  
+## 2 - Funcionamento
 
-### Cadeia de criptografia  
+O TDE realiza a criptografia no nível de página antes da gravação em disco e descriptografa durante a leitura
 
-1. DPAPI (Windows)  
-2. Service Master Key (SMK)  
-3. Database Master Key (DMK)  
-4. Certificado  
-5. Database Encryption Key (DEK)  
+### Características
+
+- Criptografia aplicada em arquivos de dados (MDF / NDF)
+- Criptografia aplicada no arquivo de log (LDF)
+- Criptografia aplicada em backups
+- Transparente para aplicações
+- Não criptografa dados em trânsito
+
+### Disponibilidade
+
+- SQL Server 2008+
+- Enterprise (inicialmente)
+- Standard a partir de 2016
+
+### Impacto
+
+- Pequeno overhead de CPU
+- Baixo impacto em I/O
+- Sem impacto na aplicação
 
 ---
+
+## 3 - Arquitetura interna - Encryption Hierarchy
+
+### Cadeia de criptografia
+
+1. DPAPI (Windows)
+2. Service Master Key (SMK)
+3. Database Master Key (DMK)
+4. Certificado
+5. Database Encryption Key (DEK)
 
 ### Fluxo de criptografia (visão hierárquica)
 
@@ -83,176 +86,156 @@ O TDE realiza a criptografia no nível de página antes da gravação em disco e
    ↓  
 5. Database Encryption Key (DEK)  
    ↓  
-6. Dados (MDF / NDF / LDF / Backups)  
+6. Dados (MDF / NDF / LDF / Backups)
+
+### Explicação do fluxo
+
+- DPAPI (Windows)
+  - Protege a Service Master Key
+  - Vinculada ao sistema operacional
+
+- Service Master Key (SMK)
+  - Criada automaticamente
+  - Protegida pelo DPAPI
+
+- Database Master Key (DMK)
+  - Protege certificados e chaves
+
+- Certificado
+  - Protege a DEK
+  - SQL Server atua como CA (Certificate Authority)
+
+- Database Encryption Key (DEK)
+  - Chave simétrica que criptografa os dados
+  - Utiliza AES
+
+- Dados
+  - MDF, NDF, LDF e backups
+
+### Observações
+
+- O SQL Server atua como CA (Certificate Authority)
+  - CA é responsável por emitir e gerenciar certificados
+  - Pode ser interna (SQL Server) ou externa
+- Hierarquia protege contra exposição direta
+- Múltiplas camadas aumentam segurança
+- Certificados são protegidos pela DMK
+- **Perda do certificado = perda do banco**
 
 ---
 
-### Explicação do fluxo  
+## 4 - Tipos de chave envolvidos
 
-- DPAPI (Windows)  
-  - Protege a Service Master Key  
-  - Vinculada ao sistema operacional  
+- Chave simétrica (DEK - Database Encryption Key)
+  - Utilizada para criptografar os dados do banco
+  - Alta performance para operações de leitura e escrita
+  - Utiliza algoritmos eficientes como AES
 
-- Service Master Key (SMK)  
-  - Criada automaticamente  
-  - Protegida pelo DPAPI  
+  Observação:
+  - Utiliza a mesma chave para criptografar e descriptografar
+  - É ideal para grandes volumes de dados devido ao baixo custo computacional
 
-- Database Master Key (DMK)  
-  - Protege certificados e chaves  
+### Sobre criptografia simétrica
 
-- Certificado  
-  - Protege a DEK  
-  - SQL Server atua como CA (Certificate Authority)  
+- A alta performance da DEK ocorre porque utiliza algoritmos como AES (Advanced Encryption Standard)
+- O AES é um algoritmo de criptografia simétrica amplamente utilizado no mercado
 
-- Database Encryption Key (DEK)  
-  - Chave simétrica que criptografa os dados  
-  - Utiliza AES  
+  - Trabalha com blocos de dados (block cipher)
+  - Suporta tamanhos de chave: 128, 192 e 256 bits
+  - É considerado seguro, eficiente e padrão de mercado
 
-- Dados  
-  - MDF, NDF, LDF e backups  
+- No SQL Server, os algoritmos disponíveis incluem:
 
----
+  - AES_128
+  - AES_192
+  - AES_256 (mais recomendado)
+  - TRIPLE_DES (menos recomendado – legado)
 
-### Observações  
+- A criptografia simétrica é mais rápida porque:
 
-- O SQL Server atua como CA (Certificate Authority)  
-  - CA é responsável por emitir e gerenciar certificados  
-  - Pode ser interna (SQL Server) ou externa  
-- Hierarquia protege contra exposição direta  
-- Múltiplas camadas aumentam segurança  
-- Certificados são protegidos pela DMK  
-- **Perda do certificado = perda do banco** 
+  - Utiliza uma única chave
+  - Possui menor overhead computacional
+  - É otimizada para operações contínuas de I/O
 
----
+- Certificado (criptografia assimétrica)
 
-## 4 – Tipos de chave envolvidos  
+  - Utilizado para proteger (criptografar) a DEK
+  - Baseado em criptografia assimétrica (par de chaves)
 
-- Chave simétrica (DEK – Database Encryption Key)  
-  - Utilizada para criptografar os dados do banco  
-  - Alta performance para operações de leitura e escrita  
-  - Utiliza algoritmos eficientes como AES  
+  - Estrutura:
 
-  Observação:  
-  - Utiliza a mesma chave para criptografar e descriptografar  
-  - É ideal para grandes volumes de dados devido ao baixo custo computacional  
+    - Chave pública → utilizada para criptografar
+    - Chave privada → utilizada para descriptografar
 
+  - A chave privada é o elemento crítico para acesso aos dados
+  - Sem ela, não é possível recuperar a DEK e, consequentemente, os dados
 
+  Observação:
 
-### Sobre criptografia simétrica  
+  - Criptografia assimétrica possui maior custo computacional
+  - Por isso, não é utilizada diretamente nos dados
+  - É usada apenas para proteger chaves menores (como a DEK)
 
-- A alta performance da DEK ocorre porque utiliza algoritmos como AES (Advanced Encryption Standard)  
-- O AES é um algoritmo de criptografia simétrica amplamente utilizado no mercado  
+### Sobre criptografia assimétrica
 
-  - Trabalha com blocos de dados (block cipher)  
-  - Suporta tamanhos de chave: 128, 192 e 256 bits  
-  - É considerado seguro, eficiente e padrão de mercado  
+- Baseada em dois elementos matematicamente relacionados (chave pública e privada)
 
-- No SQL Server, os algoritmos disponíveis incluem:  
+- Vantagens:
+  - Maior segurança no armazenamento e distribuição de chaves
+  - Permite separar quem criptografa de quem descriptografa
 
-  - AES_128  
-  - AES_192  
-  - AES_256 (mais recomendado)  
-  - TRIPLE_DES (menos recomendado – legado)  
+- Desvantagens:
+  - Mais lenta que criptografia simétrica
+  - Não escalável para grandes volumes de dados
 
-- A criptografia simétrica é mais rápida porque:  
+### Relação entre as chaves (visão arquitetural)
 
-  - Utiliza uma única chave  
-  - Possui menor overhead computacional  
-  - É otimizada para operações contínuas de I/O  
+O TDE combina os dois modelos para equilibrar performance e segurança
 
----
+- A DEK (simétrica):
+  - Responsável por criptografar os dados
+  - Otimizada para performance
 
-- Certificado (criptografia assimétrica)  
+- O certificado (assimétrico):
+  - Responsável por proteger a DEK
+  - Focado em segurança
 
-  - Utilizado para proteger (criptografar) a DEK  
-  - Baseado em criptografia assimétrica (par de chaves)  
+### Conclusão
 
-  - Estrutura:  
-
-    - Chave pública → utilizada para criptografar  
-    - Chave privada → utilizada para descriptografar  
-
-  - A chave privada é o elemento crítico para acesso aos dados  
-  - Sem ela, não é possível recuperar a DEK e, consequentemente, os dados  
-
-  Observação:  
-
-  - Criptografia assimétrica possui maior custo computacional  
-  - Por isso, não é utilizada diretamente nos dados  
-  - É usada apenas para proteger chaves menores (como a DEK)  
-
----
-
-### Sobre criptografia assimétrica  
-
-- Baseada em dois elementos matematicamente relacionados (chave pública e privada)  
-
-- Vantagens:  
-  - Maior segurança no armazenamento e distribuição de chaves  
-  - Permite separar quem criptografa de quem descriptografa  
-
-- Desvantagens:  
-  - Mais lenta que criptografia simétrica  
-  - Não escalável para grandes volumes de dados  
-
----
-
-### Relação entre as chaves (visão arquitetural)  
-
-O TDE combina os dois modelos para equilibrar performance e segurança  
-
-- A DEK (simétrica):  
-  - Responsável por criptografar os dados  
-  - Otimizada para performance  
-
-- O certificado (assimétrico):  
-  - Responsável por proteger a DEK  
-  - Focado em segurança  
-
----
-
-### Conclusão  
-
-- Criptografia simétrica → usada onde há volume e performance  
-- Criptografia assimétrica → usada onde há necessidade de proteção da chave  
+- Criptografia simétrica → usada onde há volume e performance
+- Criptografia assimétrica → usada onde há necessidade de proteção da chave
 
 Essa combinação permite que o TDE seja:
 
-- Seguro  
-- Performático  
-- Escalável   
+- Seguro
+- Performático
+- Escalável
 
 ---
 
-## 5 – Habilitando TDE  
+## 5 - Habilitando TDE
 
-### Sequência  
+### Sequência
 
-1. Criar DMK  
-2. Criar certificado  
-3. Criar DEK  
-4. Ativar criptografia  
+1. Criar DMK
+2. Criar certificado
+3. Criar DEK
+4. Ativar criptografia
 
----
-
-### 5.1 – Criar Database Master Key  
+### 5.1 - Criar Database Master Key
 
 ```sql
 CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Password';
 ```
 
----
-
-### 5.2 – Criar certificado  
+### 5.2 - Criar certificado
 
 ```sql
 CREATE CERTIFICATE DBCriptCert
 WITH SUBJECT = 'certificado para DBScript';
 ```
 
----
-
-### 5.3 – Criar Database Encryption Key  
+### 5.3 - Criar Database Encryption Key
 
 ```sql
 CREATE DATABASE ENCRYPTION KEY
@@ -260,9 +243,7 @@ WITH ALGORITHM = AES_128
 ENCRYPTION BY SERVER CERTIFICATE DBCriptCert;
 ```
 
----
-
-### 5.4 – Habilitar criptografia  
+### 5.4 - Habilitar criptografia
 
 ```sql
 ALTER DATABASE DBScript
@@ -271,9 +252,9 @@ SET ENCRYPTION ON;
 
 ---
 
-## 6 – Backup do Certificado (CRÍTICO)  
+## 6 - Backup do certificado (CRÍTICO)
 
-### Exportar  
+### Exportar
 
 ```sql
 BACKUP CERTIFICATE DBCriptCert
@@ -284,9 +265,7 @@ WITH PRIVATE KEY (
 );
 ```
 
----
-
-### Importar  
+### Importar
 
 ```sql
 CREATE CERTIFICATE DBCriptCert
@@ -297,105 +276,90 @@ WITH PRIVATE KEY (
 );
 ```
 
----
+### Restore
 
-### Restore  
-
-- Restaurar normalmente após importar certificado  
+- Restaurar normalmente após importar certificado
 
 ---
 
-## 7 – Erro comum  
+## 7 - Erro comum
 
 Ao tentar restaurar um banco de dados protegido com TDE em outro servidor, pode ocorrer o seguinte erro:
-```sql
-Msg 33111, Level 16, State 3, Line 66  
+
+```text
+Msg 33111, Level 16, State 3, Line 66
 Cannot find server certificate with thumbprint...
 ```
----
 
-### Causa  
+### Causa
 
 Esse erro ocorre quando o SQL Server não encontra o certificado utilizado para proteger a Database Encryption Key (DEK)  
-Como o TDE utiliza uma cadeia de criptografia, o banco de dados não pode ser acessado sem o certificado correspondente  
+Como o TDE utiliza uma cadeia de criptografia, o banco de dados não pode ser acessado sem o certificado correspondente
 
----
+### Explicação técnica
 
-### Explicação técnica  
+- A DEK está armazenada dentro do banco de dados
+- Porém, ela está criptografada pelo certificado
+- Durante o restore, o SQL Server tenta descriptografar a DEK
+- Se o certificado não existir no servidor destino, o processo falha
 
-- A DEK está armazenada dentro do banco de dados  
-- Porém, ela está criptografada pelo certificado  
-- Durante o restore, o SQL Server tenta descriptografar a DEK  
-- Se o certificado não existir no servidor destino, o processo falha  
+### Cenário típico
 
----
+- Backup realizado em um servidor origem com TDE habilitado
+- Restore sendo executado em outro servidor
+- Certificado não foi exportado/importado
 
-### Cenário típico  
-
-- Backup realizado em um servidor origem com TDE habilitado  
-- Restore sendo executado em outro servidor  
-- Certificado não foi exportado/importado  
-
----
-
-### Como resolver  
+### Como resolver
 
 1. Exportar o certificado no servidor de origem:
 
 ```sql
-    BACKUP CERTIFICATE DBCriptCert  
-    TO FILE = 'C:\certificados\DBCriptCert.cer'  
-    WITH PRIVATE KEY (  
-        FILE = 'C:\certificados\DBCriptCert.key',  
-        ENCRYPTION BY PASSWORD = 'password'  
-    );
-```  
+BACKUP CERTIFICATE DBCriptCert
+TO FILE = 'C:\certificados\DBCriptCert.cer'
+WITH PRIVATE KEY (
+    FILE = 'C:\certificados\DBCriptCert.key',
+    ENCRYPTION BY PASSWORD = 'password'
+);
+```
 
 2. Importar o certificado no servidor destino:
 
-
 ```sql
-    CREATE CERTIFICATE DBCriptCert  
-    FROM FILE = 'C:\certificados\DBCriptCert.cer'  
-    WITH PRIVATE KEY (  
-        FILE = 'C:\certificados\DBCriptCert.key',  
-        DECRYPTION BY PASSWORD = 'password'  
-    );
-```  
+CREATE CERTIFICATE DBCriptCert
+FROM FILE = 'C:\certificados\DBCriptCert.cer'
+WITH PRIVATE KEY (
+    FILE = 'C:\certificados\DBCriptCert.key',
+    DECRYPTION BY PASSWORD = 'password'
+);
+```
 
-3. Realizar o restore normalmente após a importação  
+3. Realizar o restore normalmente após a importação
 
----
+### Boas práticas para evitar o erro
 
-### Boas práticas para evitar o erro  
+- Sempre realizar backup do certificado imediatamente após sua criação
+- Armazenar os arquivos (.cer e .key) em local seguro
+- Documentar o processo de recuperação
+- Testar restore em ambiente de homologação
 
-- Sempre realizar backup do certificado imediatamente após sua criação  
-- Armazenar os arquivos (.cer e .key) em local seguro  
-- Documentar o processo de recuperação  
-- Testar restore em ambiente de homologação  
+### Observação crítica
 
----
-
-### Observação crítica  
-
-- Sem o certificado (e sua chave privada), o banco de dados é irrecuperável  
-- Não existe workaround ou bypass para esse cenário  
-- Esse é um dos principais riscos operacionais ao utilizar TDE  
+- Sem o certificado (e sua chave privada), o banco de dados é irrecuperável
+- Não existe workaround ou bypass para esse cenário
+- Esse é um dos principais riscos operacionais ao utilizar TDE
 
 ---
 
-## 8 – Monitoramento  
+## 8 - Monitoramento
 
-O status da criptografia pode ser acompanhado através de Dynamic Management Views (DMVs) do SQL Server  
+O status da criptografia pode ser acompanhado através de Dynamic Management Views (DMVs) do SQL Server
 
----
-
-### Principal DMV  
+### Principal DMV
 
 - sys.dm_database_encryption_keys
 
 ```sql
-SELECT 
+SELECT
     db_name(database_id) AS database_name,
     encryption_state,
     percent_complete,
@@ -404,77 +368,82 @@ SELECT
 FROM sys.dm_database_encryption_keys;
 ```
 
----
+### Interpretação do encryption_state
 
-### Interpretação do encryption_state  
+- 0 → No database encryption key present
+- 1 → Unencrypted
+- 2 → Encryption in progress
+- 3 → Encrypted
+- 4 → Key change in progress
+- 5 → Decryption in progress
+- 6 → Protection change in progress
 
-- 0 → No database encryption key present  
-- 1 → Unencrypted  
-- 2 → Encryption in progress  
-- 3 → Encrypted  
-- 4 → Key change in progress  
-- 5 → Decryption in progress  
-- 6 → Protection change in progress  
+### Uso prático
 
----
-
-### Uso prático  
-
-- Acompanhar o progresso da criptografia inicial  
-- Verificar se o banco está realmente criptografado  
-- Identificar operações de criptografia ou descriptografia em andamento  
-- Validar o algoritmo utilizado (ex: AES_128, AES_256)  
+- Acompanhar o progresso da criptografia inicial
+- Verificar se o banco está realmente criptografado
+- Identificar operações de criptografia ou descriptografia em andamento
+- Validar o algoritmo utilizado (ex: AES_128, AES_256)
 
 ---
 
-## 9 – Impactos e considerações operacionais do TDE
+## 9 - Impactos e considerações operacionais do TDE
 
-### Impactos  
+### Impactos
 
-- CPU adicional  
-- Tempo inicial de criptografia  
-- Impacto em backup  
+- CPU adicional
+- Tempo inicial de criptografia
+- Impacto em backup
 
-### Considerações  
+### Considerações
 
-- Não protege memória  
-- Não protege dados em trânsito  
-- Não substitui criptografia de aplicação  
-
----
-
-## 10 – Boas práticas  
-
-- Backup imediato do certificado  
-- Armazenar .cer e .key com segurança  
-- Testar restore  
-- Utilizar AES  
-- Documentar processo  
-- Criar em homologação  
-- Usar o mesmo certificado entre servidores  
+- Não protege memória
+- Não protege dados em trânsito
+- Não substitui criptografia de aplicação
 
 ---
 
-## 12 – Relação com LGPD  
+## 10 - Boas práticas
 
-O uso do TDE contribui diretamente para práticas de segurança exigidas pela LGPD  
+- Backup imediato do certificado
+- Armazenar .cer e .key com segurança
+- Testar restore
+- Utilizar AES
+- Documentar processo
+- Criar em homologação
+- Usar o mesmo certificado entre servidores
 
-### Princípios relacionados  
+---
 
-- Segurança  
-  - Proteção contra acessos não autorizados  
+## 11 - Relação com LGPD
 
-- Prevenção  
-  - Redução de risco de vazamento de dados  
+O uso do TDE contribui diretamente para práticas de segurança exigidas pela LGPD
 
-- Responsabilização (accountability)  
-  - Demonstração de medidas técnicas de proteção  
+### Princípios relacionados
 
-### Importante  
+- Segurança
+  - Proteção contra acessos não autorizados
 
-- TDE não é suficiente sozinho para LGPD  
+- Prevenção
+  - Redução de risco de vazamento de dados
+
+- Responsabilização (accountability)
+  - Demonstração de medidas técnicas de proteção
+
+### Importante
+
+- TDE não é suficiente sozinho para LGPD
 - Deve ser combinado com:
-  - Controle de acesso  
-  - Auditoria  
-  - Criptografia em trânsito  
-  - Políticas de segurança  
+  - Controle de acesso
+  - Auditoria
+  - Criptografia em trânsito
+  - Políticas de segurança
+
+---
+
+## Referências
+
+- [Transparent Data Encryption (TDE)](https://learn.microsoft.com/pt-br/sql/relational-databases/security/encryption/transparent-data-encryption?view=sql-server-ver16)
+- [BACKUP CERTIFICATE (Transact-SQL)](https://learn.microsoft.com/pt-br/sql/t-sql/statements/backup-certificate-transact-sql?view=sql-server-ver16)
+- [Mover um banco de dados protegido por TDE para outro SQL Server](https://learn.microsoft.com/pt-br/sql/relational-databases/security/encryption/move-a-tde-protected-database-to-another-sql-server?view=sql-server-ver16)
+- [sys.dm_database_encryption_keys (Transact-SQL)](https://learn.microsoft.com/pt-br/sql/relational-databases/system-dynamic-management-views/sys-dm-database-encryption-keys-transact-sql?view=sql-server-ver16)

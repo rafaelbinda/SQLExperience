@@ -1,8 +1,8 @@
 # A0018 – Database File Management and Maintenance
 
-Author: Rafael Binda  
-Created: 2026-03-29  
-Version: 1.0
+> **Author:** Rafael Binda  
+> **Created:** 2026-03-29  
+> **Version:** 1.0  
 
 ---
 
@@ -14,16 +14,16 @@ O foco é compreender como essas operações funcionam internamente, seus impact
 
 ---
 
-## Hands-on  
+## Hands-on
 
 [Q0014 - SQL Database File Management](../scripts/Q0014-sql-database-file-management.sql)  
 [Q0015 - SQL Move Database File](../scripts/Q0015-sql-move-database-file.sql)  
 [INST-Q0007 - SQL Database Files Space Usage](../../../dba-scripts/SQL-instance-information/INST-Q0007-database-files-space-usage.sql)  
-[INST-Q0008 - SQL Virtual Log File Overview](../../../dba-scripts/SQL-instance-information/INST-Q0008-log-vlf-overview.sql)  
+[INST-Q0008 - SQL Virtual Log File Overview](../../../dba-scripts/SQL-instance-information/INST-Q0008-log-vlf-overview.sql)
 
 ---
 
-## 1.0 - Reduzindo o tamanho dos arquivos de dados
+## 1 - Reduzindo o tamanho dos arquivos de dados
 
 ### 1.1 - DBCC SHRINKDATABASE
 
@@ -60,8 +60,6 @@ O SHRINK deve ser uma operação **pontual**, executada apenas quando realmente 
 
 Embora o comando não apague dados, ele pode causar fragmentação e gerar impacto de desempenho, principalmente em arquivos de dados
 
----
-
 ### 1.2 - AUTO_SHRINK
 
 - A propriedade `AUTO_SHRINK` executa uma lógica semelhante ao `DBCC SHRINKDATABASE`
@@ -90,8 +88,6 @@ Embora o comando não apague dados, ele pode causar fragmentação e gerar impac
 
 - Para **arquivo de dados**, é mais raro haver necessidade
 - Para **arquivo de log**, a necessidade é mais comum
-
----
 
 ### 1.3 - DBCC SHRINKFILE
 
@@ -150,7 +146,7 @@ O `EMPTYFILE` não se aplica a arquivo de log
 
 ---
 
-## 2.0 - Reduzindo o tamanho dos arquivos de log
+## 2 - Reduzindo o tamanho dos arquivos de log
 
 ### 2.1 - DBCC SHRINKFILE para arquivos de log
 
@@ -165,8 +161,6 @@ Exemplo:
 ```sql
 DBCC SHRINKFILE (N'ExamplesDBFG_Log', 1000)
 ```
-
----
 
 ### 2.2 - Entendendo a limitação do shrink no log
 
@@ -192,8 +186,6 @@ Por isso:
 
 Ou seja, o shrink do log depende diretamente da posição do **MINLSN** e da parte ativa do log
 
----
-
 ### 2.3 - Fluxo conceitual do shrink em log
 
 Em um cenário simplificado:
@@ -206,8 +198,6 @@ Em um cenário simplificado:
 6. Após truncamento do log, pode surgir mais espaço elegível para shrink
 7. Pode ser necessário executar o shrink novamente
 
----
-
 ### 2.4 - O que pode impedir a redução do log
 
 Mesmo após executar shrink, o log pode continuar grande por vários motivos:
@@ -217,8 +207,6 @@ Mesmo após executar shrink, o log pode continuar grande por vários motivos:
 - Replicação
 - Always On Availability Groups
 - Outros recursos que dependem da retenção do log
-
----
 
 ### 2.5 - Importante sobre Recovery Model
 
@@ -231,7 +219,7 @@ Após essa alteração, os backups de log anteriores deixam de compor uma sequê
 
 ---
 
-## 3.0 - Aumentando o tamanho de arquivos
+## 3 - Aumentando o tamanho de arquivos
 
 ### 3.1 - Aumentar manualmente o tamanho de um arquivo
 
@@ -251,8 +239,6 @@ MODIFY FILE
 #### Observação
 
 Essa operação é usada quando se deseja crescimento controlado, evitando múltiplos autogrowths pequenos
-
----
 
 ### 3.2 - Criando um novo arquivo
 
@@ -280,7 +266,7 @@ ADD FILE
 
 ---
 
-## 4.0 - Alterando a localização de arquivos
+## 4 - Alterando a localização de arquivos
 
 ### 4.1 - Alterando a localização de arquivo de dados ou log
 
@@ -291,8 +277,6 @@ A alteração da localização física de arquivos gera indisponibilidade e exig
 - Falta de espaço em disco em determinado volume
 - Reorganização do storage
 - Posicionamento em volumes diferentes para melhorar I/O
-
----
 
 ### 4.2 - Passo a passo conceitual para mover um arquivo
 
@@ -340,7 +324,7 @@ SET ONLINE;
 
 ---
 
-## 5.0 - Observações finais
+## 5 - Observações finais
 
 - Operações de SHRINK devem ser exceção, não rotina
 - `AUTO_SHRINK` normalmente deve permanecer desabilitado
@@ -348,3 +332,12 @@ SET ONLINE;
 - Em arquivos de log, o shrink depende da posição da porção ativa
 - Antes de reduzir log, é fundamental entender o motivo do crescimento
 - Antes de mover arquivos, é importante validar dependências, janela de manutenção e estratégia de rollback
+
+---
+
+## Referências
+
+- [DBCC SHRINKDATABASE (Transact-SQL)](https://learn.microsoft.com/pt-br/sql/t-sql/database-console-commands/dbcc-shrinkdatabase-transact-sql?view=sql-server-ver16)
+- [DBCC SHRINKFILE (Transact-SQL)](https://learn.microsoft.com/pt-br/sql/t-sql/database-console-commands/dbcc-shrinkfile-transact-sql?view=sql-server-ver16)
+- [ALTER DATABASE (Transact-SQL) – Opções de arquivo e filegroup](https://learn.microsoft.com/pt-br/sql/t-sql/statements/alter-database-transact-sql-file-and-filegroup-options?view=sql-server-ver16)
+- [Mover bancos de dados de usuário](https://learn.microsoft.com/pt-br/sql/relational-databases/databases/move-user-databases?view=sql-server-ver16)
