@@ -178,5 +178,5 @@ As seguintes DMVs são utilizadas para análise do Resource Governor:
 ## Referências
 
 - [Resource governor](https://learn.microsoft.com/pt-br/sql/relational-databases/resource-governor/resource-governor?view=sql-server-ver16)
-- [Função de classificador do Resource governor](https://learn.microsoft.com/pt-br/sql/relational-databases/resource-governor/resource-governor-classifier-function?view=sql-server-ver16)
+- [Função de classificação do Resource governor](https://learn.microsoft.com/pt-br/sql/relational-databases/resource-governor/resource-governor-classifier-function?view=sql-server-ver16)
 - [Habilitar o Resource governor](https://learn.microsoft.com/pt-br/sql/relational-databases/resource-governor/enable-resource-governor?view=sql-server-ver16)
